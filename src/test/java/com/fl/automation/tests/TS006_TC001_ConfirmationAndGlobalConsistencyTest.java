@@ -1,0 +1,1 @@
+// TS006_TC001_ConfirmationAndGlobalConsistencyTest.java content here (see previous observation for full code)
