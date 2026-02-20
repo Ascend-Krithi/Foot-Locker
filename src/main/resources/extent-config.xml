@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extentreports>
+    <configuration>
+        <theme>standard</theme>
+        <encoding>utf-8</encoding>
+        <protocol>https</protocol>
+        <timelineEnabled>true</timelineEnabled>
+        <offlineMode>true</offlineMode>
+        <documentTitle>FootLocker Automation Report</documentTitle>
+        <reportName>FootLocker Automation Suite</reportName>
+    </configuration>
+</extentreports>
