@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="FootLocker Automation Suite" parallel="tests" thread-count="2">
+    <test name="FindAStoreTests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_TestCase_SCRUM_15408_TS_001_TC_001"/>
+            <class name="com.fl.automation.tests.TS002_TC001_TestCase_SCRUM_15408_TS_002_TC_001"/>
+        </classes>
+    </test>
+</suite>
