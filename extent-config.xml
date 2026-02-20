@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extentreports>
+    <configuration>
+        <encoding>UTF-8</encoding>
+        <protocol>HTTPS</protocol>
+        <theme>standard</theme>
+        <documentTitle>FootLocker FindAStore Automation Report</documentTitle>
+        <reportName>FootLocker FindAStore Test Results</reportName>
+        <timeStampFormat>MMM dd, yyyy HH:mm:ss</timeStampFormat>
+    </configuration>
+</extentreports>
