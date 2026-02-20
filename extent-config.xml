@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extentreports>
+    <configuration>
+        <reportName>FootLocker Store Locator Automation</reportName>
+        <theme>standard</theme>
+        <encoding>utf-8</encoding>
+        <protocol>HTTPS</protocol>
+        <documentTitle>FootLocker Store Locator Test Report</documentTitle>
+        <timelineEnabled>true</timelineEnabled>
+    </configuration>
+</extentreports>
