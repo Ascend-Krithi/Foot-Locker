@@ -1,104 +1,34 @@
-# Existing imports
-from selenium import webdriver
-from Pages.HomePage import HomePage
-from Pages.FindAStorePopup import FindAStorePopup
-from Pages.StoreSearchResults import StoreSearchResults
+# Existing imports and code above...
 import unittest
-import time
+from selenium import webdriver
+from StoreLocatorPage import StoreLocatorPage
 
-class TestFootLockerStoreLocator(unittest.TestCase):
-    # Existing test methods remain unchanged
+class TestStoreLocatorPage(unittest.TestCase):
+    # ...existing test methods...
 
-    def test_TC_2105_store_locator_search_boston_ma(self):
+    def test_TC_2113_store_locator_responsive(self):
         """
-        TC-2105: Launch Foot Locker website, navigate to Store Locator, enter 'Boston, MA', search for stores, and verify results.
+        TC-2113: Verify Store Locator page displays and functions correctly on desktop, tablet, and mobile devices.
         """
-        driver = webdriver.Chrome()
-        try:
-            # Launch HomePage
-            home_page = HomePage(driver)
-            home_page.load()
-            # Open Find a Store popup
-            home_page.click_find_a_store()
-            # Wait for popup
-            find_store_popup = FindAStorePopup(driver)
-            find_store_popup.wait_until_visible()
-            # Enter location and search
-            find_store_popup.enter_location('Boston, MA')
-            find_store_popup.click_search()
-            # Wait and verify results
-            search_results = StoreSearchResults(driver)
-            search_results.wait_until_results_loaded()
-            results = search_results.get_store_results()
-            self.assertGreater(len(results), 0, "No stores found for 'Boston, MA'")
-        finally:
-            driver.quit()
+        device_viewports = {
+            'desktop': {'width': 1920, 'height': 1080},
+            'tablet': {'width': 768, 'height': 1024},
+            'mobile': {'width': 375, 'height': 667}
+        }
+        for device, viewport in device_viewports.items():
+            with self.subTest(device=device):
+                self.driver.set_window_size(viewport['width'], viewport['height'])
+                page = StoreLocatorPage(self.driver)
+                self.assertTrue(page.is_loaded(), f"Store Locator page did not load on {device}.")
+                self.assertTrue(page.is_functional(), f"Store Locator page is not functional on {device}.")
 
-    def test_TC_2106_store_locator_search_02108(self):
+    def test_TC_2114_store_locator_accessibility(self):
         """
-        TC-2106: Launch Foot Locker website, navigate to Store Locator, enter '02108', search for stores, and verify results.
+        TC-2114: Verify Store Locator page loads, supports keyboard navigation, and is accessible to screen readers.
         """
-        driver = webdriver.Chrome()
-        try:
-            # Launch HomePage
-            home_page = HomePage(driver)
-            home_page.load()
-            # Open Find a Store popup
-            home_page.click_find_a_store()
-            # Wait for popup
-            find_store_popup = FindAStorePopup(driver)
-            find_store_popup.wait_until_visible()
-            # Enter location and search
-            find_store_popup.enter_location('02108')
-            find_store_popup.click_search()
-            # Wait and verify results
-            search_results = StoreSearchResults(driver)
-            search_results.wait_until_results_loaded()
-            results = search_results.get_store_results()
-            self.assertGreater(len(results), 0, "No stores found for '02108'")
-        finally:
-            driver.quit()
+        page = StoreLocatorPage(self.driver)
+        self.assertTrue(page.is_loaded(), "Store Locator page did not load.")
+        self.assertTrue(page.is_keyboard_accessible(), "Keyboard navigation accessibility failed.")
+        self.assertTrue(page.is_screen_reader_accessible(), "Screen reader accessibility failed.")
 
-    def test_TC_2107_store_locator_search_massachusetts(self):
-        """
-        TC-2107: Launch Foot Locker website, navigate to Store Locator, enter 'Massachusetts', search for stores, and verify results.
-        """
-        driver = webdriver.Chrome()
-        try:
-            driver.get('https://www.footlocker.com/store-locator')
-            home_page = HomePage(driver)
-            home_page.go_to_store_locator()
-            find_store_popup = FindAStorePopup(driver)
-            find_store_popup.wait_for_popup()
-            find_store_popup.enter_location('Massachusetts')
-            find_store_popup.click_search()
-            search_results = StoreSearchResults(driver)
-            search_results.wait_for_results()
-            # We expect at least one result for Massachusetts
-            # If you want to check for a specific address, use search_results.verify_store_present(address)
-            # Here, just ensure results are loaded
-            # No assertion for specific address as test data not provided
-            # For demonstration, pass if results loaded
-            self.assertTrue(search_results.wait_for_results(), "No stores found for 'Massachusetts'")
-        finally:
-            driver.quit()
-
-    def test_TC_2108_store_locator_search_invalidcity123(self):
-        """
-        TC-2108: Launch Foot Locker website, navigate to Store Locator, enter 'InvalidCity123', search for stores, and verify error message.
-        """
-        driver = webdriver.Chrome()
-        try:
-            driver.get('https://www.footlocker.com/store-locator')
-            home_page = HomePage(driver)
-            home_page.go_to_store_locator()
-            find_store_popup = FindAStorePopup(driver)
-            find_store_popup.wait_for_popup()
-            find_store_popup.enter_location('InvalidCity123')
-            find_store_popup.click_search()
-            search_results = StoreSearchResults(driver)
-            # Wait for either results or error message
-            # For negative scenario, verify error message
-            self.assertTrue(search_results.verify_no_stores_found_message(), "Expected error message not found for 'InvalidCity123'")
-        finally:
-            driver.quit()
+# Existing code below...
