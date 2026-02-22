@@ -47,3 +47,39 @@ def test_case_2102(driver):
     # driver.get('https://www.footlocker.com/')
     homepage = HomepagePage(driver)
     homepage.verify_store_persistence('375 Washington Street, Boston, MA 02108')
+
+
+def test_case_2105(driver):
+    """
+    TestCaseId: 2105
+    Description: Launch Store Locator, search by city/state, verify results.
+    Steps:
+        1. Launch Store Locator page (https://www.footlocker.com/store-locator)
+        2. Enter 'Boston, MA' in Location textbox
+        3. Click 'Search for Stores'
+        4. Assert store results are displayed
+    """
+    from Pages.HomepagePage import HomepagePage
+    homepage = HomepagePage(driver)
+    homepage.launch_store_locator_page()
+    homepage.enter_location_and_search('Boston, MA')
+    results = homepage.get_store_results()
+    assert results and 'Boston' in results, "Store results not displayed for 'Boston, MA'."
+
+
+def test_case_2106(driver):
+    """
+    TestCaseId: 2106
+    Description: Launch Store Locator, search by ZIP code, verify results.
+    Steps:
+        1. Launch Store Locator page (https://www.footlocker.com/store-locator)
+        2. Enter '02108' in Location textbox
+        3. Click 'Search for Stores'
+        4. Assert store results are displayed
+    """
+    from Pages.HomepagePage import HomepagePage
+    homepage = HomepagePage(driver)
+    homepage.launch_store_locator_page()
+    homepage.enter_location_and_search('02108')
+    results = homepage.get_store_results()
+    assert results and '02108' in results, "Store results not displayed for '02108'."
