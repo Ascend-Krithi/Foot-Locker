@@ -10,6 +10,16 @@ class StoreLocatorPopup:
         with open(os.path.join(os.path.dirname(__file__), '../Locators.json')) as f:
             self.locators = json.load(f)
 
+    def navigate_to_store_locator(self, url='https://www.footlocker.com/store-locator'):
+        self.driver.get(url)
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((
+                getattr(By, self.locators['store_locator_page']['by'].upper()),
+                self.locators['store_locator_page']['value']
+            ))
+        )
+        return True
+
     def wait_for_popup(self):
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((
