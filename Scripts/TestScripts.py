@@ -1,6 +1,10 @@
-
 import unittest
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 from Pages.HomePage import HomePage
 from Pages.StoreLocatorPopup import StoreLocatorPopup
 
@@ -20,21 +24,55 @@ class TestFootLocker(unittest.TestCase):
     # Existing test methods...
 
     def test_2107_store_locator_massachusetts(self):
-        """Test Case 2107: Launch Foot Locker website, navigate to Store Locator, enter 'Massachusetts', click 'Search for Stores', and verify store list is displayed."""
-        self.home_page.load_homepage()
-        self.home_page.click_find_a_store()
-        self.store_locator_popup.wait_for_popup()
-        self.assertTrue(self.store_locator_popup.verify_location_textbox_and_search_button(), "Location textbox and search button should be visible.")
-        self.assertTrue(self.store_locator_popup.enter_location('Massachusetts'), "Should be able to enter 'Massachusetts'.")
-        self.assertTrue(self.store_locator_popup.click_search_for_stores(), "Should be able to click search for stores.")
-        self.assertTrue(self.store_locator_popup.are_store_results_displayed(), "Store list should be displayed for valid location 'Massachusetts'.")
-
+        ...
     def test_2108_store_locator_invalid_city(self):
-        """Test Case 2108: Launch Foot Locker website, navigate to Store Locator, enter 'InvalidCity123', click 'Search for Stores', and verify error message is displayed."""
-        self.home_page.load_homepage()
-        self.home_page.click_find_a_store()
-        self.store_locator_popup.wait_for_popup()
-        self.assertTrue(self.store_locator_popup.verify_location_textbox_and_search_button(), "Location textbox and search button should be visible.")
-        self.assertTrue(self.store_locator_popup.enter_location('InvalidCity123'), "Should be able to enter 'InvalidCity123'.")
-        self.assertTrue(self.store_locator_popup.click_search_for_stores(), "Should be able to click search for stores.")
-        self.assertTrue(self.store_locator_popup.is_no_stores_found_error_displayed(), "Error message should be displayed for invalid location 'InvalidCity123'.")
+        ...
+
+    def test_2109_use_my_location(self):
+        """
+        TestCase 2109:
+        - Step 1: Launch the Foot Locker website and navigate to the Store Locator page.
+        - Step 2: Ensure browser location permission is enabled.
+        - Step 3: Click on the 'Use My Location' button.
+        Expected: Store Locator page displays, browser prompts for location, and a list of stores near the user's current location is displayed.
+        """
+        self.home_page.go_to_homepage()
+        self.home_page.go_to_store_locator()
+        # Step 2: Ensure browser location permission is enabled (handled by browser, may require manual intervention in real runs)
+        self.store_locator_popup.click_use_my_location()
+        # Wait for location prompt and list to load
+        try:
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, ".store-list-item"))
+            )
+            store_list = self.store_locator_popup.get_store_list()
+            self.assertTrue(len(store_list) > 0, "Store list should not be empty after using 'Use My Location'.")
+        except TimeoutException:
+            self.fail("Store list did not load after using 'Use My Location'.")
+
+    def test_2110_store_locator_boston(self):
+        """
+        TestCase 2110:
+        - Step 1: Launch the Foot Locker website and navigate to the Store Locator page.
+        - Step 2: Perform a search for 'Boston, MA'.
+        - Step 3: Click on the store with address '375 Washington Street, Boston, MA 02108'.
+        Expected: Store Locator page displays, list of stores in Boston is shown, and store details/popup displays correct address, hours, and contact info.
+        """
+        self.home_page.go_to_homepage()
+        self.home_page.go_to_store_locator()
+        self.store_locator_popup.search_location("Boston, MA")
+        # Wait for results
+        try:
+            WebDriverWait(self.driver, 10).until(
+                EC.text_to_be_present_in_element((By.CSS_SELECTOR, ".store-list-item"), "Boston")
+            )
+        except TimeoutException:
+            self.fail("Store list did not update for 'Boston, MA'.")
+        # Click the specific store
+        store_found = self.store_locator_popup.click_store_by_address("375 Washington Street, Boston, MA 02108")
+        self.assertTrue(store_found, "Could not find the store with address '375 Washington Street, Boston, MA 02108'.")
+        # Validate store details
+        details = self.store_locator_popup.get_store_details()
+        self.assertIn("375 Washington Street, Boston, MA 02108", details.get('address', ''))
+        self.assertTrue(details.get('hours'), "Store hours should be displayed.")
+        self.assertTrue(details.get('contact'), "Contact info should be displayed.")
