@@ -69,32 +69,34 @@ class StoreLocatorPage:
         except NoSuchElementException:
             return False
 
-    def verify_store_address_visible(self, address):
+    def is_store_address_present_in_results(self, address):
         """
-        Verifies that the given store address is visible in the search results.
+        Checks if a store with the given address is present in the search results.
         Args:
-            address (str): The store address to verify (e.g., '375 Washington Street, Boston, MA 02108').
+            address (str): The address to search for.
         Returns:
-            bool: True if the address is visible, False otherwise.
+            bool: True if the address is found in the results, False otherwise.
         """
         try:
-            xpath = f"//div[contains(text(),'{address}')]")
-            element = self.driver.find_element(By.XPATH, xpath)
-            return element.is_displayed()
+            # Adjust the XPath if necessary to match the results structure
+            store_elements = self.driver.find_elements(By.XPATH, f"//div[contains(@class, 'store-address') and contains(text(), '{address}')]")
+            return any(address in elem.text for elem in store_elements)
         except NoSuchElementException:
             return False
 
-    def verify_exact_store_address(self, address):
+    def verify_store_address_exact_match(self, expected_address):
         """
-        Verifies that the store address in the results matches exactly with the expected address.
+        Verifies that a store address in the results matches exactly the expected address.
         Args:
-            address (str): The expected store address.
+            expected_address (str): The address to match.
         Returns:
-            bool: True if the address matches exactly, False otherwise.
+            bool: True if an exact match is found, False otherwise.
         """
         try:
-            xpath = f"//div[text()='{address}']"
-            element = self.driver.find_element(By.XPATH, xpath)
-            return element.is_displayed()
+            store_elements = self.driver.find_elements(By.XPATH, "//div[contains(@class, 'store-address')]")
+            for elem in store_elements:
+                if elem.text.strip() == expected_address.strip():
+                    return True
+            return False
         except NoSuchElementException:
             return False
