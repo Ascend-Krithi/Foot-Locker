@@ -1,62 +1,42 @@
+
 import pytest
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from PageClasses.HomePage import HomePage
+from PageClasses.FindAStorePopup import FindAStorePopup
+from PageClasses.StoreSearchResults import StoreSearchResults
 
-from Pages.HomePage import HomePage
-from Pages.FindAStorePopup import FindAStorePopup
-from Pages.StoreSearchResults import StoreSearchResults
+# Existing test methods...
 
-@pytest.fixture(scope='function')
-def driver():
-    driver = webdriver.Chrome()
-    yield driver
-    driver.quit()
+@pytest.mark.tc2093
+def test_tc2093_homepage_find_store_location_textbox(driver):
+    """Test Case 2093: Launch homepage, open Find a Store popup, verify location textbox."""
+    home_page = HomePage(driver)
+    home_page.launch()
+    assert home_page.is_loaded(), "Homepage did not load successfully."
 
-class TestStoreLocator:
-    # Existing methods...
+    find_store_popup = home_page.click_find_a_store()
+    assert find_store_popup.is_open(), "Find a Store popup did not open."
 
-    def test_TC_2093_location_textbox_enabled(self, driver):
-        """
-        Test Case - SCRUM-15408 TS-001 TC-002
-        Steps:
-        1. Launch the Foot Locker website and navigate to the homepage.
-        2. Click 'Find a Store' and then 'Select My Store'.
-        3. Check for the presence and enabled state of the Location textbox.
-        """
-        url = "https://www.footlocker.com/"
-        home_page = HomePage(driver)
-        home_page.load(url)
-        assert home_page.is_loaded(), "Homepage is not displayed."
-        home_page.click_find_a_store()
-        find_store_popup = FindAStorePopup(driver)
-        find_store_popup.click_select_my_store()
-        assert find_store_popup.is_popup_displayed(), "Store Locator Popup is not displayed."
-        assert find_store_popup.is_location_textbox_enabled(), "Location textbox is not visible and enabled for user input."
+    find_store_popup.click_select_my_store()
+    assert find_store_popup.is_location_textbox_visible(), "Location textbox is not visible."
+    assert find_store_popup.is_location_textbox_enabled(), "Location textbox is not enabled."
 
-    def test_TC_2094_search_boston_store(self, driver):
-        """
-        Test Case - SCRUM-15408 TS-001 TC-003
-        Steps:
-        1. Launch the Foot Locker website and navigate to the homepage.
-        2. Click 'Find a Store' and then 'Select My Store'.
-        3. Enter 'Boston, MA' in the Location textbox.
-        4. Click the 'Search for Stores' button.
-        5. Store results in or near Boston are displayed.
-        """
-        url = "https://www.footlocker.com/"
-        home_page = HomePage(driver)
-        home_page.load(url)
-        assert home_page.is_loaded(), "Homepage is not displayed."
-        home_page.click_find_a_store()
-        find_store_popup = FindAStorePopup(driver)
-        find_store_popup.click_select_my_store()
-        assert find_store_popup.is_popup_displayed(), "Store Locator Popup is not displayed."
-        find_store_popup.enter_location("Boston, MA")
-        find_store_popup.click_search_for_stores()
-        # After search, validate results are displayed
-        # Optionally, instantiate StoreSearchResults and check results
-        store_results = StoreSearchResults(driver)
-        # Here we check for at least one result for Boston
-        assert driver.find_elements(By.XPATH, "//div[contains(text(), 'Boston')]") != [], "Store results in or near Boston are not displayed."
+@pytest.mark.tc2094
+def test_tc2094_homepage_find_store_boston_search_results(driver):
+    """Test Case 2094: Launch homepage, open Find a Store popup, enter Boston, search, verify results."""
+    home_page = HomePage(driver)
+    home_page.launch()
+    assert home_page.is_loaded(), "Homepage did not load successfully."
+
+    find_store_popup = home_page.click_find_a_store()
+    assert find_store_popup.is_open(), "Find a Store popup did not open."
+
+    find_store_popup.click_select_my_store()
+    assert find_store_popup.is_location_textbox_visible(), "Location textbox is not visible."
+    assert find_store_popup.is_location_textbox_enabled(), "Location textbox is not enabled."
+
+    find_store_popup.enter_location("Boston, MA")
+    find_store_popup.click_search_for_stores()
+
+    store_results = StoreSearchResults(driver)
+    assert store_results.is_results_displayed(), "Store search results are not displayed."
+    assert store_results.has_results_for_city("Boston"), "Boston store results are not found."
