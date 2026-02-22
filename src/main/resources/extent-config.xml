@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extentreports>
+    <configuration>
+        <theme>standard</theme>
+        <encoding>utf-8</encoding>
+        <protocol>HTTPS</protocol>
+        <documentTitle>FL Automation Report</documentTitle>
+        <reportName>FL Automation Test Results</reportName>
+    </configuration>
+</extentreports>

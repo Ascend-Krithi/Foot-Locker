@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="FL Automation Suite" parallel="tests" thread-count="3">
+    <test name="FL Functional Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_HomePageLoadTest"/>
+            <class name="com.fl.automation.tests.TS001_TC002_StoreLocatorNavigationTest"/>
+            <class name="com.fl.automation.tests.TS001_TC003_StoreSearchByZipTest"/>
+            <class name="com.fl.automation.tests.TS001_TC004_StoreSearchByCityTest"/>
+            <class name="com.fl.automation.tests.TS001_TC005_StoreSearchInvalidInputTest"/>
+            <class name="com.fl.automation.tests.TS001_TC006_StoreDetailsDisplayTest"/>
+            <class name="com.fl.automation.tests.TS001_TC007_StoreResultsPaginationTest"/>
+            <class name="com.fl.automation.tests.TS001_TC008_StoreResultsSortingTest"/>
+            <class name="com.fl.automation.tests.TS001_TC009_StoreResultsFilteringTest"/>
+            <class name="com.fl.automation.tests.TS001_TC010_StoreMapDisplayTest"/>
+            <class name="com.fl.automation.tests.TS001_TC011_StoreContactInfoTest"/>
+            <class name="com.fl.automation.tests.TS001_TC012_StoreHoursDisplayTest"/>
+            <class name="com.fl.automation.tests.TS001_TC013_StoreDirectionsLinkTest"/>
+            <class name="com.fl.automation.tests.TS001_TC014_StoreFavoriteFunctionalityTest"/>
+            <class name="com.fl.automation.tests.TS001_TC015_StoreResultsNoResultsTest"/>
+        </classes>
+    </test>
+</suite>
