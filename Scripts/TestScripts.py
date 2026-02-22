@@ -50,6 +50,7 @@ def test_case_2078(driver):
     store_locator.set_preferred_store(0)  # Set the first store as preferred
     assert store_locator.is_preferred_store_confirmation_displayed(), "Preferred store confirmation was not displayed."
 
+
 def test_case_2083(driver):
     """
     TestCaseId: 2083
@@ -93,38 +94,3 @@ def test_case_2084(driver):
     home_page.click_search_for_stores()
     address = home_page.get_store_address()
     assert '375 Washington Street, Boston, MA 02108' in address, f"Expected address not found. Got: {address}"
-
-def test_case_2081(driver):
-    """
-    TestCaseId: 2081
-    Description: Test Case - SCRUM-15408 TS-001 TC-002
-    Steps:
-        1. Launch the Foot Locker website homepage (https://www.footlocker.com/)
-        2. Click on the 'Find a Store' link in the header
-        3. Click on the 'Select My Store' link in the popup
-    """
-    # TODO: Launch the homepage (https://www.footlocker.com/)
-    # TODO: Click on 'Find a Store' link in the header
-    # TODO: Click on 'Select My Store' link in the popup
-    # TODO: Assert the popup with 'Location' textbox and 'Search for Stores' button is displayed
-    pass
-
-def test_case_2082(driver):
-    """
-    TestCaseId: 2082
-    Description: Test Case - SCRUM-15408 TS-002 TC-001
-    Steps:
-        1. Launch the Foot Locker website homepage (https://www.footlocker.com/)
-        2. Click on the 'Find a Store' link
-        3. Click on the 'Select My Store' link in the popup
-        4. Enter 'Boston, MA' in the 'Location' textbox
-        5. Click the 'Search for Stores' button
-        6. Assert search results with relevant stores in or near Boston are displayed
-    """
-    # TODO: Launch the homepage (https://www.footlocker.com/)
-    # TODO: Click on 'Find a Store' link
-    # TODO: Click on 'Select My Store' link in the popup
-    # TODO: Enter 'Boston, MA' in the 'Location' textbox
-    # TODO: Click on 'Search for Stores' button
-    # TODO: Assert search results with relevant stores in or near Boston are displayed
-    pass
