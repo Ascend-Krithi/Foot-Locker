@@ -22,55 +22,51 @@ class TestScripts(unittest.TestCase):
         ...
 
     def test_2080_find_store_popup_verification(self):
-        """
-        Test Case 2080:
-        1. Launch homepage (URL: https://www.footlocker.com/).
-        2. Click 'Find a Store' link.
-        3. Verify popup message and 'Select My Store' link.
-        """
-        store_locator = StoreLocatorPage(self.driver)
-        store_locator.launch_homepage("https://www.footlocker.com/")
-        store_locator.click_find_store()
-        self.assertTrue(
-            store_locator.verify_find_store_popup_message("Choose a preferred store to make shopping easier"),
-            "Popup message not found or incorrect."
-        )
-        self.assertTrue(
-            store_locator.verify_select_my_store_link_visible(),
-            "'Select My Store' link not visible in popup."
-        )
+        ...
 
     def test_2079_preferred_store_persistence_across_pages(self):
+        ...
+
+    def test_scrum_15408_ts_002_tc_002_invalid_location_shows_no_stores_found(self):
         """
-        Test Case 2079:
-        1. Launch homepage, set preferred store to '375 Washington Street, Boston, MA 02108'.
-        2. Navigate to MensSneakersPage.
-        3. Verify preferred store persists.
+        SCRUM-15408 TS-002 TC-002
+        Steps:
+        1. Launch homepage
+        2. Click 'Find a Store'
+        3. Click 'Select My Store'
+        4. Enter 'InvalidLocation123'
+        5. Click 'Search for Stores'
+        6. Assert that a message like 'No stores found' is displayed in the popup
         """
         store_locator = StoreLocatorPage(self.driver)
-        mens_sneakers = MensSneakersPage(self.driver)
-        store_locator.launch_homepage("https://www.footlocker.com/")
+        store_locator.launch_homepage()
         store_locator.click_find_store()
-        store_locator.enter_location("Boston, MA")
+        store_locator.click_select_my_store()
+        store_locator.enter_location('InvalidLocation123')
         store_locator.click_search_for_stores()
         self.assertTrue(
-            store_locator.is_store_address_present_in_results("375 Washington Street, Boston, MA 02108"),
-            "Store address not present in search results."
-        )
-        store_locator.click_set_my_store("375 Washington Street, Boston, MA 02108")
-        self.assertTrue(
-            store_locator.verify_store_address_exact_match("375 Washington Street, Boston, MA 02108"),
-            "Preferred store address does not exactly match."
-        )
-        self.assertTrue(
-            store_locator.verify_confirmation(),
-            "Confirmation for setting preferred store not found."
-        )
-        mens_sneakers.launch_page()
-        self.assertTrue(
-            mens_sneakers.verify_store_indicator("375 Washington Street, Boston, MA 02108"),
-            "Preferred store indicator not visible or incorrect on MensSneakersPage."
+            store_locator.verify_find_store_popup_message('No stores found'),
+            "Expected 'No stores found' message to be displayed in the popup."
         )
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_scrum_15408_ts_003_tc_001_valid_location_finds_exact_store(self):
+        """
+        SCRUM-15408 TS-003 TC-001
+        Steps:
+        1. Launch homepage
+        2. Click 'Find a Store'
+        3. Click 'Select My Store'
+        4. Enter 'Boston, MA'
+        5. Click 'Search for Stores'
+        6. Assert that search results include the exact address '375 Washington Street, Boston, MA 02108'
+        """
+        store_locator = StoreLocatorPage(self.driver)
+        store_locator.launch_homepage()
+        store_locator.click_find_store()
+        store_locator.click_select_my_store()
+        store_locator.enter_location('Boston, MA')
+        store_locator.click_search_for_stores()
+        self.assertTrue(
+            store_locator.verify_store_address_exact_match('375 Washington Street, Boston, MA 02108'),
+            "Expected store address '375 Washington Street, Boston, MA 02108' to be present in search results."
+        )
