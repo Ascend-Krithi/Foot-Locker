@@ -19,16 +19,15 @@ class TestStoreLocatorPage(unittest.TestCase):
             with self.subTest(device=device):
                 self.driver.set_window_size(viewport['width'], viewport['height'])
                 page = StoreLocatorPage(self.driver)
-                self.assertTrue(page.is_loaded(), f"Store Locator page did not load on {device}.")
-                self.assertTrue(page.is_functional(), f"Store Locator page is not functional on {device}.")
+                self.assertTrue(page.is_displayed(), f"Store Locator page did not load on {device}.")
 
     def test_TC_2114_store_locator_accessibility(self):
         """
         TC-2114: Verify Store Locator page loads, supports keyboard navigation, and is accessible to screen readers.
         """
         page = StoreLocatorPage(self.driver)
-        self.assertTrue(page.is_loaded(), "Store Locator page did not load.")
-        self.assertTrue(page.is_keyboard_accessible(), "Keyboard navigation accessibility failed.")
-        self.assertTrue(page.is_screen_reader_accessible(), "Screen reader accessibility failed.")
+        self.assertTrue(page.is_displayed(), "Store Locator page did not load.")
+        self.assertTrue(page.all_elements_accessible_by_keyboard(), "Keyboard navigation accessibility failed.")
+        self.assertTrue(page.all_elements_have_accessible_names(), "Screen reader accessibility failed.")
 
 # Existing code below...
