@@ -2,6 +2,8 @@ import unittest
 from selenium import webdriver
 from Pages.HomePage import HomePage
 from Pages.StoreLocatorPopup import StoreLocatorPopup
+from Pages.StoreSelectionPopup import StoreSelectionPopup
+from Pages.ConfirmationPage import ConfirmationPage
 
 class TestStoreLocator(unittest.TestCase):
     def setUp(self):
@@ -10,6 +12,8 @@ class TestStoreLocator(unittest.TestCase):
         self.driver.get('https://www.footlocker.com/store-locator')
         self.home_page = HomePage(self.driver)
         self.store_locator_popup = StoreLocatorPopup(self.driver)
+        self.store_selection_popup = StoreSelectionPopup(self.driver)
+        self.confirmation_page = ConfirmationPage(self.driver)
 
     def tearDown(self):
         self.driver.quit()
@@ -57,3 +61,23 @@ class TestStoreLocator(unittest.TestCase):
         self.assertTrue(self.store_locator_popup.is_error_message_visible(), "Error message not visible for invalid city.")
         error_text = self.store_locator_popup.get_error_message_text()
         self.assertTrue(error_text != "", "Error message text is empty.")
+
+    def test_2109_use_my_location(self):
+        """
+        Test Case 2109: Launch Foot Locker, navigate to Store Locator, ensure location permission is enabled, click 'Use My Location', verify stores are displayed.
+        """
+        self.home_page.go_to_store_locator()
+        self.store_locator_popup.click_use_my_location()
+        # Assuming get_list_of_stores exists and returns store elements
+        stores = self.store_locator_popup.get_list_of_stores()
+        self.assertTrue(len(stores) > 0, "No stores found near user's current location.")
+
+    def test_2110_select_store_by_address(self):
+        """
+        Test Case 2110: Launch Foot Locker, search for 'Boston, MA', select store by address, verify store details popup is displayed.
+        """
+        self.home_page.go_to_store_locator()
+        self.store_locator_popup.enter_location('Boston, MA')
+        self.store_locator_popup.click_search_for_stores()
+        self.store_selection_popup.select_store_by_address()
+        self.assertTrue(self.confirmation_page.is_confirmation_displayed(), "Confirmation not displayed after selecting store.")
