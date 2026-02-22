@@ -94,3 +94,29 @@ class TestFootLockerStoreLocator:
         popup.wait_for_popup()
         popup.click_select_my_store()
         popup.verify_location_textbox_and_search_button()
+
+    def test_store_locator_search_boston(self):
+        # Test Case 2075: SCRUM-15408 TS-001 TC-003
+        driver = self.driver
+        homepage = Homepage(driver)
+        homepage.load_homepage()
+        homepage.click_find_a_store()
+        popup = StoreLocatorPopup(driver)
+        popup.wait_for_popup()
+        popup.click_select_my_store()
+        popup.enter_location('Boston, MA')
+        popup.click_search_for_stores()
+        assert popup.verify_store_search_results('Boston'), "Store locator popup did not display results for stores in or near Boston."
+
+    def test_store_locator_verify_address(self):
+        # Test Case 2076: SCRUM-15408 TS-001 TC-004
+        driver = self.driver
+        homepage = Homepage(driver)
+        homepage.load_homepage()
+        homepage.click_find_a_store()
+        popup = StoreLocatorPopup(driver)
+        popup.wait_for_popup()
+        popup.click_select_my_store()
+        popup.enter_location('Boston, MA')
+        popup.click_search_for_stores()
+        assert popup.verify_store_search_results('375 Washington Street, Boston, MA 02108'), "Store with address '375 Washington Street, Boston, MA 02108' is not visible in the results."
