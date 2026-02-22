@@ -103,3 +103,39 @@ class TestFootLocker(unittest.TestCase):
         store_selection = StoreSelectionPopup(driver)
         self.assertTrue(store_selection.is_store_address_visible(), 'Store address should be visible in results.')
         self.assertTrue(store_selection.verify_store_address('375 Washington Street, Boston, MA 02108'), 'Store address should match exactly.')
+
+    # Test Case 2077: Launch homepage, open store locator popup, search for Boston, select store by address
+    def test_2077_select_boston_store(self):
+        driver = self.driver
+        homepage = HomePage(driver)
+        homepage.load_homepage()
+        homepage.click_find_a_store()
+        locator_popup = StoreLocatorPopup(driver)
+        self.assertTrue(locator_popup.is_popup_visible(), 'Store locator popup window should open.')
+        locator_popup.click_select_my_store_button()
+        selection_popup = StoreSelectionPopup(driver)
+        self.assertTrue(selection_popup.is_location_textbox_present(), 'Location textbox should be present.')
+        selection_popup.enter_location('Boston, MA')
+        self.assertTrue(selection_popup.is_search_button_present(), 'Search button should be present.')
+        selection_popup.click_search_button()
+        self.assertTrue(selection_popup.is_store_present(), 'Store should be visible in the results.')
+        selection_popup.click_set_my_store()
+        confirmation = ConfirmationPage(driver)
+        self.assertTrue(confirmation.is_confirmation_visible(), 'Selected store should be saved as preferred.')
+
+    # Test Case 2078: Set Boston store as preferred, confirm indicator, verify persistence
+    def test_2078_confirm_store_selection_persistence(self):
+        driver = self.driver
+        homepage = HomePage(driver)
+        homepage.load_homepage()
+        homepage.click_find_a_store()
+        locator_popup = StoreLocatorPopup(driver)
+        locator_popup.click_select_my_store_button()
+        selection_popup = StoreSelectionPopup(driver)
+        selection_popup.enter_location('Boston, MA')
+        selection_popup.click_search_button()
+        selection_popup.click_set_my_store()
+        confirmation = ConfirmationPage(driver)
+        self.assertTrue(confirmation.is_confirmation_visible(), 'Confirmation indicator should be displayed.')
+        nav = Navigation(driver)
+        self.assertTrue(nav.is_my_store_indicator_visible(), 'Selected store should appear across the website.')
