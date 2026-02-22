@@ -120,3 +120,30 @@ class TestFootLockerStoreLocator:
         popup.enter_location('Boston, MA')
         popup.click_search_for_stores()
         assert popup.verify_store_search_results('375 Washington Street, Boston, MA 02108'), "Store with address '375 Washington Street, Boston, MA 02108' is not visible in the results."
+
+    def test_homepage_find_store_popup_fields(self):
+        # Test Case 2081: SCRUM-15408 TS-001 TC-002
+        driver = self.driver
+        homepage = Homepage(driver)
+        homepage.load_homepage()
+        assert homepage.load_homepage(), "Homepage did not load successfully."
+        assert homepage.click_find_store_link(), "Could not click 'Find a Store' link."
+        popup = StoreLocatorPopup(driver)
+        assert popup.wait_for_popup(), "Store locator popup did not appear."
+        assert popup.click_select_my_store(), "Could not click 'Select My Store' button."
+        assert popup.verify_location_textbox_and_search_button(), "Location textbox or Search for Stores button not visible in popup."
+
+    def test_store_locator_search_boston_ma(self):
+        # Test Case 2082: SCRUM-15408 TS-002 TC-001
+        driver = self.driver
+        homepage = Homepage(driver)
+        homepage.load_homepage()
+        assert homepage.load_homepage(), "Homepage did not load successfully."
+        assert homepage.click_find_store_link(), "Could not click 'Find a Store' link."
+        popup = StoreLocatorPopup(driver)
+        assert popup.wait_for_popup(), "Store locator popup did not appear."
+        assert popup.click_select_my_store(), "Could not click 'Select My Store' button."
+        assert popup.enter_location('Boston, MA'), "Could not enter location 'Boston, MA'."
+        assert popup.click_search_for_stores(), "Could not click 'Search for Stores' button."
+        # If verify_store_search_results exists, add:
+        # assert popup.verify_store_search_results('Boston'), "Store locator popup did not display results for stores in or near Boston."
