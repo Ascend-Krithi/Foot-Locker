@@ -1,3 +1,4 @@
+# imports
 import json
 import os
 from selenium.webdriver.common.by import By
@@ -7,7 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 class HomePage:
     def __init__(self, driver):
         self.driver = driver
-        with open(os.path.join(os.path.dirname(__file__), '../Locators.json')) as f:
+        with open(os.path.join(os.path.dirname(__file__), '../Locators/Locators.json')) as f:
             self.locators = json.load(f)
 
     def load_homepage(self, url='https://www.footlocker.com/'):
