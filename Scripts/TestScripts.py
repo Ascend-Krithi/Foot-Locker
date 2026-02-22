@@ -122,3 +122,27 @@ class TestFootLocker(unittest.TestCase):
         # Example: assert store_locator.all_elements_have_accessible_labels()
         # See accessibility test documentation for further steps.
         pass
+
+    def test_store_locator_api_failure_error_message(self):
+        """
+        TestCase 2115 (SCRUM-15408 TS-SL-012 TC-001)
+        Verifies Store Locator handles API failure gracefully and displays a user-friendly error message.
+        Steps:
+            1. Simulate store locator API being unavailable (e.g., disconnect network or mock API failure).
+               Expected: Store Locator page is displayed but cannot fetch results.
+            2. Attempt to perform a store search for location 'Boston, MA'.
+               Expected: User-friendly error message is displayed and no results are shown.
+        """
+        self.driver.get("https://www.footlocker.com/store-locator")
+        store_locator = StoreLocatorPopup(self.driver)
+        self.assertTrue(store_locator.is_page_displayed(), "Store Locator popup should be displayed.")
+        # Simulate API failure (test env must be configured for this)
+        api_failure = store_locator.simulate_api_failure()
+        self.assertTrue(api_failure, "API failure banner should be present (ensure test environment simulates failure)")
+        # Attempt to search for a store
+        store_locator.search_store("Boston, MA")
+        # Validate error message is displayed
+        error_message = store_locator.get_error_message()
+        self.assertIsNotNone(error_message, "A user-friendly error message should be displayed when API fails.")
+        # Validate no results are shown
+        self.assertTrue(store_locator.is_no_results_displayed(), "No results should be displayed and error message should be shown on API failure.")
