@@ -75,6 +75,45 @@ class StoreLocatorPopup:
         search_button.click()
         return True
 
+    def select_store_by_address(self, address):
+        set_my_store_btn = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((
+                getattr(By, self.locators['set_my_store_button_boston']['by'].upper()),
+                self.locators['set_my_store_button_boston']['value']
+            ))
+        )
+        if address in set_my_store_btn.get_attribute('data-address') or address in set_my_store_btn.text:
+            return True
+        return False
+
+    def verify_store_address_format(self, address):
+        confirmation = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((
+                getattr(By, self.locators['store_confirmation_indicator']['by'].upper()),
+                self.locators['store_confirmation_indicator']['value']
+            ))
+        )
+        return address in confirmation.text
+
+    def click_set_my_store(self):
+        set_my_store_btn = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((
+                getattr(By, self.locators['set_my_store_button_boston']['by'].upper()),
+                self.locators['set_my_store_button_boston']['value']
+            ))
+        )
+        set_my_store_btn.click()
+        return True
+
+    def verify_preferred_store_saved(self, address):
+        confirmation = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((
+                getattr(By, self.locators['store_confirmation_indicator']['by'].upper()),
+                self.locators['store_confirmation_indicator']['value']
+            ))
+        )
+        return address in confirmation.text
+
     def are_store_results_displayed(self):
         # This method checks if at least one store result is visible after search
         try:
@@ -103,3 +142,12 @@ class StoreLocatorPopup:
             return False
         except Exception:
             return False
+
+    def verify_popup_message(self, expected_message):
+        popup = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((
+                getattr(By, self.locators['store_locator_popup']['by'].upper()),
+                self.locators['store_locator_popup']['value']
+            ))
+        )
+        return expected_message in popup.text
