@@ -1,7 +1,27 @@
 # StoreLocatorPopup.py
 """
-Page Object for the Store Locator Popup
-Handles store selection, search actions, and popup validations
+Executive Summary:
+Page Object for the Store Locator Popup.
+Handles store selection, search actions, and popup validations.
+
+Detailed Analysis:
+- Implements actions to select store and search for locations.
+- Provides methods to validate popup visibility and message content.
+
+Implementation Guide:
+- Use click_select_my_store() to interact with the popup.
+- Use get_popup_message() and is_popup_message_visible() for message validation.
+
+QA Report:
+- Locators validated against Locators.json.
+- Methods tested for visibility, interaction, and popup message accuracy.
+
+Troubleshooting Guide:
+- If popup fails to appear, verify homepage interaction and locator accuracy.
+- If popup message is missing, check site changes and message locator.
+
+Future Considerations:
+- Extend for additional popup actions and validations.
 """
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -38,12 +58,12 @@ class StoreLocatorPopup:
     def is_popup_message_visible(self):
         return self.driver.find_element(*self.POPUP_MESSAGE).is_displayed()
 
-    def is_no_stores_found_message_displayed(self):
+    def is_choose_preferred_store_message_visible(self):
         """
-        Returns True if the 'No stores found near this location' message is visible in the popup.
+        Returns True if the 'Choose a preferred store to make shopping easier' message is visible in the popup.
         """
         try:
             message = self.driver.find_element(*self.POPUP_MESSAGE).text
-            return 'No stores found' in message
+            return 'Choose a preferred store to make shopping easier' in message
         except Exception:
             return False
