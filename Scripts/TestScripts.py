@@ -1,49 +1,50 @@
-# Existing imports and code...
+# Existing imports and code remain unchanged
 import unittest
 from selenium import webdriver
-from Pages/HomePage import HomePage
-from Pages/StoreLocatorPopup import StoreLocatorPopup
+from PageClasses.HomePage import HomePage
+from PageClasses.StoreLocatorPopup import StoreLocatorPopup
+from PageClasses.StoreSelectionPopup import StoreSelectionPopup
+from PageClasses.ConfirmationPage import ConfirmationPage
+from PageClasses.ProductListingPage import ProductListingPage
 
 class TestScripts(unittest.TestCase):
-    # ... existing test methods ...
+    # ... Existing test methods remain unchanged ...
+    ...
 
-    def test_2103_homepage_find_a_store_popup(self):
+    def test_2103_homepage_find_store_popup(self):
         """
-        testCaseId 2103:
-        1. Launch homepage
-        2. Check 'Find a Store' link visible
-        3. Click 'Find a Store'
-        4. Popup appears
+        TestCaseId: 2103
+        Step 1: Launch 'https://www.footlocker.com/' and validate the Home Page is displayed.
+        Step 2: Validate 'Find a Store' link is visible.
+        Step 3: Click 'Find a Store', validate Store Locator popup appears.
         """
-        driver = webdriver.Chrome()  # or your configured driver
+        driver = webdriver.Chrome()
         try:
-            home_page = HomePage(driver)
-            self.assertTrue(home_page.is_homepage_loaded(), "Homepage did not load correctly.")
-            self.assertTrue(home_page.is_find_a_store_visible(), "'Find a Store' link is not visible on the homepage.")
-            home_page.click_find_a_store()
-            popup = StoreLocatorPopup(driver)
-            self.assertTrue(popup.is_popup_visible(), "Store locator popup did not appear after clicking 'Find a Store'.")
+            driver.get('https://www.footlocker.com/')
+            homepage = HomePage(driver)
+            self.assertTrue(homepage.is_homepage_loaded(), "Home Page did not load successfully.")
+            self.assertTrue(homepage.is_find_a_store_visible(), "'Find a Store' link is not visible.")
+            homepage.click_find_a_store()
+            store_locator_popup = StoreLocatorPopup(driver)
+            self.assertTrue(store_locator_popup.is_popup_visible(), "Store Locator popup did not appear after clicking 'Find a Store'.")
         finally:
             driver.quit()
 
-    def test_2104_find_a_store_popup_message_and_link(self):
+    def test_2104_store_locator_popup_message(self):
         """
-        testCaseId 2104:
-        1. Launch homepage
-        2. Click 'Find a Store'
-        3. Popup displays message and 'Select My Store' link
+        TestCaseId: 2104
+        Step 1: Launch 'https://www.footlocker.com/' and validate Home Page is displayed.
+        Step 2: Click 'Find a Store', validate Store Locator popup appears.
+        Step 3: Validate popup message 'Choose a preferred store to make shopping easier' is visible.
         """
-        driver = webdriver.Chrome()  # or your configured driver
+        driver = webdriver.Chrome()
         try:
-            home_page = HomePage(driver)
-            self.assertTrue(home_page.is_homepage_loaded(), "Homepage did not load correctly.")
-            home_page.click_find_a_store()
-            popup = StoreLocatorPopup(driver)
-            self.assertTrue(popup.is_popup_visible(), "Store locator popup did not appear after clicking 'Find a Store'.")
-            expected_message = "Choose a preferred store to make shopping easier"
-            self.assertTrue(popup.is_popup_message_visible(), "Popup message is not visible.")
-            self.assertEqual(popup.get_popup_message(), expected_message, f"Expected popup message '{expected_message}', got '{popup.get_popup_message()}'")
-            self.assertTrue(popup.is_popup_message_visible(), "Popup message is not visible.")
-            self.assertTrue(popup.click_select_my_store is not None, "'Select My Store' link is not available on the popup.")
+            driver.get('https://www.footlocker.com/')
+            homepage = HomePage(driver)
+            self.assertTrue(homepage.is_homepage_loaded(), "Home Page did not load successfully.")
+            homepage.click_find_a_store()
+            store_locator_popup = StoreLocatorPopup(driver)
+            self.assertTrue(store_locator_popup.is_popup_visible(), "Store Locator popup did not appear after clicking 'Find a Store'.")
+            self.assertTrue(store_locator_popup.is_choose_preferred_store_message_visible(), "Popup message 'Choose a preferred store to make shopping easier' is not visible.")
         finally:
             driver.quit()
