@@ -1,0 +1,43 @@
+package com.fl.automation.tests;
+
+import com.fl.automation.core.ConfigReader;
+import com.fl.automation.core.DriverFactory;
+import com.fl.automation.pages.HomePage;
+import com.fl.automation.pages.StoreLocatorPage;
+import org.openqa.selenium.WebDriver;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+/**
+ * Acceptance Criteria ID: 
+ * Test Scenario ID: SCRUM-15408 TS-001
+ * Test Case ID: TC-001
+ * Description: Launch the Foot Locker homepage in a browser, click on the Find a Store button, observe the popup message, and check for the presence of the Select My Store link within the popup
+ */
+public class TS001_TC001_TestCaseSCRUM15408TS001TC001 {
+
+    private WebDriver driver;
+
+    @BeforeMethod
+    public void setUp() {
+        DriverFactory.initDriver();
+        driver = DriverFactory.getDriver();
+        driver.get(ConfigReader.get("base.url"));
+    }
+
+    @Test
+    public void testFindAStoreAndSelectMyStore() {
+        HomePage homePage = new HomePage(driver);
+        homePage.clickFindAStore();
+
+        StoreLocatorPage storeLocatorPage = new StoreLocatorPage(driver);
+        Assert.assertTrue(storeLocatorPage.isSelectMyStoreDisplayed(), "Select My Store link is not visible");
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        DriverFactory.quitDriver();
+    }
+}
