@@ -37,3 +37,10 @@ class StoreLocatorPopup:
 
     def is_popup_message_visible(self):
         return self.driver.find_element(*self.POPUP_MESSAGE).is_displayed()
+
+    def is_store_locator_page_loaded(self):
+        """
+        Validates that the Store Locator page is loaded by checking visibility of the location textbox.
+        Returns True if visible, else False.
+        """
+        return self.driver.find_element(*self.LOCATION_TEXTBOX).is_displayed()
