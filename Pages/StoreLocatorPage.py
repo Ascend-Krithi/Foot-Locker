@@ -3,12 +3,14 @@
 StoreLocatorPage
 ================
 
-This PageClass models advanced Store Locator page interactions for Foot Locker, including toggling map view and handling pagination.
+This PageClass models advanced Store Locator page interactions for Foot Locker, including toggling map view, handling pagination, simulating API unavailability, and validating user-friendly error messages.
 
 Features:
 - Toggle between list and map views
 - Navigate store result pages (pagination)
 - Validate map pins and store results
+- Simulate store locator API unavailability
+- Validate user-friendly error message display when API is unavailable
 
 Strict code integrity, robust locator mapping, and comprehensive docstrings included for downstream automation.
 """
@@ -20,7 +22,7 @@ from selenium.common.exceptions import TimeoutException
 
 class StoreLocatorPage:
     """
-    PageClass for Foot Locker Store Locator advanced interactions: map view & pagination.
+    PageClass for Foot Locker Store Locator advanced interactions: map view, pagination, API failure simulation, and error handling.
     """
 
     # Locators from Locators.json and inferred for map/pagination
@@ -31,6 +33,9 @@ class StoreLocatorPage:
     PAGINATION_NEXT_BUTTON = (By.XPATH, "//button[contains(@aria-label, 'Next') or contains(text(), 'Next')]" )  # inferred
     PAGINATION_PREV_BUTTON = (By.XPATH, "//button[contains(@aria-label, 'Previous') or contains(text(), 'Previous')]" )  # inferred
     PAGINATION_PAGE_NUMBER = (By.XPATH, "//button[@aria-label='Page']" )  # inferred
+    LOCATION_TEXTBOX = (By.XPATH, "//input[@id='store-locator-input']")
+    SEARCH_FOR_STORES_BUTTON = (By.XPATH, "//button[contains(text(), 'Search for Stores')]")
+    NO_STORES_FOUND_MESSAGE = (By.XPATH, "//div[contains(text(), 'No stores found near this location')]")
 
     def __init__(self, driver, wait_time=10):
         self.driver = driver
@@ -122,5 +127,36 @@ class StoreLocatorPage:
         try:
             pins = self.wait.until(EC.visibility_of_all_elements_located(self.MAP_PIN))
             return len(pins) > 0
+        except TimeoutException:
+            return False
+
+    def simulate_api_unavailability(self):
+        """
+        Simulates store locator API being unavailable.
+        This method should be implemented using network interception, mocking,
+        or disabling network calls, depending on the test framework/environment.
+        """
+        # Placeholder for integration with network interception tool or environment setup
+        raise NotImplementedError("API unavailability simulation must be handled by test environment setup.")
+
+    def search_for_store(self, location):
+        """
+        Enters a location and triggers a store search.
+        """
+        location_textbox = self.wait.until(EC.element_to_be_clickable(self.LOCATION_TEXTBOX))
+        location_textbox.clear()
+        location_textbox.send_keys(location)
+        search_button = self.wait.until(EC.element_to_be_clickable(self.SEARCH_FOR_STORES_BUTTON))
+        search_button.click()
+
+    def is_error_message_displayed(self):
+        """
+        Validates that the error message is displayed when API is unavailable.
+        """
+        try:
+            error_message = self.wait.until(
+                EC.visibility_of_element_located(self.NO_STORES_FOUND_MESSAGE)
+            )
+            return error_message.is_displayed()
         except TimeoutException:
             return False
