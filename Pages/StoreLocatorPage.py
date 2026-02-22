@@ -68,3 +68,33 @@ class StoreLocatorPage:
             return location_box.is_displayed() and search_button.is_displayed()
         except NoSuchElementException:
             return False
+
+    def verify_store_address_visible(self, address):
+        """
+        Verifies that the given store address is visible in the search results.
+        Args:
+            address (str): The store address to verify (e.g., '375 Washington Street, Boston, MA 02108').
+        Returns:
+            bool: True if the address is visible, False otherwise.
+        """
+        try:
+            xpath = f"//div[contains(text(),'{address}')]")
+            element = self.driver.find_element(By.XPATH, xpath)
+            return element.is_displayed()
+        except NoSuchElementException:
+            return False
+
+    def verify_exact_store_address(self, address):
+        """
+        Verifies that the store address in the results matches exactly with the expected address.
+        Args:
+            address (str): The expected store address.
+        Returns:
+            bool: True if the address matches exactly, False otherwise.
+        """
+        try:
+            xpath = f"//div[text()='{address}']"
+            element = self.driver.find_element(By.XPATH, xpath)
+            return element.is_displayed()
+        except NoSuchElementException:
+            return False
