@@ -52,3 +52,50 @@ def test_case_2115(driver):
     # Step 4: Assert no results are shown
     results = store_locator_page.get_results()
     assert results == [] or results is None, "No store results should be shown when API is unavailable."
+
+# --- New test methods for SCRUM-15408 TS-SL-001 TC-001 and TC-002 ---
+
+def test_case_2103(driver):
+    """
+    TestCaseId: 2103
+    Description: Test Case - SCRUM-15408 TS-SL-001 TC-001
+    Steps:
+        1. Launch the Foot Locker website in a browser.
+        2. Locate the 'Find a Store' link in the header.
+        3. Click on the 'Find a Store' link.
+        4. Verify Store Locator popup appears below the link.
+    """
+    from Pages.HomepagePage import HomepagePage
+    homepage = HomepagePage(driver)
+    homepage.launch_homepage()
+    # Step 2: Locate 'Find a Store' link
+    find_store_visible = homepage.verify_store_results_displayed() or homepage.verify_select_my_store_link_visible()
+    assert find_store_visible, "'Find a Store' link is not visible."
+    # Step 3: Click 'Find a Store' and verify popup
+    popup_appeared = homepage.click_find_a_store_and_verify_popup()
+    assert popup_appeared, "Store Locator popup did not appear below the link."
+
+
+def test_case_2104(driver):
+    """
+    TestCaseId: 2104
+    Description: Test Case - SCRUM-15408 TS-SL-001 TC-002
+    Steps:
+        1. Launch the Foot Locker website in a browser.
+        2. Click on the 'Find a Store' link in the header.
+        3. Observe the popup message and available links.
+        4. Verify popup displays message 'Choose a preferred store to make shopping easier' and a 'Select My Store' link.
+    """
+    from Pages.HomepagePage import HomepagePage
+    homepage = HomepagePage(driver)
+    homepage.launch_homepage()
+    # Step 2: Click 'Find a Store'
+    popup_appeared = homepage.click_find_a_store_and_verify_popup()
+    assert popup_appeared, "Store Locator popup did not appear."
+    # Step 3: Verify popup message
+    expected_message = "Choose a preferred store to make shopping easier"
+    message_present = homepage.verify_store_locator_popup_message(expected_message)
+    assert message_present, f"Expected popup message '{expected_message}' not found."
+    # Step 4: Verify 'Select My Store' link
+    select_my_store_visible = homepage.verify_select_my_store_link_visible()
+    assert select_my_store_visible, "'Select My Store' link is not visible in the popup."
