@@ -3,6 +3,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
+from Pages.Homepage import Homepage
+from Pages.StoreLocatorPopup import StoreLocatorPopup
 
 class TestFootLockerStoreLocator:
     def setup_method(self):
@@ -70,3 +72,25 @@ class TestFootLockerStoreLocator:
         # Verify preferred store persists
         preferred_store = driver.find_element(By.XPATH, "//div[contains(@class,'preferred-store') and contains(text(),'375 Washington Street, Boston, MA 02108')]")
         assert preferred_store.is_displayed(), 'Preferred store not visible after navigation.'
+
+    def test_homepage_find_store_popup(self):
+        # Test Case 2073: SCRUM-15408 TS-001 TC-001
+        driver = self.driver
+        homepage = Homepage(driver)
+        homepage.load_homepage()
+        homepage.click_find_store()
+        popup = StoreLocatorPopup(driver)
+        popup.wait_for_popup()
+        popup.verify_popup_message()
+        popup.verify_select_my_store_button()
+
+    def test_store_locator_popup_fields(self):
+        # Test Case 2074: SCRUM-15408 TS-001 TC-002
+        driver = self.driver
+        homepage = Homepage(driver)
+        homepage.load_homepage()
+        homepage.click_find_store()
+        popup = StoreLocatorPopup(driver)
+        popup.wait_for_popup()
+        popup.click_select_my_store()
+        popup.verify_location_textbox_and_search_button()
