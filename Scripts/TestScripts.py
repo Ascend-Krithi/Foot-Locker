@@ -123,26 +123,32 @@ class TestFootLocker(unittest.TestCase):
         # See accessibility test documentation for further steps.
         pass
 
-    def test_store_locator_api_failure_error_message(self):
+    def test_store_locator_api_unavailable_error_message(self):
         """
         TestCase 2115 (SCRUM-15408 TS-SL-012 TC-001)
-        Verifies Store Locator handles API failure gracefully and displays a user-friendly error message.
+        Verifies Store Locator page behavior when the store locator API is unavailable.
         Steps:
             1. Simulate store locator API being unavailable (e.g., disconnect network or mock API failure).
                Expected: Store Locator page is displayed but cannot fetch results.
-            2. Attempt to perform a store search for location 'Boston, MA'.
+            2. Attempt to perform a store search with location 'Boston, MA'.
                Expected: User-friendly error message is displayed and no results are shown.
         """
-        self.driver.get("https://www.footlocker.com/store-locator")
+        # Step 1: Launch homepage and navigate to Store Locator
+        home_page = HomePage(self.driver)
+        self.assertTrue(home_page.load_homepage(), "Homepage should load successfully.")
+        self.assertTrue(home_page.click_find_a_store(), "Should navigate to Store Locator.")
         store_locator = StoreLocatorPopup(self.driver)
-        self.assertTrue(store_locator.is_page_displayed(), "Store Locator popup should be displayed.")
-        # Simulate API failure (test env must be configured for this)
-        api_failure = store_locator.simulate_api_failure()
-        self.assertTrue(api_failure, "API failure banner should be present (ensure test environment simulates failure)")
-        # Attempt to search for a store
-        store_locator.search_store("Boston, MA")
-        # Validate error message is displayed
-        error_message = store_locator.get_error_message()
-        self.assertIsNotNone(error_message, "A user-friendly error message should be displayed when API fails.")
-        # Validate no results are shown
-        self.assertTrue(store_locator.is_no_results_displayed(), "No results should be displayed and error message should be shown on API failure.")
+        self.assertTrue(store_locator.wait_for_popup(), "Store Locator popup should be visible.")
+
+        # Step 2: Simulate API unavailability
+        self.assertTrue(store_locator.simulate_api_unavailability(), "Should simulate API unavailability.")
+
+        # Step 3: Attempt to search for stores with location 'Boston, MA'
+        self.assertTrue(store_locator.enter_location('Boston, MA'), "Location 'Boston, MA' should be entered.")
+        self.assertTrue(store_locator.click_search_for_stores(), "Search for stores button should be clicked.")
+
+        # Step 4: Assert that no store results are available
+        self.assertTrue(store_locator.is_store_results_unavailable(), "No store results should be available when API is unavailable.")
+
+        # Step 5: Assert that a user-friendly error message is displayed
+        self.assertTrue(store_locator.is_error_message_displayed(), "User-friendly error message should be displayed when API is unavailable.")
