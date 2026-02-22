@@ -57,3 +57,24 @@ class TestFootLocker(unittest.TestCase):
         self.assertTrue(self.store_locator_popup.is_store_address_present_in_results('375 Washington Street, Boston, MA 02108'), "Store with address should be present in results.")
         self.assertTrue(self.store_locator_popup.click_store_by_address('375 Washington Street, Boston, MA 02108'), "Should be able to click on the store with the specified address.")
         self.assertTrue(self.store_locator_popup.verify_store_details_popup('375 Washington Street, Boston, MA 02108'), "Store details popup should display correct address.")
+
+    def test_2111_store_locator_boston_map_view(self):
+        """Test Case 2111: Launch Foot Locker website, navigate to Store Locator, search for 'Boston, MA', toggle to map view, and verify map pins are displayed."""
+        self.home_page.load_homepage()
+        self.home_page.click_find_a_store()
+        self.assertTrue(self.store_locator_popup.wait_for_popup(), "Store Locator popup should be visible.")
+        self.assertTrue(self.store_locator_popup.enter_location('Boston, MA'), "Should be able to enter 'Boston, MA'.")
+        self.assertTrue(self.store_locator_popup.click_search_for_stores(), "Should be able to click search for stores.")
+        self.assertTrue(self.store_locator_popup.are_store_results_displayed(), "Store results should be displayed for 'Boston, MA'.")
+        self.assertTrue(self.store_locator_popup.toggle_map_view(), "Map view should display pins for each store location.")
+
+    def test_2112_store_locator_new_york_pagination(self):
+        """Test Case 2112: Launch Foot Locker website, navigate to Store Locator, search for 'New York', paginate to next page, and verify next page of store results is displayed."""
+        self.home_page.load_homepage()
+        self.home_page.click_find_a_store()
+        self.assertTrue(self.store_locator_popup.wait_for_popup(), "Store Locator popup should be visible.")
+        self.assertTrue(self.store_locator_popup.enter_location('New York'), "Should be able to enter 'New York'.")
+        self.assertTrue(self.store_locator_popup.click_search_for_stores(), "Should be able to click search for stores.")
+        self.assertTrue(self.store_locator_popup.are_store_results_displayed(), "Multiple pages of store results should be displayed for 'New York'.")
+        self.assertTrue(self.store_locator_popup.go_to_next_page(), "Should be able to navigate to the next page of store results.")
+        self.assertTrue(self.store_locator_popup.are_store_results_displayed(), "Next page of store results should be displayed.")
