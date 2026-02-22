@@ -16,57 +16,95 @@ class TestScripts(unittest.TestCase):
         ...
 
     def test_2099_set_preferred_store(self):
+        ...
+    def test_2100_store_confirmation_and_persistence(self):
+        ...
+
+    def test_2101_store_persistence_after_navigation(self):
         """
-        TestCase 2099:
-        1. Launch the Foot Locker website and navigate to the homepage (URL: https://www.footlocker.com/). Expected: Homepage is displayed.
-        2. Click 'Find a Store' and then 'Select My Store'. Expected: Store Locator Popup is displayed.
-        3. Enter 'Boston, MA' in the Location textbox and click 'Search for Stores'. Expected: Store results are displayed.
-        4. Click 'Set My Store' for the store at '375 Washington Street, Boston, MA 02108'. Expected: The selected store is saved as the user’s preferred store.
+        Test Case 2101:
+        1. Set the store at '375 Washington Street, Boston, MA 02108' as 'My Store'.
+        2. Navigate to Men's Shoes (product listing).
+        3. Return to homepage.
+        4. Click 'Find a Store' and 'Select My Store' again. Validate that 'My Store' is still set.
         """
         driver = webdriver.Chrome()
         try:
-            homepage = HomePage(driver)
-            homepage.launch_homepage("https://www.footlocker.com/")
-            self.assertTrue(homepage.is_homepage_displayed(), "Homepage is not displayed.")
+            driver.get("https://your-site-homepage.com")
+            home_page = HomePage(driver)
+            home_page.click_find_store()
 
-            homepage.click_find_a_store()
-            store_locator = StoreLocatorPopup(driver)
-            store_locator.click_select_my_store()
-            # Assuming a method to verify popup is displayed, or rely on next steps
-            store_locator.enter_location("Boston, MA")
-            store_locator.click_search_for_stores()
+            store_locator_popup = StoreLocatorPopup(driver)
+            store_locator_popup.search_store("375 Washington Street, Boston, MA 02108")
+            store_locator_popup.select_store("375 Washington Street, Boston, MA 02108")
 
-            store_selection = StoreSelectionPopup(driver)
-            store_selection.click_set_my_store("375 Washington Street, Boston, MA 02108")
-            # Optionally, add assertion if UI feedback is immediate
+            store_selection_popup = StoreSelectionPopup(driver)
+            store_selection_popup.set_my_store()
+
+            confirmation_page = ConfirmationPage(driver)
+            self.assertTrue(confirmation_page.is_my_store_confirmation_displayed("375 Washington Street, Boston, MA 02108"),
+                            "My Store confirmation not displayed after setting store.")
+
+            # Navigate to Men's Shoes (product listing)
+            home_page.navigate_to_mens_shoes()
+            product_listing_page = ProductListingPage(driver)
+            self.assertTrue(product_listing_page.is_my_store_indicator_displayed("375 Washington Street, Boston, MA 02108"),
+                            "My Store indicator not displayed on product listing page.")
+
+            # Return to homepage
+            product_listing_page.navigate_to_homepage()
+            self.assertTrue(home_page.is_my_store_indicator_displayed("375 Washington Street, Boston, MA 02108"),
+                            "My Store indicator not displayed on homepage after navigation.")
+
+            # Click 'Find a Store' and 'Select My Store' again
+            home_page.click_find_store()
+            store_locator_popup.select_my_store()
+            self.assertTrue(store_selection_popup.is_my_store_selected("375 Washington Street, Boston, MA 02108"),
+                            "My Store is not persisted after navigation.")
         finally:
             driver.quit()
 
-    def test_2100_store_confirmation_and_persistence(self):
+    def test_2102_store_persistence_after_browser_restart(self):
         """
-        TestCase 2100:
-        1. Set the store at '375 Washington Street, Boston, MA 02108' as 'My Store' (as in previous test case). Expected: Store is set as preferred.
-        2. Observe the UI for confirmation (e.g., message, highlight, or store name in header). Expected: Confirmation indicator is displayed and the selected store appears consistently across the website.
+        Test Case 2102:
+        1. Set the store at '375 Washington Street, Boston, MA 02108' as 'My Store'.
+        2. Close the browser completely.
+        3. Reopen browser and navigate to homepage.
+        4. Click 'Find a Store' and 'Select My Store' again. Validate that 'My Store' is still set.
         """
+        # First session: set My Store
         driver = webdriver.Chrome()
         try:
-            homepage = HomePage(driver)
-            homepage.launch_homepage("https://www.footlocker.com/")
-            self.assertTrue(homepage.is_homepage_displayed(), "Homepage is not displayed.")
+            driver.get("https://your-site-homepage.com")
+            home_page = HomePage(driver)
+            home_page.click_find_store()
 
-            homepage.click_find_a_store()
-            store_locator = StoreLocatorPopup(driver)
-            store_locator.click_select_my_store()
-            store_locator.enter_location("Boston, MA")
-            store_locator.click_search_for_stores()
+            store_locator_popup = StoreLocatorPopup(driver)
+            store_locator_popup.search_store("375 Washington Street, Boston, MA 02108")
+            store_locator_popup.select_store("375 Washington Street, Boston, MA 02108")
 
-            store_selection = StoreSelectionPopup(driver)
-            store_selection.click_set_my_store("375 Washington Street, Boston, MA 02108")
+            store_selection_popup = StoreSelectionPopup(driver)
+            store_selection_popup.set_my_store()
 
             confirmation_page = ConfirmationPage(driver)
-            self.assertTrue(confirmation_page.is_confirmation_displayed(), "Confirmation indicator is not displayed.")
+            self.assertTrue(confirmation_page.is_my_store_confirmation_displayed("375 Washington Street, Boston, MA 02108"),
+                            "My Store confirmation not displayed after setting store.")
+        finally:
+            driver.quit()
 
-            product_listing = ProductListingPage(driver)
-            self.assertTrue(product_listing.is_my_store_indicator_displayed("375 Washington Street, Boston, MA 02108"), "Selected store is not indicated in product listing.")
+        # Second session: verify persistence
+        driver = webdriver.Chrome()
+        try:
+            driver.get("https://your-site-homepage.com")
+            home_page = HomePage(driver)
+            self.assertTrue(home_page.is_my_store_indicator_displayed("375 Washington Street, Boston, MA 02108"),
+                            "My Store indicator not displayed on homepage after browser restart.")
+
+            home_page.click_find_store()
+            store_locator_popup = StoreLocatorPopup(driver)
+            store_locator_popup.select_my_store()
+            store_selection_popup = StoreSelectionPopup(driver)
+            self.assertTrue(store_selection_popup.is_my_store_selected("375 Washington Street, Boston, MA 02108"),
+                            "My Store is not persisted after browser restart.")
         finally:
             driver.quit()
