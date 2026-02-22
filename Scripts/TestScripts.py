@@ -78,3 +78,40 @@ class TestFootLocker(unittest.TestCase):
         self.assertTrue(self.store_locator_popup.are_store_results_displayed(), "Multiple pages of store results should be displayed for 'New York'.")
         self.assertTrue(self.store_locator_popup.go_to_next_page(), "Should be able to navigate to the next page of store results.")
         self.assertTrue(self.store_locator_popup.are_store_results_displayed(), "Next page of store results should be displayed.")
+
+    # --- New Test Methods (2113, 2114) ---
+    def test_2113_store_locator_device_emulation(self):
+        """Test Case 2113: Access Store Locator page on desktop, tablet, and mobile browsers. Verify page displays and functions correctly."""
+        for device_type in ['desktop', 'tablet', 'mobile']:
+            with self.subTest(device_type=device_type):
+                self.assertTrue(
+                    self.home_page.load_homepage(device_type=device_type),
+                    f"Homepage should load correctly for device type: {device_type}"
+                )
+                self.assertTrue(
+                    self.home_page.click_find_a_store(),
+                    f"Should be able to click 'Find a Store' for device type: {device_type}"
+                )
+                self.assertTrue(
+                    self.store_locator_popup.wait_for_popup(),
+                    f"Store Locator popup should be visible for device type: {device_type}"
+                )
+
+    def test_2114_store_locator_accessibility(self):
+        """Test Case 2114: Navigate to Store Locator page via URL, test keyboard navigation and screen reader accessibility."""
+        self.assertTrue(
+            self.home_page.load_homepage(url='https://www.footlocker.com/store-locator'),
+            "Store Locator page should load directly via URL."
+        )
+        self.assertTrue(
+            self.store_locator_popup.wait_for_popup(),
+            "Store Locator popup should be visible."
+        )
+        self.assertTrue(
+            self.store_locator_popup.check_keyboard_navigation(),
+            "All elements should be accessible via keyboard."
+        )
+        self.assertTrue(
+            self.store_locator_popup.check_screen_reader_accessibility(),
+            "All elements should be announced correctly and page should be usable with a screen reader."
+        )
