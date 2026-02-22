@@ -37,3 +37,13 @@ class StoreLocatorPopup:
 
     def is_popup_message_visible(self):
         return self.driver.find_element(*self.POPUP_MESSAGE).is_displayed()
+
+    def is_no_stores_found_message_displayed(self):
+        """
+        Returns True if the 'No stores found near this location' message is visible in the popup.
+        """
+        try:
+            message = self.driver.find_element(*self.POPUP_MESSAGE).text
+            return 'No stores found' in message
+        except Exception:
+            return False
