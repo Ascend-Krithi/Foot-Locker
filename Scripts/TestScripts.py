@@ -40,3 +40,21 @@ class StoreLocatorTests(unittest.TestCase):
         self.assertTrue(self.page.is_store_locator_popup_displayed(), "Store Locator popup should be displayed")
         self.assertTrue(self.page.is_location_textbox_present(), "Location textbox should be present in Store Locator popup")
         self.assertTrue(self.page.is_search_for_stores_button_present(), "Search for Stores button should be present in Store Locator popup")
+
+    def test_2075_search_stores_in_boston(self):
+        """testCaseId 2075: Launch homepage, open store locator popup, enter 'Boston, MA', search for stores."""
+        self.page.launch_homepage('https://www.footlocker.com/')
+        self.page.open_store_locator_popup()
+        self.page.enter_location('Boston, MA')
+        self.page.search_for_stores()
+        # Optionally, add assertion for search results if confirmation indicator is available
+
+    def test_2076_verify_boston_store_address(self):
+        """testCaseId 2076: Launch homepage, open store locator popup, enter 'Boston, MA', search for stores, verify store address."""
+        self.page.launch_homepage('https://www.footlocker.com/')
+        self.page.open_store_locator_popup()
+        self.page.enter_location('Boston, MA')
+        self.page.search_for_stores()
+        address = '375 Washington Street, Boston, MA 02108'
+        self.assertTrue(self.page.is_store_address_visible(address), f"Store address '{address}' should be visible in the results.")
+        self.assertTrue(self.page.verify_store_address_match(address), f"Store address should match exactly: '{address}'")
