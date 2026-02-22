@@ -48,7 +48,6 @@ def test_case_2102(driver):
     homepage = HomepagePage(driver)
     homepage.verify_store_persistence('375 Washington Street, Boston, MA 02108')
 
-
 def test_case_2105(driver):
     """
     TestCaseId: 2105
@@ -66,7 +65,6 @@ def test_case_2105(driver):
     results = homepage.get_store_results()
     assert results and 'Boston' in results, "Store results not displayed for 'Boston, MA'."
 
-
 def test_case_2106(driver):
     """
     TestCaseId: 2106
@@ -83,3 +81,35 @@ def test_case_2106(driver):
     homepage.enter_location_and_search('02108')
     results = homepage.get_store_results()
     assert results and '02108' in results, "Store results not displayed for '02108'."
+
+def test_case_2107(driver):
+    """
+    TestCaseId: 2107
+    Description: Test Case - SCRUM-15408 TS-SL-004 TC-001
+    Steps:
+        1. Launch the Foot Locker website and navigate to the Store Locator page.
+        2. Enter 'Massachusetts' in the Location textbox.
+        3. Click on the 'Search for Stores' button.
+        4. Assert that the list of stores in Massachusetts is displayed.
+    """
+    from Pages.HomepagePage import HomepagePage
+    homepage = HomepagePage(driver)
+    homepage.navigate_to_store_locator('https://www.footlocker.com/store-locator')
+    homepage.enter_location_and_search('Massachusetts')
+    assert homepage.verify_store_results_displayed(), "Store results not displayed for 'Massachusetts'."
+
+def test_case_2108(driver):
+    """
+    TestCaseId: 2108
+    Description: Test Case - SCRUM-15408 TS-SL-005 TC-001
+    Steps:
+        1. Launch the Foot Locker website and navigate to the Store Locator page.
+        2. Enter 'InvalidCity123' in the Location textbox.
+        3. Click on the 'Search for Stores' button.
+        4. Assert that the error message is displayed indicating no stores found.
+    """
+    from Pages.HomepagePage import HomepagePage
+    homepage = HomepagePage(driver)
+    homepage.navigate_to_store_locator('https://www.footlocker.com/store-locator')
+    homepage.enter_location_and_search('InvalidCity123')
+    assert homepage.verify_no_stores_found(), "Error message not displayed for invalid location 'InvalidCity123'."
