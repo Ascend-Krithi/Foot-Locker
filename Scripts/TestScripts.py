@@ -37,7 +37,7 @@ class TestStoreLocator:
     def test_find_a_store_popup_and_select_link(self, driver):
         """Test Case - SCRUM-15408 TS-001 TC-001: Launch Foot Locker website, click 'Find a Store', verify popup and 'Select My Store' link"""
         driver.get('https://www.footlocker.com/')
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]") ))
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]")))
         find_store_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Find a Store')]")
         find_store_btn.click()
         popup = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//div[contains(@class, 'store-locator-popup')]") ))
@@ -50,7 +50,7 @@ class TestStoreLocator:
     def test_select_my_store_opens_locator_popup(self, driver):
         """Test Case - SCRUM-15408 TS-001 TC-002: Click 'Select My Store' and verify store locator popup, textbox, and button"""
         driver.get('https://www.footlocker.com/')
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]") ))
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]")))
         find_store_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Find a Store')]")
         find_store_btn.click()
         select_my_store_link = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Select My Store')]") ))
@@ -65,7 +65,7 @@ class TestStoreLocator:
     def test_TC_2075_store_locator_search_boston(self, driver):
         """Test Case - SCRUM-15408 TS-001 TC-003: Launch Foot Locker website, open store locator popup, enter 'Boston, MA', click 'Search for Stores', and verify results."""
         driver.get('https://www.footlocker.com/')
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]") ))
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]")))
         find_store_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Find a Store')]")
         find_store_btn.click()
         select_my_store_link = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Select My Store')]") ))
@@ -84,7 +84,7 @@ class TestStoreLocator:
     def test_TC_2076_verify_store_address_boston(self, driver):
         """Test Case - SCRUM-15408 TS-001 TC-004: Launch website, open store locator popup, enter 'Boston, MA', click 'Search for Stores', verify store address '375 Washington Street, Boston, MA 02108' is visible and matches expected."""
         driver.get('https://www.footlocker.com/')
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]") ))
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]")))
         find_store_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Find a Store')]")
         find_store_btn.click()
         select_my_store_link = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Select My Store')]") ))
@@ -106,7 +106,7 @@ class TestStoreLocator:
     def test_TC_2085_verify_store_address_format(self, driver):
         """Test Case - SCRUM-15408 TS-003 TC-002: Launch homepage, click 'Find a Store', click 'Select My Store', enter 'Boston, MA', click 'Search for Stores', locate store with address '375 Washington Street, Boston, MA 02108', verify address format matches exactly."""
         driver.get('https://www.footlocker.com/')
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]") ))
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]")))
         find_store_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Find a Store')]")
         find_store_btn.click()
         select_my_store_link = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Select My Store')]") ))
@@ -128,7 +128,7 @@ class TestStoreLocator:
     def test_TC_2086_set_my_store_boston(self, driver):
         """Test Case - SCRUM-15408 TS-004 TC-001: Launch homepage, click 'Find a Store', click 'Select My Store', enter 'Boston, MA', click 'Search for Stores', locate store with address '375 Washington Street, Boston, MA 02108', click 'Set My Store' for this store, verify the store is set as preferred."""
         driver.get('https://www.footlocker.com/')
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]") ))
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]")))
         find_store_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Find a Store')]")
         find_store_btn.click()
         select_my_store_link = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Select My Store')]") ))
@@ -155,7 +155,7 @@ class TestStoreLocator:
     def test_TC_2087_set_my_store_other_then_boston(self, driver):
         """Test Case - SCRUM-15408 TS-004 TC-002: Launch homepage, click 'Find a Store', click 'Select My Store', enter 'Boston, MA', click 'Search for Stores', click 'Set My Store' for a store other than '375 Washington Street, Boston, MA 02108', then click 'Set My Store' for '375 Washington Street, Boston, MA 02108', and verify preferred store is updated."""
         driver.get('https://www.footlocker.com/')
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]") ))
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]")))
         find_store_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Find a Store')]")
         find_store_btn.click()
         select_my_store_link = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Select My Store')]") ))
@@ -174,7 +174,6 @@ class TestStoreLocator:
         other_store_btns = driver.find_elements(By.XPATH, "//div[contains(@class, 'store-results')]//span[not(contains(text(), '375 Washington Street, Boston, MA 02108'))]/ancestor::div[contains(@class, 'store-card')]//button[contains(text(), 'Set My Store')]")
         if other_store_btns:
             other_store_btns[0].click()
-            # Verify preferred store is set (could be a UI element update, confirmation message, etc.)
             confirmation = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//div[contains(@class, 'preferred-store-confirmation')]") ))
             assert confirmation.is_displayed(), "Preferred store confirmation should be visible after setting store."
         else:
@@ -189,7 +188,7 @@ class TestStoreLocator:
     def test_TC_2088_set_my_store_boston_and_verify_confirmation(self, driver):
         """Test Case - SCRUM-15408 TS-005 TC-001: Launch homepage, click 'Find a Store', click 'Select My Store', enter 'Boston, MA', click 'Search for Stores', click 'Set My Store' for '375 Washington Street, Boston, MA 02108', verify confirmation indicator (message, highlight, or store name) is displayed."""
         driver.get('https://www.footlocker.com/')
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]") ))
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Find a Store')]")))
         find_store_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Find a Store')]")
         find_store_btn.click()
         select_my_store_link = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Select My Store')]") ))
@@ -207,6 +206,5 @@ class TestStoreLocator:
         store_address_elem = driver.find_element(By.XPATH, "//div[contains(@class, 'store-results')]//span[contains(text(), '375 Washington Street, Boston, MA 02108')]")
         set_my_store_btn = driver.find_element(By.XPATH, "//div[contains(@class, 'store-results')]//span[contains(text(), '375 Washington Street, Boston, MA 02108')]/ancestor::div[contains(@class, 'store-card')]//button[contains(text(), 'Set My Store')]")
         set_my_store_btn.click()
-        # Verify confirmation indicator
         confirmation = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//div[contains(@class, 'preferred-store-confirmation')]") ))
         assert confirmation.is_displayed(), "Confirmation indicator should be visible after setting preferred store."
