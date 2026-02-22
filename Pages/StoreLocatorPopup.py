@@ -1,44 +1,39 @@
+# StoreLocatorPopup.py
+"""
+Page Object for the Store Locator Popup
+Handles store selection, search actions, and popup validations
+"""
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.remote.webdriver import WebDriver
 
 class StoreLocatorPopup:
-    def __init__(self, driver):
+    def __init__(self, driver: WebDriver):
         self.driver = driver
-        self.popup_locator = (By.XPATH, "//div[@data-testid='store-locator-popup']") # Example: adjust as needed
-        self.popup_message_locator = (By.XPATH, "//div[contains(text(),'Choose a preferred store to make shopping easier')]")
-        self.select_my_store_button_locator = (By.XPATH, "//button[contains(text(), 'Select My Store')]")
 
+    # Locators
+    SELECT_MY_STORE_BUTTON = (By.XPATH, "//button[contains(text(), 'Select My Store')]")
+    LOCATION_TEXTBOX = (By.ID, "store-locator-search-input")
+    SEARCH_FOR_STORES_BUTTON = (By.XPATH, "//button[contains(text(), 'Search for Stores')]")
+    POPUP_MESSAGE = (By.XPATH, "//div[contains(@class, 'store-locator-popup-message')]")
+
+    # Actions
+    def click_select_my_store(self):
+        self.driver.find_element(*self.SELECT_MY_STORE_BUTTON).click()
+
+    def enter_location(self, location: str):
+        textbox = self.driver.find_element(*self.LOCATION_TEXTBOX)
+        textbox.clear()
+        textbox.send_keys(location)
+
+    def click_search_for_stores(self):
+        self.driver.find_element(*self.SEARCH_FOR_STORES_BUTTON).click()
+
+    # Validations
     def is_popup_visible(self):
-        return WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located(self.popup_locator)
-        )
+        return self.driver.find_element(*self.SELECT_MY_STORE_BUTTON).is_displayed()
 
     def get_popup_message(self):
-        popup_message = WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located(self.popup_message_locator)
-        )
-        return popup_message.text
+        return self.driver.find_element(*self.POPUP_MESSAGE).text
 
-    def is_select_my_store_button_visible(self):
-        return WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located(self.select_my_store_button_locator)
-        )
-
-    def click_select_my_store_button(self):
-        select_btn = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(self.select_my_store_button_locator)
-        )
-        select_btn.click()
-
-    # Appended methods
-    def enter_location(self, location):
-        """Enters the location in the location input field."""
-        location_input = self.driver.find_element(By.NAME, "location")
-        location_input.clear()
-        location_input.send_keys(location)
-
-    def click_search(self):
-        """Clicks the 'Search' button in the Store Locator popup."""
-        search_btn = self.driver.find_element(By.CSS_SELECTOR, ".search-btn")
-        search_btn.click()
+    def is_popup_message_visible(self):
+        return self.driver.find_element(*self.POPUP_MESSAGE).is_displayed()
