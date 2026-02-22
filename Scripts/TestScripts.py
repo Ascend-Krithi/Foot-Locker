@@ -1,4 +1,3 @@
-
 import pytest
 from PageClasses.HomePage import HomePage
 from PageClasses.FindAStorePopup import FindAStorePopup
