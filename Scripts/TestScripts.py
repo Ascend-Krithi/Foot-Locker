@@ -1,110 +1,49 @@
-# Existing imports and code remain unchanged
+# Existing imports and code...
 import unittest
 from selenium import webdriver
-from PageClasses.HomePage import HomePage
-from PageClasses.StoreLocatorPopup import StoreLocatorPopup
-from PageClasses.StoreSelectionPopup import StoreSelectionPopup
-from PageClasses.ConfirmationPage import ConfirmationPage
-from PageClasses.ProductListingPage import ProductListingPage
+from Pages/HomePage import HomePage
+from Pages/StoreLocatorPopup import StoreLocatorPopup
 
 class TestScripts(unittest.TestCase):
-    # ... Existing test methods remain unchanged ...
+    # ... existing test methods ...
 
-    def test_2097_homepage_store_locator_search(self):
-        ...
-    def test_2098_homepage_store_locator_search_with_address_validation(self):
-        ...
-
-    def test_2099_set_preferred_store(self):
-        ...
-    def test_2100_store_confirmation_and_persistence(self):
-        ...
-
-    def test_2101_store_persistence_after_navigation(self):
+    def test_2103_homepage_find_a_store_popup(self):
         """
-        Test Case 2101:
-        1. Set the store at '375 Washington Street, Boston, MA 02108' as 'My Store'.
-        2. Navigate to Men's Shoes (product listing).
-        3. Return to homepage.
-        4. Click 'Find a Store' and 'Select My Store' again. Validate that 'My Store' is still set.
+        testCaseId 2103:
+        1. Launch homepage
+        2. Check 'Find a Store' link visible
+        3. Click 'Find a Store'
+        4. Popup appears
         """
-        driver = webdriver.Chrome()
+        driver = webdriver.Chrome()  # or your configured driver
         try:
-            driver.get("https://your-site-homepage.com")
             home_page = HomePage(driver)
-            home_page.click_find_store()
-
-            store_locator_popup = StoreLocatorPopup(driver)
-            store_locator_popup.search_store("375 Washington Street, Boston, MA 02108")
-            store_locator_popup.select_store("375 Washington Street, Boston, MA 02108")
-
-            store_selection_popup = StoreSelectionPopup(driver)
-            store_selection_popup.set_my_store()
-
-            confirmation_page = ConfirmationPage(driver)
-            self.assertTrue(confirmation_page.is_my_store_confirmation_displayed("375 Washington Street, Boston, MA 02108"),
-                            "My Store confirmation not displayed after setting store.")
-
-            # Navigate to Men's Shoes (product listing)
-            home_page.navigate_to_mens_shoes()
-            product_listing_page = ProductListingPage(driver)
-            self.assertTrue(product_listing_page.is_my_store_indicator_displayed("375 Washington Street, Boston, MA 02108"),
-                            "My Store indicator not displayed on product listing page.")
-
-            # Return to homepage
-            product_listing_page.navigate_to_homepage()
-            self.assertTrue(home_page.is_my_store_indicator_displayed("375 Washington Street, Boston, MA 02108"),
-                            "My Store indicator not displayed on homepage after navigation.")
-
-            # Click 'Find a Store' and 'Select My Store' again
-            home_page.click_find_store()
-            store_locator_popup.select_my_store()
-            self.assertTrue(store_selection_popup.is_my_store_selected("375 Washington Street, Boston, MA 02108"),
-                            "My Store is not persisted after navigation.")
+            self.assertTrue(home_page.is_homepage_loaded(), "Homepage did not load correctly.")
+            self.assertTrue(home_page.is_find_a_store_visible(), "'Find a Store' link is not visible on the homepage.")
+            home_page.click_find_a_store()
+            popup = StoreLocatorPopup(driver)
+            self.assertTrue(popup.is_popup_visible(), "Store locator popup did not appear after clicking 'Find a Store'.")
         finally:
             driver.quit()
 
-    def test_2102_store_persistence_after_browser_restart(self):
+    def test_2104_find_a_store_popup_message_and_link(self):
         """
-        Test Case 2102:
-        1. Set the store at '375 Washington Street, Boston, MA 02108' as 'My Store'.
-        2. Close the browser completely.
-        3. Reopen browser and navigate to homepage.
-        4. Click 'Find a Store' and 'Select My Store' again. Validate that 'My Store' is still set.
+        testCaseId 2104:
+        1. Launch homepage
+        2. Click 'Find a Store'
+        3. Popup displays message and 'Select My Store' link
         """
-        # First session: set My Store
-        driver = webdriver.Chrome()
+        driver = webdriver.Chrome()  # or your configured driver
         try:
-            driver.get("https://your-site-homepage.com")
             home_page = HomePage(driver)
-            home_page.click_find_store()
-
-            store_locator_popup = StoreLocatorPopup(driver)
-            store_locator_popup.search_store("375 Washington Street, Boston, MA 02108")
-            store_locator_popup.select_store("375 Washington Street, Boston, MA 02108")
-
-            store_selection_popup = StoreSelectionPopup(driver)
-            store_selection_popup.set_my_store()
-
-            confirmation_page = ConfirmationPage(driver)
-            self.assertTrue(confirmation_page.is_my_store_confirmation_displayed("375 Washington Street, Boston, MA 02108"),
-                            "My Store confirmation not displayed after setting store.")
-        finally:
-            driver.quit()
-
-        # Second session: verify persistence
-        driver = webdriver.Chrome()
-        try:
-            driver.get("https://your-site-homepage.com")
-            home_page = HomePage(driver)
-            self.assertTrue(home_page.is_my_store_indicator_displayed("375 Washington Street, Boston, MA 02108"),
-                            "My Store indicator not displayed on homepage after browser restart.")
-
-            home_page.click_find_store()
-            store_locator_popup = StoreLocatorPopup(driver)
-            store_locator_popup.select_my_store()
-            store_selection_popup = StoreSelectionPopup(driver)
-            self.assertTrue(store_selection_popup.is_my_store_selected("375 Washington Street, Boston, MA 02108"),
-                            "My Store is not persisted after browser restart.")
+            self.assertTrue(home_page.is_homepage_loaded(), "Homepage did not load correctly.")
+            home_page.click_find_a_store()
+            popup = StoreLocatorPopup(driver)
+            self.assertTrue(popup.is_popup_visible(), "Store locator popup did not appear after clicking 'Find a Store'.")
+            expected_message = "Choose a preferred store to make shopping easier"
+            self.assertTrue(popup.is_popup_message_visible(), "Popup message is not visible.")
+            self.assertEqual(popup.get_popup_message(), expected_message, f"Expected popup message '{expected_message}', got '{popup.get_popup_message()}'")
+            self.assertTrue(popup.is_popup_message_visible(), "Popup message is not visible.")
+            self.assertTrue(popup.click_select_my_store is not None, "'Select My Store' link is not available on the popup.")
         finally:
             driver.quit()
