@@ -56,3 +56,31 @@ class TestScripts(unittest.TestCase):
         store_locator.enter_location("02108")
         store_locator.click_search_for_stores()
         self.assertTrue(store_locator.verify_store_list_displayed(), "Store list is not displayed for ZIP code '02108'.")
+
+    def test_scrum_15408_ts_sl_004_tc_001_search_store_by_massachusetts(self):
+        """
+        SCRUM-15408 TS-SL-004 TC-001
+        1. Launch the Foot Locker website and navigate to the Store Locator page.
+        2. Enter 'Massachusetts' in the Location textbox.
+        3. Click on the 'Search for Stores' button.
+        4. Verify that the list of stores in Massachusetts is displayed.
+        """
+        store_locator = StoreLocatorPage(self.driver, self.page.locators)
+        store_locator.navigate_to_store_locator(url="https://www.footlocker.com/store-locator")
+        store_locator.enter_location("Massachusetts")
+        store_locator.click_search()
+        self.assertTrue(store_locator.is_store_search_successful(), "Store list is not displayed for location 'Massachusetts'.")
+
+    def test_scrum_15408_ts_sl_005_tc_001_search_store_by_invalidcity123(self):
+        """
+        SCRUM-15408 TS-SL-005 TC-001
+        1. Launch the Foot Locker website and navigate to the Store Locator page.
+        2. Enter 'InvalidCity123' in the Location textbox.
+        3. Click on the 'Search for Stores' button.
+        4. Verify that error message is displayed indicating no stores found.
+        """
+        store_locator = StoreLocatorPage(self.driver, self.page.locators)
+        store_locator.navigate_to_store_locator(url="https://www.footlocker.com/store-locator")
+        store_locator.enter_location("InvalidCity123")
+        store_locator.click_search()
+        self.assertTrue(store_locator.is_no_stores_found(), "No stores found error message is not displayed for location 'InvalidCity123'.")
