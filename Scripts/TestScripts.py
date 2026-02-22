@@ -76,3 +76,40 @@ def test_tc2096_homepage_find_store_nome_alaska(driver):
 
     store_results = StoreSearchResults(driver)
     assert store_results.is_no_stores_found(), "'No stores found' message not displayed as expected."
+
+@pytest.mark.tc2097
+def test_tc2097_find_store_boston_ma(driver):
+    """Test Case 2097: Launch homepage, click 'Find a Store', select 'My Store', enter 'Boston, MA', search, verify store results."""
+    home_page = HomePage(driver)
+    home_page.load("https://www.footlocker.com/")
+    assert home_page.is_loaded(), "Homepage did not load successfully."
+
+    home_page.click_find_a_store()
+    find_store_popup = FindAStorePopup(driver)
+    assert find_store_popup.is_popup_displayed(), "Store Locator Popup is not displayed."
+
+    find_store_popup.click_select_my_store()
+    find_store_popup.enter_location("Boston, MA")
+    find_store_popup.click_search_for_stores()
+
+    store_results = StoreSearchResults(driver)
+    # Assuming is_results_displayed or similar is implemented
+    assert store_results.is_store_present_in_results("Boston, MA"), "Store results for Boston, MA not found."
+
+@pytest.mark.tc2098
+def test_tc2098_find_store_boston_ma_with_address(driver):
+    """Test Case 2098: Launch homepage, click 'Find a Store', select 'My Store', enter 'Boston, MA', search, verify specific store address in results."""
+    home_page = HomePage(driver)
+    home_page.load("https://www.footlocker.com/")
+    assert home_page.is_loaded(), "Homepage did not load successfully."
+
+    home_page.click_find_a_store()
+    find_store_popup = FindAStorePopup(driver)
+    assert find_store_popup.is_popup_displayed(), "Store Locator Popup is not displayed."
+
+    find_store_popup.click_select_my_store()
+    find_store_popup.enter_location("Boston, MA")
+    find_store_popup.click_search_for_stores()
+
+    store_results = StoreSearchResults(driver)
+    assert store_results.is_store_present_in_results("375 Washington Street, Boston, MA 02108"), "Store with address '375 Washington Street, Boston, MA 02108' not found in results."
