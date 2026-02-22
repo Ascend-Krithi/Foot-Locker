@@ -1,45 +1,50 @@
 # StoreSearchResults.py
+"""
+Page Object for Store Search Results.
+Covers search results, setting store, and address validation.
+"""
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 class StoreSearchResults:
-    SET_MY_STORE_BUTTON_XPATH = "//button[contains(text(), 'Set My Store') and ancestor::div[contains(., '{address}')]]"
-    STORE_ADDRESS_DIV_XPATH = "//div[contains(text(), '{address}')"]
+    """
+    Page Object representing Store Search Results.
+    """
+    SET_MY_STORE_BUTTON_XPATH_TEMPLATE = "//button[contains(text(), 'Set My Store') and ancestor::div[contains(., '{}')]]"
+    STORE_ADDRESS_DIV_XPATH_TEMPLATE = "//div[contains(text(), '{}')]"
 
-    def __init__(self, driver: WebDriver):
+    def __init__(self, driver):
+        """
+        Initializes StoreSearchResults object.
+        :param driver: Selenium WebDriver instance
+        """
         self.driver = driver
-        self.wait = WebDriverWait(driver, 10)
 
-    def set_my_store_by_address(self, address: str):
-        set_my_store_xpath = self.SET_MY_STORE_BUTTON_XPATH.format(address=address)
-        set_my_store_btn = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, set_my_store_xpath))
-        )
-        set_my_store_btn.click()
-
-    def is_store_address_present(self, address: str) -> bool:
-        address_xpath = self.STORE_ADDRESS_DIV_XPATH.format(address=address)
+    def is_store_address_visible(self, address, timeout=10):
+        """
+        Checks if a store address is visible in the search results.
+        :param address: Store address string
+        :param timeout: Max seconds to wait
+        :return: True if address is visible, False otherwise
+        """
+        xpath = self.STORE_ADDRESS_DIV_XPATH_TEMPLATE.format(address)
         try:
-            self.wait.until(
-                EC.visibility_of_element_located((By.XPATH, address_xpath))
+            WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located((By.XPATH, xpath))
             )
             return True
-        except:
+        except Exception:
             return False
 
-    def is_store_set_confirmation_displayed(self, address: str) -> bool:
-        # This method attempts to check for confirmation indicator after setting store
-        # (e.g., highlight, confirmation message, or header update).
-        # This implementation assumes a confirmation appears in a div near the address.
-        # Adjust selector as needed for actual UI.
-        address_xpath = self.STORE_ADDRESS_DIV_XPATH.format(address=address)
-        confirmation_xpath = address_xpath + "/following-sibling::div[contains(@class, 'confirmation') or contains(text(), 'preferred') or contains(text(), 'set as your store')]"
-        try:
-            self.wait.until(
-                EC.visibility_of_element_located((By.XPATH, confirmation_xpath))
-            )
-            return True
-        except:
-            return False
+    def click_set_my_store_button(self, address, timeout=10):
+        """
+        Clicks the 'Set My Store' button for a given store address.
+        :param address: Store address string
+        :param timeout: Max seconds to wait
+        :return: None
+        """
+        xpath = self.SET_MY_STORE_BUTTON_XPATH_TEMPLATE.format(address)
+        WebDriverWait(self.driver, timeout).until(
+            EC.element_to_be_clickable((By.XPATH, xpath))
+        ).click()
