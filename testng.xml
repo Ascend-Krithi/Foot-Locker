@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Suite" parallel="false">
+    <test name="Store Locator Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_TestCase_SCRUM15408_TS001_TC001"/>
+            <class name="com.fl.automation.tests.TS001_TC002_TestCase_SCRUM15408_TS001_TC001"/>
+            <class name="com.fl.automation.tests.TS001_TC003_TestCase_SCRUM15408_TS001_TC002"/>
+            <class name="com.fl.automation.tests.TS001_TC004_TestCase_SCRUM15408_TS001_TC003"/>
+            <class name="com.fl.automation.tests.TS001_TC005_TestCase_SCRUM15408_TS001_TC004"/>
+            <class name="com.fl.automation.tests.TS001_TC006_TestCase_SCRUM15408_TS001_TC005"/>
+            <class name="com.fl.automation.tests.TS001_TC007_TestCase_SCRUM15408_TS001_TC006"/>
+            <class name="com.fl.automation.tests.TS001_TC008_TestCase_SCRUM15408_TS001_TC007"/>
+            <class name="com.fl.automation.tests.TS001_TC009_TestCase_SCRUM15408_TS001_TC001"/>
+            <class name="com.fl.automation.tests.TS001_TC010_TestCase_SCRUM15408_TS001_TC002"/>
+            <class name="com.fl.automation.tests.TS001_TC011_TestCase_SCRUM15408_TS001_TC003"/>
+            <class name="com.fl.automation.tests.TS001_TC012_TestCase_SCRUM15408_TS001_TC004"/>
+            <class name="com.fl.automation.tests.TS001_TC013_TestCase_SCRUM15408_TS001_TC005"/>
+            <class name="com.fl.automation.tests.TS001_TC014_TestCase_SCRUM15408_TS001_TC006"/>
+            <class name="com.fl.automation.tests.TS001_TC015_TestCase_SCRUM15408_TS001_TC007"/>
+        </classes>
+    </test>
+</suite>
