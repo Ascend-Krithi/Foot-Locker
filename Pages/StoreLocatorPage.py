@@ -1,7 +1,7 @@
 # StoreLocatorPage.py
 """
 Selenium Page Object for Foot Locker Store Locator functionality.
-Covers navigation, location entry, search, and result verification.
+Covers navigation, location entry, search, result verification, and error handling for 'no stores found'.
 Strict adherence to Python Selenium best practices.
 """
 
@@ -51,41 +51,34 @@ class StoreLocatorPage:
         Clicks the Search for Stores button.
         """
         search_btn = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(self.locators["search_button"])
+            EC.element_to_be_clickable(self.locators["search_for_stores_button"])
         )
         search_btn.click()
 
-    def get_search_results(self):
+    def is_store_search_successful(self):
         """
-        Returns a list of store results displayed after search.
-        :return: List of dicts with store info (e.g., name, address)
+        Verifies if confirmation indicator is present after search (successful search).
+        :return: True if confirmation indicator is visible, False otherwise
         """
         try:
             WebDriverWait(self.driver, 10).until(
-                EC.visibility_of_element_located(self.locators["results_container"])
+                EC.visibility_of_element_located(self.locators["confirmation_indicator"])
             )
-            results = self.driver.find_elements(*self.locators["store_result_items"])
-            store_list = []
-            for item in results:
-                try:
-                    name = item.find_element(*self.locators["store_name"]).text
-                except NoSuchElementException:
-                    name = ""
-                try:
-                    address = item.find_element(*self.locators["store_address"]).text
-                except NoSuchElementException:
-                    address = ""
-                store_list.append({"name": name, "address": address})
-            return store_list
+            return True
         except TimeoutException:
-            return []
+            return False
 
-# Example locators mapping from Locators.json:
-# locators = {
-#     "location_textbox": (By.ID, "store-locator-input"),
-#     "search_button": (By.XPATH, "//button[@data-testid='store-locator-search']"),
-#     "results_container": (By.ID, "store-results-container"),
-#     "store_result_items": (By.CLASS_NAME, "store-result-item"),
-#     "store_name": (By.CLASS_NAME, "store-name"),
-#     "store_address": (By.CLASS_NAME, "store-address")
-# }
+    def is_no_stores_found(self):
+        """
+        Verifies if error message is displayed indicating no stores found.
+        :return: True if no stores found indicator is visible, False otherwise
+        """
+        try:
+            error_indicator = WebDriverWait(self.driver, 5).until(
+                EC.visibility_of_element_located((By.XPATH, "//div[contains(text(),'No stores found')]"))
+            )
+            return error_indicator.is_displayed()
+        except TimeoutException:
+            return False
+
+    # Existing methods remain untouched.
