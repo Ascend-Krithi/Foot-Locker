@@ -94,3 +94,45 @@ def test_case_2084(driver):
     home_page.click_search_for_stores()
     address = home_page.get_store_address()
     assert '375 Washington Street, Boston, MA 02108' in address, f"Expected address not found. Got: {address}"
+
+
+def test_case_2097(driver):
+    """
+    TestCaseId: 2097
+    Description: Test Case - SCRUM-15408 TS-001 TC-006
+    Steps:
+        1. Launch the Foot Locker website homepage (https://www.footlocker.com/)
+        2. Click 'Find a Store' and 'Select My Store'
+        3. Enter 'Boston, MA' in the location textbox and click 'Search for Stores'
+        4. Assert store results are displayed
+    """
+    from Pages.HomepagePage import HomepagePage
+    homepage = HomepagePage(driver)
+    homepage.launch_homepage('https://www.footlocker.com/')
+    homepage.click_find_a_store()
+    homepage.click_select_my_store()
+    homepage.enter_location_and_search('Boston, MA')
+    results_text = homepage.get_store_results()
+    assert results_text and len(results_text.strip()) > 0, "Store results are not displayed."
+
+
+def test_case_2098(driver):
+    """
+    TestCaseId: 2098
+    Description: Test Case - SCRUM-15408 TS-001 TC-007
+    Steps:
+        1. Launch the Foot Locker website homepage (https://www.footlocker.com/)
+        2. Click 'Find a Store' and 'Select My Store'
+        3. Enter 'Boston, MA' in the location textbox and click 'Search for Stores'
+        4. Assert store results are displayed
+        5. Assert the store with address '375 Washington Street, Boston, MA 02108' is present in results
+    """
+    from Pages.HomepagePage import HomepagePage
+    homepage = HomepagePage(driver)
+    homepage.launch_homepage('https://www.footlocker.com/')
+    homepage.click_find_a_store()
+    homepage.click_select_my_store()
+    homepage.enter_location_and_search('Boston, MA')
+    results_text = homepage.get_store_results()
+    assert results_text and len(results_text.strip()) > 0, "Store results are not displayed."
+    assert homepage.verify_store_address_present('375 Washington Street, Boston, MA 02108'), "Store address '375 Washington Street, Boston, MA 02108' not found in results."
