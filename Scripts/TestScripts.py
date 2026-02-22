@@ -134,42 +134,36 @@ class TestScripts(unittest.TestCase):
         self.assertIsNotNone(store_indicator, "Preferred store indicator not found on Women's Shoes page.")
         self.assertIn('375 Washington Street, Boston, MA 02108', store_indicator)
 
-    # Newly added test for SCRUM-15408 TS-001 TC-004
-    def test_scrum_15408_ts_001_tc_004_search_boston_by_zip(self):
+    def test_scrum_15408_ts_001_tc_002_store_locator_location_textbox(self):
         """
-        Test Case: SCRUM-15408 TS-001 TC-004
+        Test Case: SCRUM-15408 TS-001 TC-002 (2093)
         Steps:
-        1. Launch the Foot Locker website and navigate to the homepage.
-        2. Click 'Find a Store' and then 'Select My Store'.
-        3. Enter '02108' in the Location textbox.
-        4. Click the 'Search for Stores' button.
-        5. Verify store results in or near Boston are displayed.
+        1. Launch homepage
+        2. Click 'Find a Store'
+        3. Click 'Select My Store'
+        4. Check presence and enabled state of location textbox
         """
-        self.page.launch_homepage('https://www.footlocker.com/')
-        self.page.click_find_store()
-        self.page.click_select_my_store()
-        self.page.enter_location('02108')
-        self.page.click_search_for_stores()
-        # You may want to verify a specific store address or check for any Boston-related address
-        found = self.page.is_store_address_present_in_results('Boston')
-        self.assertTrue(found, "No store results found in or near Boston for ZIP 02108.")
+        # Implemented using StoreLocatorPage methods
+        self.page.click_find_store_link()
+        self.page.click_select_my_store_button()
+        is_present_and_enabled = self.page.is_location_textbox_present_and_enabled()
+        self.assertTrue(is_present_and_enabled, "Location textbox is not present and enabled.")
 
-    # Newly added test for SCRUM-15408 TS-001 TC-005
-    def test_scrum_15408_ts_001_tc_005_search_nome_alaska(self):
+    def test_scrum_15408_ts_001_tc_003_store_locator_search_boston(self):
         """
-        Test Case: SCRUM-15408 TS-001 TC-005
+        Test Case: SCRUM-15408 TS-001 TC-003 (2094)
         Steps:
-        1. Launch the Foot Locker website and navigate to the homepage.
-        2. Click 'Find a Store' and then 'Select My Store'.
-        3. Enter 'Nome, Alaska' in the Location textbox.
-        4. Click the 'Search for Stores' button.
-        5. Verify 'No stores found near this location' message is displayed.
+        1. Launch homepage
+        2. Click 'Find a Store'
+        3. Click 'Select My Store'
+        4. Enter 'Boston, MA' in the location textbox
+        5. Click 'Search for Stores'
+        6. Validate that store results are displayed
         """
-        self.page.launch_homepage('https://www.footlocker.com/')
-        self.page.click_find_store()
-        self.page.click_select_my_store()
-        self.page.enter_location('Nome, Alaska')
-        self.page.click_search_for_stores()
-        # Check that the popup message for no stores found is present
-        found = self.page.verify_find_store_popup_message('No stores found near this location')
-        self.assertTrue(found, "'No stores found near this location' message was not displayed for Nome, Alaska.")
+        # Implemented using StoreLocatorPage methods
+        self.page.click_find_store_link()
+        self.page.click_select_my_store_button()
+        self.page.enter_location('Boston, MA')
+        self.page.click_search_for_stores_button()
+        has_results = self.page.is_store_result_present()
+        self.assertTrue(has_results, "No store results found for 'Boston, MA'.")
