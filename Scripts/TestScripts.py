@@ -23,40 +23,73 @@ class TestScripts(unittest.TestCase):
     def test_scrum_15408_ts_001_tc_002_store_locator_location_textbox(self): ...
     def test_scrum_15408_ts_001_tc_003_store_locator_search_boston(self): ...
 
-    def test_scrum_15408_ts_001_tc_008_set_preferred_store(self):
-        """
-        Test Case: SCRUM-15408 TS-001 TC-008
-        Steps:
-        1. Launch the Foot Locker website and navigate to the homepage.
-        2. Click 'Find a Store' and then 'Select My Store'.
-        3. Enter 'Boston, MA' in the Location textbox and click 'Search for Stores'.
-        4. Click 'Set My Store' for the store at '375 Washington Street, Boston, MA 02108'.
-        Expected: The selected store is saved as the user’s preferred store.
-        """
-        self.page.launch_homepage('https://www.footlocker.com/')
-        self.page.click_find_store()
-        self.page.click_select_my_store()
-        self.page.enter_location('Boston, MA')
-        self.page.click_search_for_stores()
-        self.page.click_set_my_store()
-        is_preferred = self.page.verify_store_address_exact_match('375 Washington Street, Boston, MA 02108')
-        self.assertTrue(is_preferred, "Preferred store was not set correctly.")
+    def test_scrum_15408_ts_001_tc_008_set_preferred_store(self): ...
+    def test_scrum_15408_ts_001_tc_009_verify_preferred_store_confirmation(self): ...
 
-    def test_scrum_15408_ts_001_tc_009_verify_preferred_store_confirmation(self):
+    def test_scrum_15408_ts_001_tc_010_preferred_store_persistence_navigation(self):
         """
-        Test Case: SCRUM-15408 TS-001 TC-009
-        Steps:
-        1. Set the store at '375 Washington Street, Boston, MA 02108' as 'My Store' (as in previous test case).
-        2. Observe the UI for confirmation (e.g., message, highlight, or store name in header).
-        Expected: Confirmation indicator is displayed and the selected store appears consistently across the website.
+        SCRUM-15408 TS-001 TC-010
+        1. Set the store at '375 Washington Street, Boston, MA 02108' as 'My Store'.
+        2. Navigate to another page (Men's Shoes).
+        3. Return to the homepage.
+        4. Click 'Find a Store' and 'Select My Store' again.
+        5. Verify the preferred store is still set.
         """
-        self.page.launch_homepage('https://www.footlocker.com/')
-        self.page.click_find_store()
-        self.page.click_select_my_store()
-        self.page.enter_location('Boston, MA')
-        self.page.click_search_for_stores()
-        self.page.click_set_my_store()
-        confirmation = self.page.verify_confirmation()
-        self.assertTrue(confirmation, "Confirmation indicator is not displayed.")
-        is_preferred = self.page.verify_store_address_exact_match('375 Washington Street, Boston, MA 02108')
-        self.assertTrue(is_preferred, "Preferred store is not shown consistently across the website.")
+        store_locator = StoreLocatorPage(self.driver)
+        mens_sneakers = MensSneakersPage(self.driver)
+
+        # Step 1: Open homepage and set preferred store
+        store_locator.open_homepage()
+        store_locator.click_find_store()
+        store_locator.enter_location('375 Washington Street, Boston, MA 02108')
+        store_locator.click_search_for_stores()
+        store_locator.set_my_store('375 Washington Street, Boston, MA 02108')
+        self.assertTrue(store_locator.is_confirmation_displayed(), "Confirmation not displayed after setting preferred store.")
+
+        # Step 2: Navigate to Men's Shoes page
+        mens_sneakers.launch_page()
+        self.assertTrue(mens_sneakers.verify_store_indicator('375 Washington Street, Boston, MA 02108'), "Preferred store not indicated on Men's Sneakers page.")
+
+        # Step 3: Return to homepage
+        store_locator.open_homepage()
+
+        # Step 4: Click 'Find a Store' and 'Select My Store' again
+        store_locator.click_find_store()
+        store_locator.click_select_my_store()
+
+        # Step 5: Verify the preferred store is still set
+        self.assertTrue(store_locator.is_my_store_persisted('375 Washington Street, Boston, MA 02108'), "Preferred store was not persisted after navigation.")
+
+    def test_scrum_15408_ts_001_tc_011_preferred_store_persistence_browser_restart(self):
+        """
+        SCRUM-15408 TS-001 TC-011
+        1. Set the store at '375 Washington Street, Boston, MA 02108' as 'My Store'.
+        2. Close the browser completely.
+        3. Reopen browser and navigate to homepage.
+        4. Click 'Find a Store' and 'Select My Store' again.
+        5. Verify the preferred store is still set.
+        """
+        store_locator = StoreLocatorPage(self.driver)
+
+        # Step 1: Open homepage and set preferred store
+        store_locator.open_homepage()
+        store_locator.click_find_store()
+        store_locator.enter_location('375 Washington Street, Boston, MA 02108')
+        store_locator.click_search_for_stores()
+        store_locator.set_my_store('375 Washington Street, Boston, MA 02108')
+        self.assertTrue(store_locator.is_confirmation_displayed(), "Confirmation not displayed after setting preferred store.")
+
+        # Step 2: Close the browser completely
+        self.driver.quit()
+
+        # Step 3: Reopen browser and navigate to homepage
+        self.driver = webdriver.Chrome()
+        store_locator = StoreLocatorPage(self.driver)
+        store_locator.open_homepage()
+
+        # Step 4: Click 'Find a Store' and 'Select My Store' again
+        store_locator.click_find_store()
+        store_locator.click_select_my_store()
+
+        # Step 5: Verify the preferred store is still set
+        self.assertTrue(store_locator.is_my_store_persisted('375 Washington Street, Boston, MA 02108'), "Preferred store was not persisted after browser restart.")
