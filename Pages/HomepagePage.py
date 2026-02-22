@@ -1,15 +1,15 @@
 # Pages/HomepagePage.py
 """
 HomepagePage
-==============
+============
 
-This PageClass models the Foot Locker homepage and store locator interactions as specified in test cases SCRUM-15408 TS-001 TC-006 and TC-007.
+This PageClass models the Foot Locker homepage and store locator interactions as specified in test cases SCRUM-15408 TS-SL-002 TC-001 and TS-SL-003 TC-001.
 
 Features:
 - Launch homepage
-- Click 'Find a Store' and 'Select My Store'
-- Enter location and search for stores
-- Verify store results and specific address presence
+- Navigate directly to Store Locator page
+- Enter location (city or ZIP) and search for stores
+- Verify store results
 
 Strict code integrity, robust locator mapping, and comprehensive docstrings are included for downstream automation.
 """
@@ -54,28 +54,22 @@ class HomepagePage:
         except TimeoutException:
             raise AssertionError("Homepage did not load as expected.")
 
-    def click_find_a_store(self):
+    def navigate_to_store_locator(self, url="https://www.footlocker.com/store-locator"):
         """
-        Clicks the 'Find a Store' button.
+        Navigates directly to the Foot Locker Store Locator page.
+        :param url: Store Locator URL
         :return: None
         """
-        find_store_btn = self.wait.until(EC.element_to_be_clickable(self.FIND_A_STORE_BUTTON))
-        find_store_btn.click()
-
-    def click_select_my_store(self):
-        """
-        Clicks the 'Select My Store' button.
-        :return: None
-        """
-        select_store_btn = self.wait.until(EC.element_to_be_clickable(self.SELECT_MY_STORE_BUTTON))
-        select_store_btn.click()
-        # Wait for store locator popup
-        self.wait.until(EC.visibility_of_element_located(self.STORE_RESULTS_POPUP))
+        self.driver.get(url)
+        try:
+            self.wait.until(EC.presence_of_element_located(self.LOCATION_TEXTBOX))
+        except TimeoutException:
+            raise AssertionError("Store Locator page did not load as expected.")
 
     def enter_location_and_search(self, location):
         """
-        Enters a location in the textbox and clicks 'Search for Stores'.
-        :param location: String location (e.g. 'Boston, MA')
+        Enters a location (city or ZIP) in the textbox and clicks 'Search for Stores'.
+        :param location: String location (e.g. 'Boston, MA' or '02108')
         :return: None
         """
         location_box = self.wait.until(EC.element_to_be_clickable(self.LOCATION_TEXTBOX))
@@ -94,14 +88,16 @@ class HomepagePage:
         results_popup = self.wait.until(EC.visibility_of_element_located(self.STORE_RESULTS_POPUP))
         return results_popup.text
 
-    def verify_store_address_present(self, address):
+    def verify_store_results_displayed(self):
         """
-        Verifies that a store with the exact address is present in the results.
-        :param address: Store address string
-        :return: True if present, else False
+        Verifies that the store results popup is displayed.
+        :return: True if displayed, else False
         """
-        results_text = self.get_store_results()
-        return address in results_text
+        try:
+            self.wait.until(EC.visibility_of_element_located(self.STORE_RESULTS_POPUP))
+            return True
+        except TimeoutException:
+            return False
 
     def verify_no_stores_found(self):
         """
