@@ -36,4 +36,24 @@ class TestStoreLocator(unittest.TestCase):
         stores = self.store_locator_popup.get_list_of_stores()
         self.assertTrue(len(stores) > 0, "No stores found for location '02108'")
 
-# Note: Ensure StoreLocatorPopup has a get_list_of_stores() method that returns a list of store elements.
+    def test_2107_search_stores_massachusetts(self):
+        """
+        Test Case 2107: Launch Foot Locker, open Store Locator, search for 'Massachusetts', verify list of stores is displayed.
+        """
+        self.home_page.click_find_a_store()
+        self.store_locator_popup.enter_location('Massachusetts')
+        self.store_locator_popup.click_search_for_stores()
+        # Assuming get_list_of_stores exists and returns store elements
+        stores = self.store_locator_popup.get_list_of_stores()
+        self.assertTrue(len(stores) > 0, "No stores found for location 'Massachusetts'")
+
+    def test_2108_search_invalid_city(self):
+        """
+        Test Case 2108: Launch Foot Locker, open Store Locator, search for 'InvalidCity123', verify error message is displayed.
+        """
+        self.home_page.click_find_a_store()
+        self.store_locator_popup.enter_location('InvalidCity123')
+        self.store_locator_popup.click_search_for_stores()
+        self.assertTrue(self.store_locator_popup.is_error_message_visible(), "Error message not visible for invalid city.")
+        error_text = self.store_locator_popup.get_error_message_text()
+        self.assertTrue(error_text != "", "Error message text is empty.")
