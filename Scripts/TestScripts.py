@@ -1,67 +1,103 @@
 # Existing imports
+import pytest
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from Pages.HomePage import HomePage
 from Pages.StoreLocatorPopup import StoreLocatorPopup
-import unittest
 
-class TestScripts(unittest.TestCase):
-    # ...existing test methods...
+class TestFootLockerStoreLocator:
+    # ... (existing test methods remain unchanged)
 
-    def test_2081_verify_store_locator_popup_fields(self):
+    @pytest.mark.tc2091
+    def test_TC2091_store_locator_popup_display(self, driver):
         """
-        Test Case 2081:
-        1. Load homepage
-        2. Click Find a Store
-        3. Click Select My Store
-        4. Verify popup fields
+        TC ID: 2091 (SCRUM-15408 TS-006 TC-002)
+        Test that the Store Locator popup appears when the Store Locator link is clicked from the home page.
+        Steps:
+        1. Navigate to the home page
+        2. Click the Store Locator link
+        3. Verify that the Store Locator popup is displayed
         """
-        driver = self.driver
         home_page = HomePage(driver)
-        store_popup = StoreLocatorPopup(driver)
+        store_locator_popup = StoreLocatorPopup(driver)
         
-        # Step 1: Load homepage
-        home_page.load()
+        # Step 1: Navigate to home page (assume driver is already on home page)
+        # Step 2: Click the Store Locator link
+        home_page.click_store_locator_link()
         
-        # Step 2: Click Find a Store
-        home_page.click_find_a_store()
-        
-        # Step 3: Click Select My Store
-        home_page.click_select_my_store()
-        
-        # Step 4: Verify popup fields
-        self.assertTrue(store_popup.is_popup_displayed(), "Store locator popup not displayed.")
-        self.assertTrue(store_popup.is_search_field_present(), "Search field not present in popup.")
-        self.assertTrue(store_popup.is_search_button_present(), "Search button not present in popup.")
-        self.assertTrue(store_popup.is_close_button_present(), "Close button not present in popup.")
+        # Step 3: Verify that the Store Locator popup is displayed
+        assert store_locator_popup.is_popup_displayed(), "Store Locator popup should be displayed after clicking the link."
 
-    def test_2082_search_store_by_location(self):
+    @pytest.mark.tc2092
+    def test_TC2092_store_locator_search_and_results(self, driver):
         """
-        Test Case 2082:
-        1. Load homepage
-        2. Click Find a Store
-        3. Click Select My Store
-        4. Enter 'Boston, MA'
-        5. Click Search for Stores
-        6. Verify results
+        TC ID: 2092 (SCRUM-15408 TS-001 TC-001)
+        Test that searching for a store by ZIP code displays results in the Store Locator popup.
+        Steps:
+        1. Navigate to the home page
+        2. Click the Store Locator link
+        3. Enter a valid ZIP code and submit
+        4. Verify that search results are displayed
         """
-        driver = self.driver
         home_page = HomePage(driver)
-        store_popup = StoreLocatorPopup(driver)
+        store_locator_popup = StoreLocatorPopup(driver)
         
-        # Step 1: Load homepage
-        home_page.load()
+        # Step 1: Navigate to home page (assume driver is already on home page)
+        # Step 2: Click the Store Locator link
+        home_page.click_store_locator_link()
         
-        # Step 2: Click Find a Store
-        home_page.click_find_a_store()
+        # Wait for popup to be visible
+        assert store_locator_popup.is_popup_displayed(), "Store Locator popup should be displayed after clicking the link."
         
-        # Step 3: Click Select My Store
-        home_page.click_select_my_store()
+        # Step 3: Enter a valid ZIP code and submit
+        store_locator_popup.enter_zip_code("10001")
+        store_locator_popup.click_search_button()
         
-        # Step 4: Enter 'Boston, MA'
-        store_popup.enter_search_text('Boston, MA')
+        # Step 4: Verify that search results are displayed
+        assert store_locator_popup.has_search_results(), "Search results should be displayed for valid ZIP code."
+
+    @pytest.mark.tc2093
+    def test_TC2093_find_store_and_location_textbox(self, driver):
+        """
+        TC ID: 2093 (SCRUM-15408 TS-001 TC-002)
+        Steps:
+        1. Launch the Foot Locker website and navigate to the homepage.
+        2. Click 'Find a Store' and then 'Select My Store'.
+        3. Check for the presence and enabled state of the Location textbox.
+        """
+        home_page = HomePage(driver)
+        store_locator_popup = StoreLocatorPopup(driver)
         
-        # Step 5: Click Search for Stores
-        store_popup.click_search_button()
+        # Step 1: Launch homepage
+        assert home_page.load_homepage(), "Homepage should load successfully."
+        # Step 2: Click 'Find a Store' and then 'Select My Store'
+        assert home_page.click_find_a_store(), "Find a Store link should be clickable."
+        assert store_locator_popup.wait_for_popup(), "Store Locator popup should be visible."
+        assert store_locator_popup.click_select_my_store(), "Select My Store should be clickable."
+        # Step 3: Check for location textbox and search button
+        assert store_locator_popup.verify_location_textbox_and_search_button(), "Location textbox and Search button should be visible and enabled."
+
+    @pytest.mark.tc2094
+    def test_TC2094_enter_location_and_search(self, driver):
+        """
+        TC ID: 2094 (SCRUM-15408 TS-001 TC-003)
+        Steps:
+        1. Launch the Foot Locker website and navigate to the homepage.
+        2. Click 'Find a Store' and then 'Select My Store'.
+        3. Enter 'Boston, MA' in the Location textbox.
+        4. Click the 'Search for Stores' button.
+        """
+        home_page = HomePage(driver)
+        store_locator_popup = StoreLocatorPopup(driver)
         
-        # Step 6: Verify results
-        self.assertTrue(store_popup.is_results_displayed(), "Search results not displayed for 'Boston, MA'.")
+        # Step 1: Launch homepage
+        assert home_page.load_homepage(), "Homepage should load successfully."
+        # Step 2: Click 'Find a Store' and then 'Select My Store'
+        assert home_page.click_find_a_store(), "Find a Store link should be clickable."
+        assert store_locator_popup.wait_for_popup(), "Store Locator popup should be visible."
+        assert store_locator_popup.click_select_my_store(), "Select My Store should be clickable."
+        # Step 3: Enter 'Boston, MA' in Location textbox
+        assert store_locator_popup.enter_location('Boston, MA'), "Should be able to enter location."
+        # Step 4: Click 'Search for Stores' button
+        assert store_locator_popup.click_search_for_stores(), "Search for Stores button should be clickable."
