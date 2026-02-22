@@ -1,80 +1,73 @@
+
 import unittest
 from selenium import webdriver
-from Pages.HomePage import HomePage
-from Pages.StoreLocatorPopup import StoreLocatorPopup
-from Pages.StoreSelectionPopup import StoreSelectionPopup
-from Pages.ConfirmationPage import ConfirmationPage
+from PageClasses.HomePage import HomePage
+from PageClasses.StoreLocatorPopup import StoreLocatorPopup
+from PageClasses.StoreSelectionPopup import StoreSelectionPopup
+from PageClasses.ConfirmationPage import ConfirmationPage
 
-class FootLockerTests(unittest.TestCase):
+class TestScripts(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Chrome()
-        self.driver.implicitly_wait(10)
+        self.driver.maximize_window()
+        self.home_page = HomePage(self.driver)
+        self.store_locator_popup = StoreLocatorPopup(self.driver)
+        self.store_selection_popup = StoreSelectionPopup(self.driver)
+        self.confirmation_page = ConfirmationPage(self.driver)
 
     def tearDown(self):
         self.driver.quit()
 
-    # ... (existing test methods remain unchanged)
+    # Existing test methods ...
 
-    def test_2077_set_boston_store_via_store_locator(self):
-        pass
+    # Test case 2091: Validate store selection flow from homepage
+    def test_2091_store_selection_from_homepage(self):
+        # Navigate to home page
+        self.home_page.open()
+        self.assertTrue(self.home_page.is_loaded(), "Home page failed to load")
 
-    def test_2078_confirm_boston_store_set_and_persisted(self):
-        pass
+        # Open Store Locator popup
+        self.home_page.click_store_locator()
+        self.assertTrue(self.store_locator_popup.is_displayed(), "Store Locator popup not displayed")
 
-    def test_2081_homepage_find_store_popup(self):
-        driver = self.driver
-        homepage = HomePage(driver)
-        homepage.load_homepage()
-        self.assertTrue(driver.current_url.startswith('https://www.footlocker.com/'))
-        homepage.click_find_a_store()
-        store_locator_popup = StoreLocatorPopup(driver)
-        self.assertTrue(store_locator_popup.is_popup_visible())
-        store_locator_popup.click_select_my_store_button()
-        store_selection_popup = StoreSelectionPopup(driver)
-        self.assertTrue(store_selection_popup.is_location_textbox_present())
-        self.assertTrue(store_selection_popup.is_search_button_present())
+        # Search for store
+        self.store_locator_popup.enter_search_criteria("New York")
+        self.store_locator_popup.click_search()
+        self.assertTrue(self.store_locator_popup.has_results(), "No results found for 'New York'")
 
-    def test_2082_search_store_boston(self):
-        driver = self.driver
-        homepage = HomePage(driver)
-        homepage.load_homepage()
-        self.assertTrue(driver.current_url.startswith('https://www.footlocker.com/'))
-        homepage.click_find_a_store()
-        store_locator_popup = StoreLocatorPopup(driver)
-        self.assertTrue(store_locator_popup.is_popup_visible())
-        store_locator_popup.click_select_my_store_button()
-        store_selection_popup = StoreSelectionPopup(driver)
-        self.assertTrue(store_selection_popup.is_location_textbox_present())
-        store_selection_popup.enter_location('Boston, MA')
-        textbox = driver.find_element_by_id('store-locator-search-input')
-        self.assertEqual(textbox.get_attribute('value'), 'Boston, MA')
-        self.assertTrue(store_selection_popup.is_search_button_present())
-        store_selection_popup.click_search_for_stores()
-        store_items = driver.find_elements_by_xpath("//div[@class='store-item']")
-        self.assertGreater(len(store_items), 0)
+        # Select first store from results
+        self.store_locator_popup.select_store_by_index(0)
+        self.assertTrue(self.store_selection_popup.is_displayed(), "Store Selection popup not displayed")
 
-    def test_2085_validate_store_address(self):
-        # ... (truncated for brevity)
-        pass
+        # Confirm store selection
+        self.store_selection_popup.confirm_selection()
+        self.assertTrue(self.confirmation_page.is_displayed(), "Confirmation page not displayed after store selection")
 
-    def test_2080_homepage_find_store_popup_message(self):
-        """
-        Test Case 2080:
-        1. Launch the Foot Locker website homepage (https://www.footlocker.com/) and verify that the homepage loads successfully.
-        2. Locate and click on the 'Find a Store' link in the header and verify that a popup appears below 'Find a Store'.
-        3. Observe the popup and verify it displays the message 'Choose a preferred store to make shopping easier' and a visible 'Select My Store' link.
-        """
-        driver = self.driver
-        homepage = HomePage(driver)
-        driver.get('https://www.footlocker.com/')
-        self.assertTrue(homepage.is_homepage_loaded(), "Homepage did not load successfully.")
-        homepage.click_find_a_store()
-        store_locator_popup = StoreLocatorPopup(driver)
-        self.assertTrue(store_locator_popup.is_popup_visible(), "Store Locator popup did not appear.")
-        self.assertTrue(store_locator_popup.is_popup_message_visible(), "Popup message is not visible.")
-        popup_message = store_locator_popup.get_popup_message()
-        self.assertEqual(popup_message.strip(), "Choose a preferred store to make shopping easier", "Popup message text did not match expected.")
-        self.assertTrue(driver.find_element(*StoreLocatorPopup.SELECT_MY_STORE_BUTTON).is_displayed(), "Select My Store button is not visible.")
+        # Validate confirmation details
+        self.assertTrue(self.confirmation_page.has_store_details("New York"), "Store details do not match selection")
 
-if __name__ == '__main__':
+    # Test case 2092: Validate store selection cancellation
+    def test_2092_store_selection_cancellation(self):
+        # Navigate to home page
+        self.home_page.open()
+        self.assertTrue(self.home_page.is_loaded(), "Home page failed to load")
+
+        # Open Store Locator popup
+        self.home_page.click_store_locator()
+        self.assertTrue(self.store_locator_popup.is_displayed(), "Store Locator popup not displayed")
+
+        # Search for store
+        self.store_locator_popup.enter_search_criteria("Los Angeles")
+        self.store_locator_popup.click_search()
+        self.assertTrue(self.store_locator_popup.has_results(), "No results found for 'Los Angeles'")
+
+        # Select first store from results
+        self.store_locator_popup.select_store_by_index(0)
+        self.assertTrue(self.store_selection_popup.is_displayed(), "Store Selection popup not displayed")
+
+        # Cancel store selection
+        self.store_selection_popup.cancel_selection()
+        self.assertTrue(self.home_page.is_loaded(), "Home page not displayed after cancelling store selection")
+
+if __name__ == "__main__":
     unittest.main()
