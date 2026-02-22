@@ -53,43 +53,68 @@ def test_TC_009_verify_preferred_store_confirmation_and_persistence(driver):
     assert popup.verify_store_indicator_on_other_page("375 Washington Street, Boston, MA 02108"), "Preferred store indicator not shown on other pages."
 
 
-def test_TC_2105_store_locator_search_boston_ma(driver):
+def test_TC_001_store_locator_search_city(driver):
     """
-    Test Case - SCRUM-15408 TS-SL-002 TC-001 (2105):
-    1. Launch https://www.footlocker.com/store-locator
-    2. Verify Store Locator page is displayed
-    3. Enter 'Boston, MA' in the Location textbox
-    4. Verify 'Boston, MA' is entered
-    5. Click 'Search for Stores'
-    6. Verify list of stores in or near Boston is displayed
+    Test Case - SCRUM-15408 TS-SL-002 TC-001:
+    1. Launch the Foot Locker website and navigate to the Store Locator page.
+    2. Enter 'Boston, MA' in the Location textbox.
+    3. Click on the 'Search for Stores' button.
+    4. Verify list of stores in or near Boston is displayed.
     """
     home = HomePage(driver)
-    assert home.load_homepage("https://www.footlocker.com/store-locator"), "Store Locator page did not load successfully."
-    assert home.click_find_a_store(), "Failed to click 'Find a Store'."
+    assert home.go_to_store_locator_page(), "Store Locator page did not load successfully."
     popup = StoreLocatorPopup(driver)
-    assert popup.wait_for_popup(), "Store Locator Popup did not display."
     assert popup.verify_location_textbox_and_search_button(), "Location textbox or search button not visible."
     assert popup.enter_location("Boston, MA"), "Failed to enter 'Boston, MA' in the location textbox."
     assert popup.click_search_for_stores(), "Failed to click 'Search for Stores'."
-    assert popup.are_store_results_displayed(), "Store search results for Boston, MA not displayed."
+    assert popup.are_store_results_displayed(), "Store search results not displayed for 'Boston, MA'."
 
 
-def test_TC_2106_store_locator_search_zip_02108(driver):
+def test_TC_002_store_locator_search_zip(driver):
     """
-    Test Case - SCRUM-15408 TS-SL-003 TC-001 (2106):
-    1. Launch https://www.footlocker.com/store-locator
-    2. Verify Store Locator page is displayed
-    3. Enter '02108' in the Location textbox
-    4. Verify '02108' is entered
-    5. Click 'Search for Stores'
-    6. Verify list of stores in or near ZIP code 02108 is displayed
+    Test Case - SCRUM-15408 TS-SL-003 TC-001:
+    1. Launch the Foot Locker website and navigate to the Store Locator page.
+    2. Enter '02108' in the Location textbox.
+    3. Click on the 'Search for Stores' button.
+    4. Verify list of stores in or near ZIP code 02108 is displayed.
     """
     home = HomePage(driver)
-    assert home.load_homepage("https://www.footlocker.com/store-locator"), "Store Locator page did not load successfully."
-    assert home.click_find_a_store(), "Failed to click 'Find a Store'."
+    assert home.go_to_store_locator_page(), "Store Locator page did not load successfully."
     popup = StoreLocatorPopup(driver)
-    assert popup.wait_for_popup(), "Store Locator Popup did not display."
     assert popup.verify_location_textbox_and_search_button(), "Location textbox or search button not visible."
     assert popup.enter_location("02108"), "Failed to enter '02108' in the location textbox."
     assert popup.click_search_for_stores(), "Failed to click 'Search for Stores'."
-    assert popup.are_store_results_displayed(), "Store search results for ZIP code 02108 not displayed."
+    assert popup.are_store_results_displayed(), "Store search results not displayed for '02108'."
+
+# New test methods appended below
+
+def test_TC_2103_homepage_and_find_store_popup(driver):
+    """
+    Test Case - SCRUM-15408 TS-SL-001 TC-001:
+    1. Launch the Foot Locker website in a browser. [Test Data- URL: https://www.footlocker.com/] [Acceptance Criteria- AC1]
+    2. Locate the 'Find a Store' link in the header. [Acceptance Criteria- AC1]
+    3. Click on the 'Find a Store' link. [Acceptance Criteria- AC1]
+    """
+    home = HomePage(driver)
+    assert home.load_homepage(), "Home Page did not load successfully."
+    assert home.click_find_a_store(), "Failed to click 'Find a Store'."
+    popup = StoreLocatorPopup(driver)
+    assert popup.wait_for_popup(), "Store Locator popup did not appear."
+    assert popup.is_select_my_store_link_visible(), "'Find a Store' link is not visible in popup."
+
+
+def test_TC_2104_popup_message_and_select_my_store(driver):
+    """
+    Test Case - SCRUM-15408 TS-SL-001 TC-002:
+    1. Launch the Foot Locker website in a browser. [Test Data- URL: https://www.footlocker.com/] [Acceptance Criteria- AC1]
+    2. Click on the 'Find a Store' link in the header. [Acceptance Criteria- AC1]
+    3. Observe the popup message and available links. [Acceptance Criteria- AC1]
+    """
+    home = HomePage(driver)
+    assert home.load_homepage(), "Home Page did not load successfully."
+    assert home.click_find_a_store(), "Failed to click 'Find a Store'."
+    popup = StoreLocatorPopup(driver)
+    assert popup.wait_for_popup(), "Store Locator popup did not appear."
+    expected_message = "Choose a preferred store to make shopping easier"
+    assert popup.verify_popup_message(expected_message), f"Popup message '{expected_message}' not found."
+    assert popup.is_select_my_store_link_visible(), "'Select My Store' link is not visible in popup."
