@@ -37,3 +37,9 @@ class StoreSelectionPopup:
             EC.element_to_be_clickable(self.set_my_store_button_locator)
         )
         set_store_btn.click()
+
+    # Appended method
+    def select_first_store(self):
+        """Selects the first store from the list."""
+        first_store = self.driver.find_element(By.XPATH, "//div[@class='store-item'][1]")
+        first_store.click()

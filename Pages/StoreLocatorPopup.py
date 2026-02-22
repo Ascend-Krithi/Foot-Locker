@@ -30,3 +30,15 @@ class StoreLocatorPopup:
             EC.element_to_be_clickable(self.select_my_store_button_locator)
         )
         select_btn.click()
+
+    # Appended methods
+    def enter_location(self, location):
+        """Enters the location in the location input field."""
+        location_input = self.driver.find_element(By.NAME, "location")
+        location_input.clear()
+        location_input.send_keys(location)
+
+    def click_search(self):
+        """Clicks the 'Search' button in the Store Locator popup."""
+        search_btn = self.driver.find_element(By.CSS_SELECTOR, ".search-btn")
+        search_btn.click()

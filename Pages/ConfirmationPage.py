@@ -11,3 +11,9 @@ class ConfirmationPage:
         return WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located(self.confirmation_indicator_locator)
         )
+
+    # Appended method
+    def get_confirmation_message(self):
+        """Returns the confirmation message text."""
+        confirmation_msg = self.driver.find_element(By.ID, "confirmationMsg")
+        return confirmation_msg.text

@@ -19,3 +19,9 @@ class HomePage:
             EC.element_to_be_clickable(self.find_a_store_locator)
         )
         find_store_btn.click()
+
+    # Appended method
+    def click_find_store(self):
+        """Clicks the 'Find a Store' button."""
+        find_store_btn = self.driver.find_element(By.ID, "findStoreBtn")
+        find_store_btn.click()
