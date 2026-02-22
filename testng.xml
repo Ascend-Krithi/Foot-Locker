@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Suite" parallel="false">
+    <test name="Store Locator Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_VerifyFindAStorePopup"/>
+            <class name="com.fl.automation.tests.TS001_TC002_VerifyFindAStorePresence"/>
+            <class name="com.fl.automation.tests.TS001_TC003_VerifySelectMyStoreLink"/>
+            <class name="com.fl.automation.tests.TS001_TC004_VerifyStoreLocatorPopup"/>
+            <class name="com.fl.automation.tests.TS001_TC005_VerifyPopupClose"/>
+            <class name="com.fl.automation.tests.TS001_TC006_VerifyCrossBrowserSupport"/>
+            <class name="com.fl.automation.tests.TS001_TC007_VerifyMobileResponsiveness"/>
+            <class name="com.fl.automation.tests.TS001_TC008_VerifyKeyboardNavigation"/>
+            <class name="com.fl.automation.tests.TS001_TC009_VerifyFindAStoreFlow"/>
+            <class name="com.fl.automation.tests.TS001_TC010_VerifyStoreLocatorControls"/>
+            <class name="com.fl.automation.tests.TS001_TC011_VerifyStoreSearch"/>
+            <class name="com.fl.automation.tests.TS001_TC012_VerifyStoreAddress"/>
+            <class name="com.fl.automation.tests.TS001_TC013_VerifySetMyStore"/>
+            <class name="com.fl.automation.tests.TS001_TC014_VerifyStoreConfirmation"/>
+            <class name="com.fl.automation.tests.TS001_TC015_VerifyStorePersistence"/>
+        </classes>
+    </test>
+</suite>
