@@ -49,3 +49,48 @@ def test_case_2078(driver):
     store_locator.search_store('10001')  # Example zip code
     store_locator.set_preferred_store(0)  # Set the first store as preferred
     assert store_locator.is_preferred_store_confirmation_displayed(), "Preferred store confirmation was not displayed."
+
+
+def test_case_2083(driver):
+    """
+    TestCaseId: 2083
+    Description: Test Case - SCRUM-15408 TS-002 TC-002
+    Steps:
+        1. Launch the Foot Locker website homepage (https://www.footlocker.com/)
+        2. Click on the 'Find a Store' link
+        3. Click on the 'Select My Store' link in the popup
+        4. Enter 'InvalidLocation123' in the 'Location' textbox
+        5. Click the 'Search for Stores' button
+        6. Assert 'No stores found' or similar message is displayed in the popup
+    """
+    from pages.home_page import HomePage
+    home_page = HomePage(driver)
+    home_page.launch_homepage('https://www.footlocker.com/')
+    home_page.click_find_a_store()
+    home_page.click_select_my_store()
+    home_page.enter_location('InvalidLocation123')
+    home_page.click_search_for_stores()
+    popup_message = home_page.get_popup_message()
+    assert 'no stores found' in popup_message.lower(), f"Expected 'no stores found' message, got: {popup_message}"
+
+def test_case_2084(driver):
+    """
+    TestCaseId: 2084
+    Description: Test Case - SCRUM-15408 TS-003 TC-001
+    Steps:
+        1. Launch the Foot Locker website homepage (https://www.footlocker.com/)
+        2. Click on the 'Find a Store' link
+        3. Click on the 'Select My Store' link
+        4. Enter 'Boston, MA' in the 'Location' textbox
+        5. Click the 'Search for Stores' button
+        6. Assert the store with address '375 Washington Street, Boston, MA 02108' is visible in results
+    """
+    from pages.home_page import HomePage
+    home_page = HomePage(driver)
+    home_page.launch_homepage('https://www.footlocker.com/')
+    home_page.click_find_a_store()
+    home_page.click_select_my_store()
+    home_page.enter_location('Boston, MA')
+    home_page.click_search_for_stores()
+    address = home_page.get_store_address()
+    assert '375 Washington Street, Boston, MA 02108' in address, f"Expected address not found. Got: {address}"
