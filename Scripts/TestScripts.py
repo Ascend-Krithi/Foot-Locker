@@ -158,3 +158,53 @@ class TestFootLockerStoreLocator:
         # Step 5: Verify 'no stores found' message is displayed
         assert store_locator_popup.verify_no_stores_found_message(), "'No stores found' message should be displayed for 'Nome, Alaska'."
 
+    @pytest.mark.tc2097
+    def test_TC2097_find_store_search_results(self, driver):
+        """
+        TC ID: 2097 (SCRUM-15408 TS-001 TC-006)
+        Steps:
+        1. Launch the Foot Locker website and navigate to the homepage.
+        2. Click 'Find a Store' and then 'Select My Store'.
+        3. Enter 'Boston, MA' in the Location textbox and click 'Search for Stores'.
+        4. Assert store results are displayed.
+        """
+        home_page = HomePage(driver)
+        store_locator_popup = StoreLocatorPopup(driver)
+
+        # Step 1: Launch homepage
+        assert home_page.load_homepage(), "Homepage should load successfully."
+        # Step 2: Click 'Find a Store' and then 'Select My Store'
+        assert home_page.click_find_a_store(), "Find a Store link should be clickable."
+        assert store_locator_popup.wait_for_popup(), "Store Locator popup should be visible."
+        assert store_locator_popup.click_select_my_store(), "Select My Store should be clickable."
+        # Step 3: Enter 'Boston, MA' in Location textbox and click search
+        assert store_locator_popup.enter_location('Boston, MA'), "Should be able to enter location 'Boston, MA'."
+        assert store_locator_popup.click_search_for_stores(), "Search for Stores button should be clickable."
+        # Step 4: Assert store results are displayed
+        assert store_locator_popup.are_store_results_displayed(), "Store results should be displayed for 'Boston, MA'."
+
+    @pytest.mark.tc2098
+    def test_TC2098_boston_store_address_search(self, driver):
+        """
+        TC ID: 2098 (SCRUM-15408 TS-001 TC-007)
+        Steps:
+        1. Launch the Foot Locker website and navigate to the homepage.
+        2. Click 'Find a Store' and then 'Select My Store'.
+        3. Enter 'Boston, MA' in the Location textbox and click 'Search for Stores'.
+        4. Check results for address '375 Washington Street, Boston, MA 02108'.
+        5. Assert store with this address is present.
+        """
+        home_page = HomePage(driver)
+        store_locator_popup = StoreLocatorPopup(driver)
+
+        # Step 1: Launch homepage
+        assert home_page.load_homepage(), "Homepage should load successfully."
+        # Step 2: Click 'Find a Store' and then 'Select My Store'
+        assert home_page.click_find_a_store(), "Find a Store link should be clickable."
+        assert store_locator_popup.wait_for_popup(), "Store Locator popup should be visible."
+        assert store_locator_popup.click_select_my_store(), "Select My Store should be clickable."
+        # Step 3: Enter 'Boston, MA' in Location textbox and click search
+        assert store_locator_popup.enter_location('Boston, MA'), "Should be able to enter location 'Boston, MA'."
+        assert store_locator_popup.click_search_for_stores(), "Search for Stores button should be clickable."
+        # Step 4: Check for the specific address in results
+        assert store_locator_popup.is_store_address_present_in_results('375 Washington Street, Boston, MA 02108'), "Store with address '375 Washington Street, Boston, MA 02108' should be present in results."
