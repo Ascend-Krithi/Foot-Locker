@@ -61,3 +61,37 @@ class StoreLocatorPopup:
             ))
         )
         return location_box.is_displayed() and search_button.is_displayed()
+
+    # --- New methods for TC-002 steps 4 & 5 ---
+    def enter_location(self, location):
+        """
+        Enters the provided location text into the location textbox in the store locator popup.
+        Args:
+            location (str): The location string to enter (e.g., 'Boston, MA').
+        Returns:
+            bool: True if entry was successful, False otherwise.
+        """
+        location_box = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((
+                getattr(By, self.locators['location_textbox']['by'].upper()),
+                self.locators['location_textbox']['value']
+            ))
+        )
+        location_box.clear()
+        location_box.send_keys(location)
+        return location_box.get_attribute('value') == location
+
+    def click_search_for_stores(self):
+        """
+        Clicks the 'Search for Stores' button in the store locator popup.
+        Returns:
+            bool: True if click was successful.
+        """
+        search_button = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((
+                getattr(By, self.locators['search_for_stores_button']['by'].upper()),
+                self.locators['search_for_stores_button']['value']
+            ))
+        )
+        search_button.click()
+        return True
