@@ -1,7 +1,7 @@
 # StoreLocatorPage.py
 """
 Selenium Page Object for Foot Locker Store Locator functionality.
-Covers navigation, location entry, search, result verification, and error handling for 'no stores found'.
+Covers navigation, location entry, search, result verification, error handling, keyboard navigation, and accessibility checks.
 Strict adherence to Python Selenium best practices.
 """
 
@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver.common.keys import Keys
 
 class StoreLocatorPage:
     """
@@ -109,4 +110,88 @@ class StoreLocatorPage:
             )
             return len(store_results) > 0
         except TimeoutException:
+            return False
+
+    # --- Appended for SCRUM-15408 TS-SL-010 TC-001 and TS-SL-011 TC-001 ---
+    def emulate_device(self, device_name):
+        """
+        Sets the browser window size to emulate desktop, tablet, or mobile.
+        :param device_name: 'desktop', 'tablet', or 'mobile'
+        """
+        sizes = {
+            'desktop': (1920, 1080),
+            'tablet': (800, 1280),
+            'mobile': (375, 667)
+        }
+        if device_name not in sizes:
+            raise ValueError(f"Unsupported device name: {device_name}")
+        width, height = sizes[device_name]
+        self.driver.set_window_size(width, height)
+
+    def verify_page_accessible(self):
+        """
+        Verifies Store Locator page loads and is functional.
+        """
+        try:
+            WebDriverWait(self.driver, 10).until(
+                EC.visibility_of_element_located(self.locators["location_textbox"])
+            )
+            return True
+        except TimeoutException:
+            return False
+
+    def test_keyboard_navigation(self):
+        """
+        Tests keyboard navigation through all interactive elements on the Store Locator page.
+        Returns True if all elements are accessible via keyboard (tab order).
+        """
+        try:
+            # List of locators for interactive elements
+            elements = [
+                self.locators["find_store_link"],
+                self.locators["location_textbox"],
+                self.locators["search_for_stores_button"],
+                self.locators["select_my_store_button"],
+                self.locators["set_my_store_button"]
+            ]
+            prev_elem = None
+            for locator in elements:
+                elem = WebDriverWait(self.driver, 10).until(
+                    EC.visibility_of_element_located(locator)
+                )
+                elem.send_keys(Keys.TAB)
+                # Optionally, check if element receives focus
+                # This requires JS execution:
+                focused = self.driver.execute_script("return document.activeElement === arguments[0];", elem)
+                if not focused:
+                    return False
+                prev_elem = elem
+            return True
+        except Exception:
+            return False
+
+    def test_accessibility_attributes(self):
+        """
+        Checks if key interactive elements have accessibility attributes for screen readers.
+        Returns True if all elements have at least one ARIA or label attribute.
+        """
+        try:
+            elements = [
+                self.locators["find_store_link"],
+                self.locators["location_textbox"],
+                self.locators["search_for_stores_button"],
+                self.locators["select_my_store_button"],
+                self.locators["set_my_store_button"]
+            ]
+            for locator in elements:
+                elem = WebDriverWait(self.driver, 10).until(
+                    EC.visibility_of_element_located(locator)
+                )
+                aria_label = elem.get_attribute("aria-label")
+                aria_describedby = elem.get_attribute("aria-describedby")
+                label = elem.get_attribute("label")
+                if not (aria_label or aria_describedby or label):
+                    return False
+            return True
+        except Exception:
             return False
