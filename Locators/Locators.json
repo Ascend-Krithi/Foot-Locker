@@ -1,0 +1,36 @@
+{
+  "HomePage": {
+    "FIND_A_STORE_LINK": {
+      "by": "link text",
+      "value": "Find a Store"
+    }
+  },
+  "FindAStorePopup": {
+    "SELECT_MY_STORE_LINK": {
+      "by": "link text",
+      "value": "Select My Store"
+    },
+    "LOCATION_TEXTBOX": {
+      "by": "id",
+      "value": "store-search-location"
+    },
+    "SEARCH_BUTTON": {
+      "by": "xpath",
+      "value": "//button[contains(text(), 'Search for Stores')]"
+    },
+    "POPUP_CONTAINER": {
+      "by": "id",
+      "value": "find-store-popup"
+    }
+  },
+  "StoreSearchResults": {
+    "SET_MY_STORE_BUTTON_XPATH": {
+      "by": "xpath",
+      "value": "//button[contains(text(), 'Set My Store') and ancestor::div[contains(., '{address}')]]"
+    },
+    "STORE_ADDRESS_DIV_XPATH": {
+      "by": "xpath",
+      "value": "//div[contains(text(), '{address}')"]
+    }
+  }
+}
