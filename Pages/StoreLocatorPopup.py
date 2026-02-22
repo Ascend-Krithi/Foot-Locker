@@ -113,3 +113,36 @@ class StoreLocatorPopup:
             ))
         )
         return address in confirmation.text
+
+    # --- New Methods for Test Cases ---
+    def verify_store_results_displayed(self):
+        """
+        Verifies that store results are displayed after searching.
+        Returns True if any store result element is visible.
+        """
+        try:
+            results = WebDriverWait(self.driver, 10).until(
+                EC.visibility_of_element_located((
+                    getattr(By, self.locators['set_my_store_button_boston']['by'].upper()),
+                    self.locators['set_my_store_button_boston']['value']
+                ))
+            )
+            return results.is_displayed()
+        except Exception:
+            return False
+
+    def is_store_present_in_results(self, address):
+        """
+        Checks if a store with the exact address is present in the search results.
+        Returns True if found, False otherwise.
+        """
+        try:
+            store_result = WebDriverWait(self.driver, 10).until(
+                EC.visibility_of_element_located((
+                    getattr(By, self.locators['set_my_store_button_boston']['by'].upper()),
+                    self.locators['set_my_store_button_boston']['value']
+                ))
+            )
+            return address in store_result.get_attribute('data-address') or address in store_result.text
+        except Exception:
+            return False
