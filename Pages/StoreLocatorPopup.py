@@ -114,35 +114,31 @@ class StoreLocatorPopup:
         )
         return address in confirmation.text
 
-    # --- New Methods for Test Cases ---
-    def verify_store_results_displayed(self):
-        """
-        Verifies that store results are displayed after searching.
-        Returns True if any store result element is visible.
-        """
+    def are_store_results_displayed(self):
+        # This method checks if at least one store result is visible after search
         try:
-            results = WebDriverWait(self.driver, 10).until(
-                EC.visibility_of_element_located((
-                    getattr(By, self.locators['set_my_store_button_boston']['by'].upper()),
-                    self.locators['set_my_store_button_boston']['value']
+            store_results = WebDriverWait(self.driver, 10).until(
+                EC.visibility_of_any_elements_located((
+                    By.XPATH,
+                    "//div[contains(@class, 'store-result')]"
                 ))
             )
-            return results.is_displayed()
+            return len(store_results) > 0
         except Exception:
             return False
 
-    def is_store_present_in_results(self, address):
-        """
-        Checks if a store with the exact address is present in the search results.
-        Returns True if found, False otherwise.
-        """
+    def is_store_address_present_in_results(self, address):
+        # This method checks if a store with the given address is present in the search results
         try:
-            store_result = WebDriverWait(self.driver, 10).until(
-                EC.visibility_of_element_located((
-                    getattr(By, self.locators['set_my_store_button_boston']['by'].upper()),
-                    self.locators['set_my_store_button_boston']['value']
+            store_results = WebDriverWait(self.driver, 10).until(
+                EC.visibility_of_any_elements_located((
+                    By.XPATH,
+                    "//div[contains(@class, 'store-result')]"
                 ))
             )
-            return address in store_result.get_attribute('data-address') or address in store_result.text
+            for store in store_results:
+                if address in store.text:
+                    return True
+            return False
         except Exception:
             return False
