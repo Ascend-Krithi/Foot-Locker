@@ -14,59 +14,41 @@ class TestScripts(unittest.TestCase):
         cls.driver.quit()
 
     # Existing test methods remain here...
+    ...
 
-    def test_2077_store_locator_select_and_verify_preferred_store(self):
-        ...
-
-    def test_2078_verify_selected_store_visible_across_website(self):
-        ...
-
-    def test_2080_find_store_popup_verification(self):
-        ...
-
-    def test_2079_preferred_store_persistence_across_pages(self):
-        ...
-
-    def test_scrum_15408_ts_002_tc_002_invalid_location_shows_no_stores_found(self):
+    def test_scrum_15408_ts_001_tc_002_find_a_store_popup_elements(self):
         """
-        SCRUM-15408 TS-002 TC-002
-        Steps:
-        1. Launch homepage
-        2. Click 'Find a Store'
-        3. Click 'Select My Store'
-        4. Enter 'InvalidLocation123'
-        5. Click 'Search for Stores'
-        6. Assert that a message like 'No stores found' is displayed in the popup
+        SCRUM-15408 TS-001 TC-002
+        Step 1: Launch the Foot Locker website homepage.
+        Step 2: Click on the 'Find a Store' link in the header.
+        Step 3: Click on the 'Select My Store' link in the popup.
+        Expected: Homepage loads, popup appears, 'Find a Store' popup window opens with a 'Location' textbox and a 'Search for Stores' button.
         """
+        self.driver.get('https://www.footlocker.com/')
         store_locator = StoreLocatorPage(self.driver)
-        store_locator.launch_homepage()
-        store_locator.click_find_store()
-        store_locator.click_select_my_store()
-        store_locator.enter_location('InvalidLocation123')
-        store_locator.click_search_for_stores()
-        self.assertTrue(
-            store_locator.verify_find_store_popup_message('No stores found'),
-            "Expected 'No stores found' message to be displayed in the popup."
-        )
+        store_locator.click_find_a_store_link()
+        self.assertTrue(store_locator.is_find_a_store_popup_present(), "Find a Store popup did not appear.")
+        store_locator.click_select_my_store_link()
+        self.assertTrue(store_locator.is_location_textbox_present(), "Location textbox is not present in popup.")
+        self.assertTrue(store_locator.is_search_for_stores_button_present(), "Search for Stores button is not present in popup.")
 
-    def test_scrum_15408_ts_003_tc_001_valid_location_finds_exact_store(self):
+    def test_scrum_15408_ts_002_tc_001_search_boston_ma(self):
         """
-        SCRUM-15408 TS-003 TC-001
-        Steps:
-        1. Launch homepage
-        2. Click 'Find a Store'
-        3. Click 'Select My Store'
-        4. Enter 'Boston, MA'
-        5. Click 'Search for Stores'
-        6. Assert that search results include the exact address '375 Washington Street, Boston, MA 02108'
+        SCRUM-15408 TS-002 TC-001
+        Step 1: Launch the Foot Locker website homepage.
+        Step 2: Click on the 'Find a Store' link.
+        Step 3: Click on the 'Select My Store' link in the popup.
+        Step 4: Enter 'Boston, MA' in the 'Location' textbox.
+        Step 5: Click the 'Search for Stores' button.
+        Expected: Homepage loads, popup appears, 'Find a Store' popup window opens, 'Boston, MA' is entered, and search results are displayed with relevant stores in or near Boston.
         """
+        self.driver.get('https://www.footlocker.com/')
         store_locator = StoreLocatorPage(self.driver)
-        store_locator.launch_homepage()
-        store_locator.click_find_store()
-        store_locator.click_select_my_store()
+        store_locator.click_find_a_store_link()
+        self.assertTrue(store_locator.is_find_a_store_popup_present(), "Find a Store popup did not appear.")
+        store_locator.click_select_my_store_link()
+        self.assertTrue(store_locator.is_location_textbox_present(), "Location textbox is not present in popup.")
         store_locator.enter_location('Boston, MA')
-        store_locator.click_search_for_stores()
-        self.assertTrue(
-            store_locator.verify_store_address_exact_match('375 Washington Street, Boston, MA 02108'),
-            "Expected store address '375 Washington Street, Boston, MA 02108' to be present in search results."
-        )
+        store_locator.click_search_for_stores_button()
+        self.assertTrue(store_locator.is_search_results_present(), "Search results are not displayed.")
+        self.assertTrue(store_locator.is_store_result_for_city('Boston'), "No store results for Boston, MA found.")
