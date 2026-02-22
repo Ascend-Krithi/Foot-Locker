@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Suite" parallel="false">
+    <test name="Store Locator Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC2011_TestCaseSCRUM15408TS001TC001"/>
+            <class name="com.fl.automation.tests.TS001_TC2012_TestCaseSCRUM15408TS001TC002"/>
+            <class name="com.fl.automation.tests.TS002_TC2013_TestCaseSCRUM15408TS002TC001"/>
+            <class name="com.fl.automation.tests.TS002_TC2014_TestCaseSCRUM15408TS002TC002"/>
+            <class name="com.fl.automation.tests.TS003_TC2015_TestCaseSCRUM15408TS003TC001"/>
+            <class name="com.fl.automation.tests.TS004_TC2016_TestCaseSCRUM15408TS004TC001"/>
+            <class name="com.fl.automation.tests.TS005_TC2017_TestCaseSCRUM15408TS005TC001"/>
+            <class name="com.fl.automation.tests.TS006_TC2018_TestCaseSCRUM15408TS006TC001"/>
+            <class name="com.fl.automation.tests.TS001_TC2073_TestCaseSCRUM15408TS001TC001"/>
+            <class name="com.fl.automation.tests.TS001_TC2074_TestCaseSCRUM15408TS001TC002"/>
+            <class name="com.fl.automation.tests.TS001_TC2075_TestCaseSCRUM15408TS001TC003"/>
+            <class name="com.fl.automation.tests.TS001_TC2076_TestCaseSCRUM15408TS001TC004"/>
+            <class name="com.fl.automation.tests.TS001_TC2077_TestCaseSCRUM15408TS001TC005"/>
+            <class name="com.fl.automation.tests.TS001_TC2078_TestCaseSCRUM15408TS001TC006"/>
+            <class name="com.fl.automation.tests.TS001_TC2079_TestCaseSCRUM15408TS001TC007"/>
+            <class name="com.fl.automation.tests.TS001_TC2080_TestCaseSCRUM15408TS001TC001"/>
+            <class name="com.fl.automation.tests.TS001_TC2081_TestCaseSCRUM15408TS001TC002"/>
+            <class name="com.fl.automation.tests.TS002_TC2082_TestCaseSCRUM15408TS002TC001"/>
+            <class name="com.fl.automation.tests.TS002_TC2083_TestCaseSCRUM15408TS002TC002"/>
+            <class name="com.fl.automation.tests.TS003_TC2084_TestCaseSCRUM15408TS003TC001"/>
+            <class name="com.fl.automation.tests.TS003_TC2085_TestCaseSCRUM15408TS003TC002"/>
+            <class name="com.fl.automation.tests.TS004_TC2086_TestCaseSCRUM15408TS004TC001"/>
+            <class name="com.fl.automation.tests.TS004_TC2087_TestCaseSCRUM15408TS004TC002"/>
+            <class name="com.fl.automation.tests.TS005_TC2088_TestCaseSCRUM15408TS005TC001"/>
+            <class name="com.fl.automation.tests.TS005_TC2089_TestCaseSCRUM15408TS005TC002"/>
+            <class name="com.fl.automation.tests.TS006_TC2090_TestCaseSCRUM15408TS006TC001"/>
+            <class name="com.fl.automation.tests.TS006_TC2091_TestCaseSCRUM15408TS006TC002"/>
+            <class name="com.fl.automation.tests.TS001_TC2092_TestCaseSCRUM15408TS001TC001"/>
+            <class name="com.fl.automation.tests.TS001_TC2093_TestCaseSCRUM15408TS001TC002"/>
+            <class name="com.fl.automation.tests.TS001_TC2094_TestCaseSCRUM15408TS001TC003"/>
+            <class name="com.fl.automation.tests.TS001_TC2095_TestCaseSCRUM15408TS001TC004"/>
+            <class name="com.fl.automation.tests.TS001_TC2096_TestCaseSCRUM15408TS001TC005"/>
+            <class name="com.fl.automation.tests.TS001_TC2097_TestCaseSCRUM15408TS001TC006"/>
+            <class name="com.fl.automation.tests.TS001_TC2098_TestCaseSCRUM15408TS001TC007"/>
+            <class name="com.fl.automation.tests.TS001_TC2099_TestCaseSCRUM15408TS001TC008"/>
+            <class name="com.fl.automation.tests.TS001_TC2100_TestCaseSCRUM15408TS001TC009"/>
+            <class name="com.fl.automation.tests.TS001_TC2101_TestCaseSCRUM15408TS001TC010"/>
+            <class name="com.fl.automation.tests.TS001_TC2102_TestCaseSCRUM15408TS001TC011"/>
+            <class name="com.fl.automation.tests.TS_SL001_TC2103_TestCaseSCRUM15408TSSL001TC001"/>
+            <class name="com.fl.automation.tests.TS_SL001_TC2104_TestCaseSCRUM15408TSSL001TC002"/>
+            <class name="com.fl.automation.tests.TS_SL002_TC2105_TestCaseSCRUM15408TSSL002TC001"/>
+            <class name="com.fl.automation.tests.TS_SL003_TC2106_TestCaseSCRUM15408TSSL003TC001"/>
+            <class name="com.fl.automation.tests.TS_SL004_TC2107_TestCaseSCRUM15408TSSL004TC001"/>
+            <class name="com.fl.automation.tests.TS_SL005_TC2108_TestCaseSCRUM15408TSSL005TC001"/>
+            <class name="com.fl.automation.tests.TS_SL006_TC2109_TestCaseSCRUM15408TSSL006TC001"/>
+            <class name="com.fl.automation.tests.TS_SL007_TC2110_TestCaseSCRUM15408TSSL007TC001"/>
+            <class name="com.fl.automation.tests.TS_SL008_TC2111_TestCaseSCRUM15408TSSL008TC001"/>
+            <class name="com.fl.automation.tests.TS_SL009_TC2112_TestCaseSCRUM15408TSSL009TC001"/>
+            <class name="com.fl.automation.tests.TS_SL010_TC2113_TestCaseSCRUM15408TSSL010TC001"/>
+            <class name="com.fl.automation.tests.TS_SL011_TC2114_TestCaseSCRUM15408TSSL011TC001"/>
+            <class name="com.fl.automation.tests.TS_SL012_TC2115_TestCaseSCRUM15408TSSL012TC001"/>
+        </classes>
+    </test>
+</suite>
