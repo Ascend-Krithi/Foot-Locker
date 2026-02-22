@@ -150,3 +150,53 @@ def test_case_2110(driver):
     assert homepage.verify_store_results_displayed(), "Store results not displayed for 'Boston, MA'."
     homepage.select_store_by_address('375 Washington Street, Boston, MA 02108')
     assert homepage.verify_store_details_popup(), "Store details popup not displayed for '375 Washington Street, Boston, MA 02108'."
+
+
+def test_case_2113(driver):
+    """
+    TestCaseID: 2113
+    Steps:
+        1. Launch the Store Locator page in desktop emulation using homepage.launch_store_locator_with_emulation('desktop').
+        2. Assert the Store Locator page loads successfully in desktop mode.
+        3. Launch the Store Locator page in tablet emulation using homepage.launch_store_locator_with_emulation('tablet').
+        4. Assert the Store Locator page loads successfully in tablet mode.
+        5. Launch the Store Locator page in mobile emulation using homepage.launch_store_locator_with_emulation('mobile').
+        6. Assert the Store Locator page loads successfully in mobile mode.
+    Expected Result:
+        The Store Locator page should load successfully in all three device emulation modes: desktop, tablet, and mobile.
+    """
+    homepage = HomepagePage(driver)
+    # Desktop emulation
+    result_desktop = homepage.launch_store_locator_with_emulation('desktop')
+    assert result_desktop, "Store Locator page did not load successfully in desktop emulation mode."
+    # Tablet emulation
+    result_tablet = homepage.launch_store_locator_with_emulation('tablet')
+    assert result_tablet, "Store Locator page did not load successfully in tablet emulation mode."
+    # Mobile emulation
+    result_mobile = homepage.launch_store_locator_with_emulation('mobile')
+    assert result_mobile, "Store Locator page did not load successfully in mobile emulation mode."
+
+
+def test_case_2114(driver):
+    """
+    TestCaseID: 2114
+    Steps:
+        a. Navigate to the Store Locator page using homepage.launch_store_locator_with_emulation('desktop').
+        b. Assert the Store Locator page loads successfully.
+        c. Test keyboard navigation accessibility using homepage.test_keyboard_navigation_store_locator().
+        d. Assert all interactive elements on the Store Locator page are accessible via keyboard.
+        e. Check ARIA and screen reader accessibility using homepage.check_store_locator_accessibility().
+        f. Assert all elements have correct ARIA roles and are accessible for screen readers.
+    Expected Result:
+        All elements on the Store Locator page are accessible via keyboard and have correct ARIA roles for screen readers.
+    """
+    homepage = HomepagePage(driver)
+    # Navigate to Store Locator in desktop mode
+    result = homepage.launch_store_locator_with_emulation('desktop')
+    assert result, "Store Locator page did not load successfully."
+    # Keyboard navigation accessibility
+    keyboard_nav_result = homepage.test_keyboard_navigation_store_locator()
+    assert keyboard_nav_result, "Not all elements are accessible via keyboard navigation on the Store Locator page."
+    # ARIA and screen reader accessibility
+    accessibility_result = homepage.check_store_locator_accessibility()
+    assert accessibility_result, "Not all elements have correct ARIA roles or are accessible for screen readers on the Store Locator page."
