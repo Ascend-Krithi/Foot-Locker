@@ -1,0 +1,1 @@
+// Selenium Java test case code for Test Scenario 2
