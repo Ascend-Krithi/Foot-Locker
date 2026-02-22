@@ -1,0 +1,10 @@
+{
+  "homepage": {
+    "find_a_store_button": "//button[contains(text(), 'Find a Store')]",
+    "select_my_store_button": "//button[contains(text(), 'Select My Store')]",
+    "location_textbox": "//input[@id='store-locator-input']",
+    "search_for_stores_button": "//button[contains(text(), 'Search for Stores')]",
+    "store_results_popup": "//div[@id='store-locator-results']",
+    "no_stores_found_message": "//div[contains(text(), 'No stores found near this location')]"
+  }
+}
