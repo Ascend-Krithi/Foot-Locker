@@ -113,3 +113,40 @@ def test_case_2108(driver):
     homepage.navigate_to_store_locator('https://www.footlocker.com/store-locator')
     homepage.enter_location_and_search('InvalidCity123')
     assert homepage.verify_no_stores_found(), "Error message not displayed for invalid location 'InvalidCity123'."
+
+def test_case_2109(driver):
+    """
+    TestCaseId: 2109
+    Description: Test Case - SCRUM-15408 TS-SL-006 TC-001
+    Steps:
+        1. Launch the Foot Locker website and navigate to the Store Locator page.
+        2. Ensure browser location permission is enabled.
+        3. Click on the 'Use My Location' button.
+        4. Verify that the list of stores near the user's current location is displayed.
+    """
+    from Pages.HomepagePage import HomepagePage
+    homepage = HomepagePage(driver)
+    homepage.launch_homepage()
+    homepage.navigate_to_store_locator('https://www.footlocker.com/store-locator')
+    homepage.ensure_browser_location_permission()
+    homepage.click_use_my_location()
+    assert homepage.verify_store_results_displayed(), "Store results not displayed after using 'Use My Location'."
+
+def test_case_2110(driver):
+    """
+    TestCaseId: 2110
+    Description: Test Case - SCRUM-15408 TS-SL-007 TC-001
+    Steps:
+        1. Launch the Foot Locker website and navigate to the Store Locator page.
+        2. Perform a search for 'Boston, MA'.
+        3. Click on the store with address '375 Washington Street, Boston, MA 02108'.
+        4. Verify the store details popup is displayed with correct info.
+    """
+    from Pages.HomepagePage import HomepagePage
+    homepage = HomepagePage(driver)
+    homepage.launch_homepage()
+    homepage.navigate_to_store_locator('https://www.footlocker.com/store-locator')
+    homepage.enter_location_and_search('Boston, MA')
+    assert homepage.verify_store_results_displayed(), "Store results not displayed for 'Boston, MA'."
+    homepage.select_store_by_address('375 Washington Street, Boston, MA 02108')
+    assert homepage.verify_store_details_popup(), "Store details popup not displayed for '375 Washington Street, Boston, MA 02108'."
