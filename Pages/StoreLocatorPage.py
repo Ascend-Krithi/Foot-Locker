@@ -75,10 +75,38 @@ class StoreLocatorPage:
         """
         try:
             error_indicator = WebDriverWait(self.driver, 5).until(
-                EC.visibility_of_element_located((By.XPATH, "//div[contains(text(),'No stores found')]"))
+                EC.visibility_of_element_located((By.XPATH, "//div[contains(text(),'No stores found')]") )
             )
             return error_indicator.is_displayed()
         except TimeoutException:
             return False
 
-    # Existing methods remain untouched.
+    def click_use_my_location(self):
+        """
+        Clicks the 'Use My Location' button and handles browser geolocation permission prompt.
+        Relies on the browser being configured to allow location access, or test setup to auto-accept permission.
+        :raises: Exception if the button is not found or not clickable.
+        """
+        try:
+            use_location_btn = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Use My Location') or contains(text(),'Use my location') or contains(.,'Use My Location') or contains(.,'Use my location') ]"))
+            )
+            use_location_btn.click()
+        except TimeoutException:
+            raise Exception("'Use My Location' button not found or not clickable within timeout.")
+        # Note: Handling browser's location permission prompt is typically done via browser profile/capabilities
+        # or external tools. Selenium cannot interact with OS-level popups directly. Ensure test environment auto-allows location.
+
+    def verify_nearby_stores_displayed(self):
+        """
+        Verifies if a list of nearby stores is displayed after using location.
+        :return: True if at least one store result is visible, False otherwise.
+        """
+        try:
+            # Assume store results have a common locator, e.g., a class or data attribute
+            store_results = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".store-result, .StoreResult"))
+            )
+            return len(store_results) > 0
+        except TimeoutException:
+            return False
