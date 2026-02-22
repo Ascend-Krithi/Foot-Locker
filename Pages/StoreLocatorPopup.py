@@ -62,15 +62,7 @@ class StoreLocatorPopup:
         )
         return location_box.is_displayed() and search_button.is_displayed()
 
-    # --- New methods for TC-002 steps 4 & 5 ---
     def enter_location(self, location):
-        """
-        Enters the provided location text into the location textbox in the store locator popup.
-        Args:
-            location (str): The location string to enter (e.g., 'Boston, MA').
-        Returns:
-            bool: True if entry was successful, False otherwise.
-        """
         location_box = WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((
                 getattr(By, self.locators['location_textbox']['by'].upper()),
@@ -82,11 +74,6 @@ class StoreLocatorPopup:
         return location_box.get_attribute('value') == location
 
     def click_search_for_stores(self):
-        """
-        Clicks the 'Search for Stores' button in the store locator popup.
-        Returns:
-            bool: True if click was successful.
-        """
         search_button = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable((
                 getattr(By, self.locators['search_for_stores_button']['by'].upper()),
@@ -95,3 +82,79 @@ class StoreLocatorPopup:
         )
         search_button.click()
         return True
+
+    # --- New methods appended for SCRUM-15408 TS-003 TC-002 and TS-004 TC-001 ---
+    def select_store_by_address(self, address):
+        """
+        Selects a store result by its address.
+        Args:
+            address (str): Store address to match (e.g., '375 Washington Street, Boston, MA 02108').
+        Returns:
+            bool: True if store is found and selected, False otherwise.
+        Note: Locator is a placeholder and must be updated in Locators.json.
+        """
+        # Placeholder locator key: 'store_address_results'
+        stores = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_all_elements_located((
+                getattr(By, self.locators.get('store_address_results', {'by':'XPATH'})['by'].upper()),
+                self.locators.get('store_address_results', {'value':'//div[@class="store-address"]'})['value']
+            ))
+        )
+        for store in stores:
+            if address in store.text:
+                store.click()
+                return True
+        return False
+
+    def verify_store_address_format(self, address):
+        """
+        Verifies the address format of the selected store.
+        Args:
+            address (str): Expected address format.
+        Returns:
+            bool: True if address format is correct, False otherwise.
+        Note: Locator is a placeholder and must be updated in Locators.json.
+        """
+        # Placeholder locator key: 'selected_store_address'
+        addr_elem = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((
+                getattr(By, self.locators.get('selected_store_address', {'by':'XPATH'})['by'].upper()),
+                self.locators.get('selected_store_address', {'value':'//div[@class="selected-store-address"]'})['value']
+            ))
+        )
+        return address in addr_elem.text
+
+    def click_set_my_store(self):
+        """
+        Clicks the 'Set My Store' button for the selected store.
+        Returns:
+            bool: True if click is successful.
+        Note: Locator is a placeholder and must be updated in Locators.json.
+        """
+        # Placeholder locator key: 'set_my_store_button'
+        set_btn = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((
+                getattr(By, self.locators.get('set_my_store_button', {'by':'XPATH'})['by'].upper()),
+                self.locators.get('set_my_store_button', {'value':'//button[contains(text(),"Set My Store")]'})['value']
+            ))
+        )
+        set_btn.click()
+        return True
+
+    def verify_preferred_store_saved(self, address):
+        """
+        Verifies that the preferred store is saved and displayed in the UI.
+        Args:
+            address (str): Expected preferred store address.
+        Returns:
+            bool: True if preferred store is displayed, False otherwise.
+        Note: Locator is a placeholder and must be updated in Locators.json.
+        """
+        # Placeholder locator key: 'preferred_store_display'
+        pref_store = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((
+                getattr(By, self.locators.get('preferred_store_display', {'by':'XPATH'})['by'].upper()),
+                self.locators.get('preferred_store_display', {'value':'//div[@class="preferred-store"]'})['value']
+            ))
+        )
+        return address in pref_store.text
