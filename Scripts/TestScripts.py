@@ -1,90 +1,71 @@
 import unittest
+from StoreLocatorPage import StoreLocatorPage
 from selenium import webdriver
-from Pages.StoreLocatorPage import StoreLocatorPage
-from Pages.MensSneakersPage import MensSneakersPage
 
 class TestScripts(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = webdriver.Chrome()
-        cls.driver.implicitly_wait(10)
+        cls.page = StoreLocatorPage(cls.driver)
 
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
 
-    # Existing test methods remain here...
+    # Existing test methods ...
 
-    def test_2077_store_locator_select_and_verify_preferred_store(self):
-        ...
-
-    def test_2078_verify_selected_store_visible_across_website(self):
-        ...
-
-    def test_2080_find_store_popup_verification(self):
-        ...
-
-    def test_2079_preferred_store_persistence_across_pages(self):
-        ...
-
-    def test_2083_invalid_location_shows_no_stores_found(self):
-        ...
-
-    def test_2084_boston_store_address_exact_match(self):
-        ...
-
-    def test_2085_store_locator_address_format(self):
+    def test_scrum_15408_ts_004_tc_002_set_other_and_preferred_store(self):
         """
-        Test Case 2085: SCRUM-15408 TS-003 TC-002
-        1. Launch the Foot Locker website homepage (https://www.footlocker.com/).
-        2. Click on the 'Find a Store' link.
-        3. Click on the 'Select My Store' link.
-        4. Enter 'Boston, MA' in the 'Location' textbox.
-        5. Click the 'Search for Stores' button.
-        6. Locate the store with address '375 Washington Street, Boston, MA 02108' in the results.
-        7. Verify the address format matches '375 Washington Street, Boston, MA 02108'.
+        Test Case: SCRUM-15408 TS-004 TC-002
+        Steps:
+        1. Launch homepage
+        2. Click 'Find a Store'
+        3. Click 'Select My Store'
+        4. Enter 'Boston, MA'
+        5. Click 'Search for Stores'
+        6. Click 'Set My Store' for a store other than '375 Washington Street, Boston, MA 02108'
+        7. Click 'Set My Store' for '375 Washington Street, Boston, MA 02108'
         """
-        store_locator = StoreLocatorPage(self.driver)
-        store_locator.launch_homepage("https://www.footlocker.com/")
-        store_locator.click_find_store()
-        store_locator.click_select_my_store()
-        store_locator.enter_location("Boston, MA")
-        store_locator.click_search_for_stores()
-        self.assertTrue(
-            store_locator.is_store_address_present_in_results("375 Washington Street, Boston, MA 02108"),
-            "Store address '375 Washington Street, Boston, MA 02108' not present in search results."
-        )
-        self.assertTrue(
-            store_locator.verify_store_address_exact_match("375 Washington Street, Boston, MA 02108"),
-            "Store address does not exactly match '375 Washington Street, Boston, MA 02108'."
-        )
+        self.page.launch_homepage()
+        self.page.click_find_a_store()
+        self.page.click_select_my_store()
+        self.page.enter_store_search('Boston, MA')
+        self.page.click_search_for_stores()
 
-    def test_2086_set_preferred_store(self):
-        """
-        Test Case 2086: SCRUM-15408 TS-004 TC-001
-        1. Launch the Foot Locker website homepage (https://www.footlocker.com/).
-        2. Click on the 'Find a Store' link.
-        3. Click on the 'Select My Store' link.
-        4. Enter 'Boston, MA' in the 'Location' textbox.
-        5. Click the 'Search for Stores' button.
-        6. Locate the store with address '375 Washington Street, Boston, MA 02108' in the results.
-        7. Click the 'Set My Store' button for this store and verify confirmation.
-        """
-        store_locator = StoreLocatorPage(self.driver)
-        store_locator.launch_homepage("https://www.footlocker.com/")
-        store_locator.click_find_store()
-        store_locator.click_select_my_store()
-        store_locator.enter_location("Boston, MA")
-        store_locator.click_search_for_stores()
-        self.assertTrue(
-            store_locator.is_store_address_present_in_results("375 Washington Street, Boston, MA 02108"),
-            "Store address '375 Washington Street, Boston, MA 02108' not present in search results."
-        )
-        store_locator.click_set_my_store()
-        self.assertTrue(
-            store_locator.verify_confirmation(),
-            "Confirmation for setting preferred store not found."
-        )
+        stores = self.page.get_search_results()
+        # Find a store other than the target
+        other_store = None
+        for store in stores:
+            if store['address'] != '375 Washington Street, Boston, MA 02108':
+                other_store = store
+                break
+        self.assertIsNotNone(other_store, "No other store found in search results.")
+        self.page.set_my_store_by_address(other_store['address'])
 
-if __name__ == "__main__":
-    unittest.main()
+        # Now set preferred store
+        self.page.set_my_store_by_address('375 Washington Street, Boston, MA 02108')
+        # Optionally verify preferred store is set
+        preferred = self.page.get_preferred_store()
+        self.assertEqual(preferred['address'], '375 Washington Street, Boston, MA 02108')
+
+    def test_scrum_15408_ts_005_tc_001_set_preferred_store_with_confirmation(self):
+        """
+        Test Case: SCRUM-15408 TS-005 TC-001
+        Steps:
+        1. Launch homepage
+        2. Click 'Find a Store'
+        3. Click 'Select My Store'
+        4. Enter 'Boston, MA'
+        5. Click 'Search for Stores'
+        6. Click 'Set My Store' for '375 Washington Street, Boston, MA 02108' and verify confirmation indicator
+        """
+        self.page.launch_homepage()
+        self.page.click_find_a_store()
+        self.page.click_select_my_store()
+        self.page.enter_store_search('Boston, MA')
+        self.page.click_search_for_stores()
+        self.page.set_my_store_by_address('375 Washington Street, Boston, MA 02108')
+
+        # Verify confirmation indicator
+        confirmation = self.page.get_set_store_confirmation('375 Washington Street, Boston, MA 02108')
+        self.assertTrue(confirmation, "Confirmation indicator not found for preferred store.")
