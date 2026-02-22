@@ -93,3 +93,31 @@ class TestScripts(unittest.TestCase):
 
         # Step 5: Verify the preferred store is still set
         self.assertTrue(store_locator.is_my_store_persisted('375 Washington Street, Boston, MA 02108'), "Preferred store was not persisted after browser restart.")
+
+    def test_scrum_15408_ts_sl_002_tc_001_search_store_by_boston_ma(self):
+        """
+        SCRUM-15408 TS-SL-002 TC-001
+        1. Launch the Foot Locker website and navigate to the Store Locator page.
+        2. Enter 'Boston, MA' in the Location textbox.
+        3. Click on the 'Search for Stores' button.
+        4. Verify that the list of stores in or near Boston is displayed.
+        """
+        store_locator = StoreLocatorPage(self.driver)
+        store_locator.navigate_to_store_locator(url="https://www.footlocker.com/store-locator")
+        store_locator.enter_location("Boston, MA")
+        store_locator.click_search_for_stores()
+        self.assertTrue(store_locator.is_store_list_displayed(), "Store list is not displayed for location 'Boston, MA'.")
+
+    def test_scrum_15408_ts_sl_003_tc_001_search_store_by_zip_02108(self):
+        """
+        SCRUM-15408 TS-SL-003 TC-001
+        1. Launch the Foot Locker website and navigate to the Store Locator page.
+        2. Enter '02108' in the Location textbox.
+        3. Click on the 'Search for Stores' button.
+        4. Verify that the list of stores in or near ZIP code 02108 is displayed.
+        """
+        store_locator = StoreLocatorPage(self.driver)
+        store_locator.navigate_to_store_locator(url="https://www.footlocker.com/store-locator")
+        store_locator.enter_location("02108")
+        store_locator.click_search_for_stores()
+        self.assertTrue(store_locator.is_store_list_displayed(), "Store list is not displayed for ZIP code '02108'.")
