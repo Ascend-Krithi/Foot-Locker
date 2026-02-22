@@ -133,7 +133,7 @@ class HomepagePage:
         results_popup = self.wait.until(EC.visibility_of_element_located(self.STORE_RESULTS_POPUP))
 
         # Find store by address in results
-        store_xpath = f"//div[@id='store-locator-results']//div[contains(text(), '{address}')]"
+        store_xpath = f"//div[@id='store-locator-results']//div[contains(text(), '{address}')]")
         try:
             store_element = self.wait.until(EC.element_to_be_clickable((By.XPATH, store_xpath)))
         except TimeoutException:
@@ -143,7 +143,7 @@ class HomepagePage:
         store_element.click()
 
         # Wait for store details popup/page
-        details_xpath = f"//div[contains(@class, 'store-details') and contains(., '{address}')]"
+        details_xpath = f"//div[contains(@class, 'store-details') and contains(., '{address}')]")
         try:
             details_element = self.wait.until(EC.visibility_of_element_located((By.XPATH, details_xpath)))
         except TimeoutException:
