@@ -1,0 +1,1 @@
+<full content of TS004_TC002_.java>
