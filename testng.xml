@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="FootLocker Automation Suite">
+    <test name="FootLocker Web Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_2432"/>
+            <class name="com.fl.automation.tests.TS002_TC001_2433"/>
+            <class name="com.fl.automation.tests.TS003_TC001_2434"/>
+            <class name="com.fl.automation.tests.TS003_TC002_2435"/>
+            <class name="com.fl.automation.tests.TS004_TC001_2436"/>
+            <class name="com.fl.automation.tests.TS005_TC001_2437"/>
+            <class name="com.fl.automation.tests.TS006_TC001_2438"/>
+            <class name="com.fl.automation.tests.TS007_TC001_2439"/>
+            <class name="com.fl.automation.tests.TS008_TC001_2440"/>
+            <class name="com.fl.automation.tests.TS001_TC001_2459"/>
+            <class name="com.fl.automation.tests.TS002_TC001_2460"/>
+            <class name="com.fl.automation.tests.TS003_TC001_2461"/>
+            <class name="com.fl.automation.tests.TS004_TC001_2462"/>
+            <class name="com.fl.automation.tests.TS001_TC001_2463"/>
+            <class name="com.fl.automation.tests.TS002_TC001_2464"/>
+            <class name="com.fl.automation.tests.TS003_TC001_2465"/>
+            <class name="com.fl.automation.tests.TS004_TC001_2466"/>
+        </classes>
+    </test>
+</suite>
