@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Suite" parallel="false">
+    <test name="Store Locator Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_LaunchHomepageVerifyFindAStorePopup"/>
+            <class name="com.fl.automation.tests.TS002_TC001_ClickSelectMyStoreVerifyPopupElements"/>
+            <class name="com.fl.automation.tests.TS003_TC001_SearchBostonMAVerifyResults"/>
+            <class name="com.fl.automation.tests.TS003_TC002_SearchInvalidLocationVerifyError"/>
+            <class name="com.fl.automation.tests.TS004_TC001_SearchBostonMAVerify375WashingtonStreet"/>
+            <class name="com.fl.automation.tests.TS005_TC001_SetMyStoreFor375WashingtonStreet"/>
+            <class name="com.fl.automation.tests.TS006_TC001_VerifyConfirmationIndicatorAcrossWebsite"/>
+            <class name="com.fl.automation.tests.TS007_TC001_VerifyStorePersistsAfterNavigation"/>
+            <class name="com.fl.automation.tests.TS008_TC001_SearchInvalidLocationVerifyError"/>
+            <class name="com.fl.automation.tests.TS001_TC001_LaunchHomepageClickFindAStoreVerifyPopup"/>
+            <class name="com.fl.automation.tests.TS002_TC001_ClickSelectMyStoreVerifyLocationTextboxSearchButton"/>
+            <class name="com.fl.automation.tests.TS003_TC001_EnterBostonMASearchForStores"/>
+            <class name="com.fl.automation.tests.TS004_TC001_SearchBostonMAVerify375WashingtonStreetStore"/>
+            <class name="com.fl.automation.tests.TS005_TC001_ClickSetMyStoreForBostonLocation"/>
+            <class name="com.fl.automation.tests.TS006_TC001_VerifyConfirmationIndicatorStoreAcrossWebsite"/>
+            <class name="com.fl.automation.tests.TS007_TC001_VerifyStorePersistsNavigation"/>
+            <class name="com.fl.automation.tests.TS008_TC001_SearchInvalidLocation123VerifyError"/>
+            <class name="com.fl.automation.tests.TS001_TC001_LaunchHomepageVerifyFindAStorePopupMessage"/>
+            <class name="com.fl.automation.tests.TS002_TC001_ClickSelectMyStoreVerifyPopupContents"/>
+            <class name="com.fl.automation.tests.TS003_TC001_SearchBostonMAVerifyStoreResults"/>
+            <class name="com.fl.automation.tests.TS004_TC001_Verify375WashingtonStreetInResults"/>
+            <class name="com.fl.automation.tests.TS005_TC001_SetMyStoreForBostonLocation"/>
+            <class name="com.fl.automation.tests.TS006_TC001_VerifyConfirmationStoreConsistency"/>
+            <class name="com.fl.automation.tests.TS007_TC001_VerifyStorePersistence"/>
+            <class name="com.fl.automation.tests.TS008_TC001_SearchInvalidVerifyError"/>
+            <class name="com.fl.automation.tests.TS001_TC001_LaunchHomepageVerifyFindAStore"/>
+            <class name="com.fl.automation.tests.TS002_TC001_OpenStoreLocatorVerifyElements"/>
+            <class name="com.fl.automation.tests.TS003_TC001_SearchBostonVerifyResults"/>
+            <class name="com.fl.automation.tests.TS004_TC001_Verify375WashingtonStreetAddress"/>
+            <class name="com.fl.automation.tests.TS005_TC001_SetPreferredStore"/>
+            <class name="com.fl.automation.tests.TS006_TC001_VerifyStoreConsistencyAcrossWebsite"/>
+            <class name="com.fl.automation.tests.TS007_TC001_VerifyStorePersistsAfterPageNavigation"/>
+        </classes>
+    </test>
+</suite>
