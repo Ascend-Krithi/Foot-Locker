@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Footlocker Store Locator Suite">
+    <test name="Store Locator Tests">
+        <classes>
+            <class name="tests.TS001_TC001_TestCase_SCRUM_15408"/>
+            <class name="tests.TS002_TC001_TestCase_SCRUM_15408"/>
+            <class name="tests.TS003_TC001_TestCase_SCRUM_15408"/>
+            <class name="tests.TS004_TC001_TestCase_SCRUM_15408"/>
+            <class name="tests.TS005_TC001_TestCase_SCRUM_15408"/>
+            <class name="tests.TS006_TC001_TestCase_SCRUM_15408"/>
+            <class name="tests.TS007_TC001_TestCase_SCRUM_15408"/>
+            <class name="tests.TS008_TC001_TestCase_SCRUM_15408"/>
+            <class name="tests.TS009_TC001_TestCase_SCRUM_15408"/>
+            <class name="tests.TS009_TC002_TestCase_SCRUM_15408"/>
+        </classes>
+    </test>
+</suite>
