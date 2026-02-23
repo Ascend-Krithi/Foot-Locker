@@ -1,0 +1,1 @@
+Properties file reader for configuration management

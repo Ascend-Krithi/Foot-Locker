@@ -1,0 +1,1 @@
+Page class with Select My Store, search input locators and methods following strict locator policy

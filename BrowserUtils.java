@@ -1,0 +1,1 @@
+Reusable browser utility methods (click, type, isDisplayed, getText, scrollIntoView)

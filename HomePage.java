@@ -1,0 +1,1 @@
+Page class with Find a Store locators and methods following strict locator policy

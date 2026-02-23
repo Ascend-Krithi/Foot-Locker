@@ -1,0 +1,1 @@
+ThreadLocal WebDriver management with initDriver() and quitDriver() methods

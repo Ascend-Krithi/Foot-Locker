@@ -1,0 +1,1 @@
+Page class with store result cards, address, Set My Store button locators and methods following strict locator policy

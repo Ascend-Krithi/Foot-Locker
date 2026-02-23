@@ -1,0 +1,1 @@
+WebDriverWait utility methods with 5 second timeout
