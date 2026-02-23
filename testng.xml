@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Store Locator Automation Suite">
+    <test name="Store Locator Tests">
+        <packages>
+            <package name="com.fl.automation.tests"/>
+        </packages>
+    </test>
+</suite>
