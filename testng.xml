@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="StoreLocatorSuite" parallel="tests" thread-count="3">
+  <test name="StoreLocatorTests">
+    <classes>
+      <class name="tests.TS001_TC001_Test"/>
+      <class name="tests.TS001_TC002_Test"/>
+      <class name="tests.TS002_TC001_Test"/>
+      <class name="tests.TS002_TC002_Test"/>
+      <class name="tests.TS003_TC001_Test"/>
+      <class name="tests.TS003_TC002_Test"/>
+      <class name="tests.TS004_TC001_Test"/>
+      <class name="tests.TS004_TC002_Test"/>
+      <class name="tests.TS005_TC001_Test"/>
+      <class name="tests.TS005_TC002_Test"/>
+      <class name="tests.TS006_TC001_Test"/>
+      <class name="tests.TS006_TC002_Test"/>
+      <class name="tests.TS001_TC001_V2_Test"/>
+      <class name="tests.TS002_TC001_V2_Test"/>
+      <class name="tests.TS003_TC001_V2_Test"/>
+      <class name="tests.TS003_TC002_V2_Test"/>
+      <class name="tests.TS004_TC001_V2_Test"/>
+      <class name="tests.TS005_TC001_V2_Test"/>
+      <class name="tests.TS006_TC001_V2_Test"/>
+      <class name="tests.TS007_TC001_Test"/>
+      <class name="tests.TS008_TC001_Test"/>
+      <class name="tests.TS001_TC001_V3_Test"/>
+      <class name="tests.TS001_TC002_V2_Test"/>
+      <class name="tests.TS002_TC001_V3_Test"/>
+      <class name="tests.TS002_TC002_V2_Test"/>
+      <class name="tests.TS003_TC001_V3_Test"/>
+      <class name="tests.TS003_TC002_V3_Test"/>
+      <class name="tests.TS004_TC001_V3_Test"/>
+      <class name="tests.TS004_TC002_V2_Test"/>
+      <class name="tests.TS005_TC001_V3_Test"/>
+      <class name="tests.TS005_TC002_V2_Test"/>
+      <class name="tests.TS006_TC001_V3_Test"/>
+      <class name="tests.TS006_TC002_V2_Test"/>
+      <class name="tests.TS007_TC001_V2_Test"/>
+      <class name="tests.TS007_TC002_Test"/>
+      <class name="tests.TS008_TC001_V2_Test"/>
+      <class name="tests.TS008_TC002_Test"/>
+      <class name="tests.TS009_TC001_Test"/>
+      <class name="tests.TS009_TC002_Test"/>
+      <class name="tests.HAP21_TS001_TC001_Test"/>
+      <class name="tests.HAP21_TS002_TC001_Test"/>
+      <class name="tests.HAP21_TS003_TC001_Test"/>
+      <class name="tests.HAP21_TS004_TC001_Test"/>
+    </classes>
+  </test>
+</suite>
