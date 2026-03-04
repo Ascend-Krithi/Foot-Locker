@@ -1,0 +1,35 @@
+package com.fl.automation.pages;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import com.fl.automation.core.BrowserUtils;
+
+public class HomePage {
+    private WebDriver driver;
+    private By findStoreHeaderLink = By.linkText("Find a Store");
+    private By findStoreHeaderCss = By.cssSelector("header a[href*='stores.footlocker.com']");
+    private By findStoreHeaderXpath = By.xpath("//header//a[contains(.,'Find a Store') or contains(.,'Store Locator')]");
+
+    public HomePage(WebDriver driver) {
+        this.driver = driver;
+    }
+
+    public boolean isFindStoreHeaderDisplayed() {
+        return BrowserUtils.isDisplayed(driver, getFindStoreHeader());
+    }
+
+    public WebElement getFindStoreHeader() {
+        if (driver.findElements(findStoreHeaderLink).size() > 0) {
+            return driver.findElement(findStoreHeaderLink);
+        } else if (driver.findElements(findStoreHeaderCss).size() > 0) {
+            return driver.findElement(findStoreHeaderCss);
+        } else {
+            return driver.findElement(findStoreHeaderXpath);
+        }
+    }
+
+    public void clickFindStoreHeader() {
+        BrowserUtils.click(driver, getFindStoreHeader());
+    }
+}

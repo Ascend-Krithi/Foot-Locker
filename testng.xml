@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="StoreLocatorSuite" parallel="false">
+    <test name="StoreLocatorTests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_2900"/>
+            <class name="com.fl.automation.tests.TS001_TC002_2901"/>
+            <class name="com.fl.automation.tests.TS002_TC001_2902"/>
+            <class name="com.fl.automation.tests.TS002_TC002_2903"/>
+            <class name="com.fl.automation.tests.TS003_TC001_2904"/>
+            <class name="com.fl.automation.tests.TS004_TC001_2905"/>
+            <class name="com.fl.automation.tests.TS005_TC001_2906"/>
+            <class name="com.fl.automation.tests.TS006_TC001_2907"/>
+            <class name="com.fl.automation.tests.TS001_TC001_2933"/>
+            <class name="com.fl.automation.tests.TS001_TC002_2934"/>
+            <class name="com.fl.automation.tests.TS001_TC003_2935"/>
+            <class name="com.fl.automation.tests.TS001_TC004_2936"/>
+            <class name="com.fl.automation.tests.TS001_TC005_2937"/>
+            <class name="com.fl.automation.tests.TS001_TC006_2938"/>
+        </classes>
+    </test>
+</suite>
