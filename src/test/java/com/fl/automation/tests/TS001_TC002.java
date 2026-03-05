@@ -4,9 +4,7 @@ import com.fl.automation.core.BaseTest;
 import com.fl.automation.pages.HomePage;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
-
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -21,41 +19,27 @@ public class TS001_TC002 extends BaseTest {
     public void validateStoreLocatorTextbox() {
 
         HomePage homePage = new HomePage(driver);
-
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(25));
-
-        // Stabilize landing
-        homePage.acceptCookiesIfPresent();
-        homePage.closeFlxRewardsIfPresent();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
         // Step 1 — Click Find a Store
         homePage.clickFindAStore();
 
-        // Step 2 — Wait for popup
-        wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//*[contains(text(),'Choose a preferred store')]")
-        ));
+        // Step 2 — Click "Select my store"
+        By selectMyStore = By.xpath("//*[contains(text(),'Select my store') or contains(text(),'Select My Store')]");
+        WebElement selectStoreBtn = wait.until(ExpectedConditions.elementToBeClickable(selectMyStore));
+        selectStoreBtn.click();
 
-        // Step 3 — Click "Select my store"
-        WebElement selectStore = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(
-                        By.xpath("//*[contains(text(),'Select my store')]")
-                )
-        );
+        // Step 3 — Validate "Location" input textbox
+        By locationTextbox = By.xpath("//input[contains(@placeholder,'Location') or " +
+                                      "contains(@placeholder,'address') or contains(@placeholder,'Zip')]");
+        WebElement locationInput = wait.until(ExpectedConditions.visibilityOfElementLocated(locationTextbox));
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", selectStore);
+        Assert.assertTrue(locationInput.isDisplayed(), "Location search textbox is NOT visible.");
 
-        // Step 4 — Wait for Location textbox
-        WebElement locationTextbox = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(
-                        By.xpath("//input[contains(@placeholder,'address') or contains(@placeholder,'Zip')]")
-                )
-        );
+        // Step 4 — Validate 'Search for store' button exists
+        By searchForStore = By.xpath("//*[contains(text(),'Search for store') or contains(text(),'Search Store')]");
+        WebElement searchBtn = wait.until(ExpectedConditions.visibilityOfElementLocated(searchForStore));
 
-        // Step 5 — Validate textbox displayed
-        Assert.assertTrue(
-                locationTextbox.isDisplayed(),
-                "Location textbox should be visible in the Find a Store popup."
-        );
+        Assert.assertTrue(searchBtn.isDisplayed(), "'Search for store' button is NOT visible.");
     }
 }
