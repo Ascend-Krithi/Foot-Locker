@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.fl</groupId>
@@ -9,7 +8,6 @@
   <version>1.0-SNAPSHOT</version>
 
   <properties>
-    <!-- IMPORTANT: do NOT define maven.compiler.release here -->
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -54,13 +52,11 @@
   <build>
     <plugins>
 
-      <!-- Java 17 + Lombok annotation processor + (allowed) exports -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.13.0</version>
         <configuration>
-          <!-- use source/target (NOT release) -->
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
           <encoding>${project.build.sourceEncoding}</encoding>
@@ -73,7 +69,6 @@
             </path>
           </annotationProcessorPaths>
 
-          <!-- These exports are allowed when NOT using --release -->
           <compilerArgs>
             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
