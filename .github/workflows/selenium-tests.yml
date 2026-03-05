@@ -2,10 +2,12 @@ name: Run Selenium Tests
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - Feature-*
 
 jobs:
-  test:
+  build:
 
     runs-on: ubuntu-latest
 
@@ -18,10 +20,10 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '11'
 
-      - name: Build Maven Project
-        run: mvn clean install
+      - name: Verify Files
+        run: ls -R
 
-      - name: Execute TestNG Tests
-        run: mvn test
+      - name: Build and Run Tests
+        run: mvn -f pom.xml clean test
