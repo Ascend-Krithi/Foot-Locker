@@ -10,15 +10,13 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 40
 
     steps:
 
-      # Checkout
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ---------------- JAVA ----------------
       - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
@@ -26,8 +24,7 @@ jobs:
           java-version: '17'
           cache: maven
 
-      # ---------------- CHROME ----------------
-      - name: Install Chrome Stable
+      - name: Install Chrome
         id: chrome
         uses: browser-actions/setup-chrome@v1
         with:
@@ -35,24 +32,21 @@ jobs:
 
       - name: Show Chrome Version
         run: |
-          echo "Chrome path: ${{ steps.chrome.outputs.chrome-path }}"
+          echo "Chrome Path: ${{ steps.chrome.outputs.chrome-path }}"
           ${{ steps.chrome.outputs.chrome-path }} --version
 
-      # Remove Ubuntu's old chromedriver
-      - name: Remove preinstalled chromedriver
+      - name: Remove default chromedriver
         run: |
           if command -v chromedriver; then
             sudo rm -f "$(command -v chromedriver)"
           fi
-          echo "chromedriver removed"
 
-      # ---------------- VIDEO SETUP ----------------
       - name: Install Xvfb & FFmpeg
         run: |
-          sudo apt-get update
-          sudo apt-get install -y xvfb ffmpeg
+          sudo apt update
+          sudo apt install -y xvfb ffmpeg
 
-      - name: Start Xvfb on Display :99
+      - name: Start Xvfb
         run: |
           export DISPLAY=:99
           Xvfb :99 -screen 0 1920x1080x24 -ac &
@@ -64,13 +58,12 @@ jobs:
           export DISPLAY=:99
           mkdir -p recordings
           ffmpeg -y -video_size 1920x1080 -f x11grab -i :99 \
-            -r 25 -codec:v libx264 -preset ultrafast \
+            -r 25 -vcodec libx264 -preset ultrafast \
             recordings/test-run.mp4 > /dev/null 2>&1 &
         env:
           DISPLAY: ":99"
 
-      # ---------------- RUN TESTS ----------------
-      - name: Run TS001 Tests
+      - name: Run Test Scripts (TS001)
         env:
           DISPLAY: ":99"
           HEADLESS: "false"
@@ -78,23 +71,19 @@ jobs:
         run: |
           unset CHROMEWEBDRIVER || true
           mvn -X -B -fae \
-            -DskipTests=false \
             -Dheadless=false \
-            -Dwebdriver.http.factory=jdk-http-client \
             -DchromeBinary="${{ steps.chrome.outputs.chrome-path }}" \
+            -Dwebdriver.http.factory=jdk-http-client \
             -Dtest=TS001_TC001,TS001_TC002 \
             test
 
-      # ---------------- STOP VIDEO ----------------
-      - name: Stop Screen Recording
+      - name: Stop Recording
         if: always()
         run: |
           pkill -15 ffmpeg || true
           sleep 2
-          ls -lh recordings
 
-      # ---------------- ARTIFACTS ----------------
-      - name: Upload Artifacts (Reports + Video)
+      - name: Upload Artifacts (Video + Reports)
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -104,4 +93,3 @@ jobs:
             **/target/surefire-reports/**
             **/test-output/**
             **/ExtentReport.html
-          if-no-files-found: warn
