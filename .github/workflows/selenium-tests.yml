@@ -12,19 +12,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
+      # 1️⃣ Checkout the repo
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Setup Java
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '11'
 
-      - name: Show Repo Files
-        run: ls -R  # Optional debug to see repo structure
+      # 3️⃣ Debug folder structure (optional)
+      - name: Show Folder Structure
+        run: ls -R
 
+      # 4️⃣ Run Maven in correct folder
       - name: Run Maven Tests
+        working-directory: Foot-Locker
         run: mvn clean test
-        working-directory: .
