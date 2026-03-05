@@ -13,6 +13,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Print workspace & list files
+        run: |
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+          pwd
+          ls -la
+
+      - name: Ensure pom.xml exists at repo root
+        run: |
+          test -f pom.xml && echo "pom.xml found" || (echo "pom.xml NOT found at repo root" && exit 1)
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -21,10 +33,30 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: Build & run tests
-        run: mvn -B -e -DskipTests=false test
+      # 👉 Full debug + fail at end so all modules run
+      - name: Build & run tests (debug)
+        run: |
+          mvn -X -B -fae -DskipTests=false test
 
-      - name: Upload TestNG/Surefire reports
+      # 👉 Print failing test summaries into the logs (if any)
+      - name: Show Surefire/TestNG failures in logs
+        if: always()
+        run: |
+          echo "===== Searching for surefire reports ====="
+          find . -type d -path "*/target/surefire-reports" -print
+          echo "===== Failures (if any) ====="
+          # Print failure/error summaries if files exist
+          for f in $(find . -type f -path "*/target/surefire-reports/*.txt"); do
+            echo "----- $f -----"
+            sed -n '1,200p' "$f"
+          done
+          # Also print top lines of TestNG emailable-report.html (if present)
+          for h in $(find . -type f -path "*/test-output/emailable-report.html"); do
+            echo "----- $h (first 200 lines) -----"
+            sed -n '1,200p' "$h" || true
+          done
+
+      - name: Upload TestNG/Surefire reports as artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -32,3 +64,4 @@ jobs:
           path: |
             **/target/surefire-reports/**
             **/test-output/**
+          if-no-files-found: warn
