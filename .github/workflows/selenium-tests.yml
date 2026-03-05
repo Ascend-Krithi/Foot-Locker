@@ -22,9 +22,9 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
-      - name: Show Folder Structure
-        run: ls -R
+      - name: Show Repo Files
+        run: ls -R  # Optional debug to see repo structure
 
       - name: Run Maven Tests
-        working-directory: ./Foot-Locker
         run: mvn clean test
+        working-directory: .
