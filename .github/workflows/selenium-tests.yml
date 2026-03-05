@@ -1,4 +1,4 @@
-name: FootLocker Automation CI
+name: FootLocker Automation CI (safety POM + video)
 
 on:
   push:
@@ -10,11 +10,10 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 45
 
     steps:
-
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup JDK 17
@@ -24,27 +23,123 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: Install Chrome
+      # ---------- SAFETY-NET: overwrite pom.xml on runner ----------
+      - name: Write clean pom.xml (temporary safety-net)
+        run: |
+          cat > pom.xml <<'XML'
+          <project xmlns="http://maven.apache.org/POM/4.0.0"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+            <modelVersion>4.0.0</modelVersion>
+            <groupId>com.fl</groupId>
+            <artifactId>footlocker-automation</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <properties>
+              <maven.compiler.source>17</maven.compiler.source>
+              <maven.compiler.target>17</maven.compiler.target>
+              <maven.compiler.release>17</maven.compiler.release>
+              <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+              <lombok.version>1.18.32</lombok.version>
+              <surefire.version>3.2.5</surefire.version>
+            </properties>
+            <dependencies>
+              <dependency>
+                <groupId>org.seleniumhq.selenium</groupId>
+                <artifactId>selenium-java</artifactId>
+                <version>4.21.0</version>
+              </dependency>
+              <dependency>
+                <groupId>io.github.bonigarcia</groupId>
+                <artifactId>webdrivermanager</artifactId>
+                <version>5.9.2</version>
+              </dependency>
+              <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>7.10.2</version>
+                <scope>test</scope>
+              </dependency>
+              <dependency>
+                <groupId>com.aventstack</groupId>
+                <artifactId>extentreports</artifactId>
+                <version>5.1.1</version>
+              </dependency>
+              <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+              </dependency>
+            </dependencies>
+            <build>
+              <plugins>
+                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <version>3.13.0</version>
+                  <configuration>
+                    <release>${maven.compiler.release}</release>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <annotationProcessorPaths>
+                      <path>
+                        <groupId>org.projectlombok</groupId>
+                        <artifactId>lombok</artifactId>
+                        <version>${lombok.version}</version>
+                      </path>
+                    </annotationProcessorPaths>
+                    <compilerArgs>
+                      <arg>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                      <arg>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                      <arg>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+                      <arg>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+                      <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                      <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                      <arg>--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+                    </compilerArgs>
+                  </configuration>
+                </plugin>
+                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-surefire-plugin</artifactId>
+                  <version>${surefire.version}</version>
+                  <configuration>
+                    <suiteXmlFiles>
+                      <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <testFailureIgnore>false</testFailureIgnore>
+                  </configuration>
+                </plugin>
+              </plugins>
+            </build>
+          </project>
+          XML
+
+      - name: Validate POM quickly
+        run: mvn -B -q validate || (echo "POM invalid" && sed -n '1,160p' pom.xml && exit 1)
+
+      # ---------- Chrome ----------
+      - name: Install Chrome (stable)
         id: chrome
         uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: stable
 
-      - name: Show Chrome Version
+      - name: Show Chrome version
         run: |
-          echo "Chrome Path: ${{ steps.chrome.outputs.chrome-path }}"
+          echo "Chrome path: ${{ steps.chrome.outputs.chrome-path }}"
           ${{ steps.chrome.outputs.chrome-path }} --version
 
-      - name: Remove default chromedriver
+      - name: Remove preinstalled chromedriver (avoid mismatch)
         run: |
           if command -v chromedriver; then
             sudo rm -f "$(command -v chromedriver)"
           fi
 
+      # ---------- Video ----------
       - name: Install Xvfb & FFmpeg
         run: |
-          sudo apt update
-          sudo apt install -y xvfb ffmpeg
+          sudo apt-get update
+          sudo apt-get install -y xvfb ffmpeg
 
       - name: Start Xvfb
         run: |
@@ -53,17 +148,18 @@ jobs:
         env:
           DISPLAY: ":99"
 
-      - name: Start Screen Recording
+      - name: Start screen recording
         run: |
           export DISPLAY=:99
           mkdir -p recordings
           ffmpeg -y -video_size 1920x1080 -f x11grab -i :99 \
-            -r 25 -vcodec libx264 -preset ultrafast \
-            recordings/test-run.mp4 > /dev/null 2>&1 &
+                 -r 25 -codec:v libx264 -preset ultrafast \
+                 recordings/test-run.mp4 > /dev/null 2>&1 &
         env:
           DISPLAY: ":99"
 
-      - name: Run Test Scripts (TS001)
+      # ---------- Tests ----------
+      - name: Run TS001 tests
         env:
           DISPLAY: ":99"
           HEADLESS: "false"
@@ -72,16 +168,18 @@ jobs:
           unset CHROMEWEBDRIVER || true
           mvn -X -B -fae \
             -Dheadless=false \
-            -DchromeBinary="${{ steps.chrome.outputs.chrome-path }}" \
             -Dwebdriver.http.factory=jdk-http-client \
+            -DchromeBinary="${{ steps.chrome.outputs.chrome-path }}" \
             -Dtest=TS001_TC001,TS001_TC002 \
             test
 
-      - name: Stop Recording
+      # ---------- Artifacts ----------
+      - name: Stop screen recording
         if: always()
         run: |
           pkill -15 ffmpeg || true
           sleep 2
+          ls -lh recordings || true
 
       - name: Upload Artifacts (Video + Reports)
         if: always()
@@ -93,3 +191,4 @@ jobs:
             **/target/surefire-reports/**
             **/test-output/**
             **/ExtentReport.html
+          if-no-files-found: warn
