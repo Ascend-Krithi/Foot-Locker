@@ -1,6 +1,5 @@
 name: Run Selenium Tests
 
-
 on:
   push:
     branches:
@@ -23,8 +22,9 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
-      - name: Verify Files
+      - name: Show Folder Structure
         run: ls -R
 
-      - name: Build and Run Tests
-        run: mvn -f pom.xml clean test
+      - name: Run Maven Tests
+        working-directory: ./Foot-Locker
+        run: mvn clean test
