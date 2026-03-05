@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <reportName>FootLocker Automation Report</reportName>
+    <theme>STANDARD</theme>
+    <encoding>UTF-8</encoding>
+    <protocol>HTTPS</protocol>
+</configuration>
