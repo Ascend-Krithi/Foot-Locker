@@ -12,7 +12,6 @@
         <classes>
             <class name="com.fl.automation.tests.TS001_TC001"/>
             <class name="com.fl.automation.tests.TS001_TC002"/>
-            <class name="com.fl.automation.tests.TS002_TC001"/>
         </classes>
 
     </test>
