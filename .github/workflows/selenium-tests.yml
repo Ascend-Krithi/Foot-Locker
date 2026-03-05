@@ -25,7 +25,7 @@ jobs:
           java-version: '17'
           cache: maven
 
-      # 1) Install Chrome stable (predictable version)
+      # Install Chrome stable (predictable version)
       - name: Install Chrome (stable)
         id: chrome
         uses: browser-actions/setup-chrome@v1
@@ -38,7 +38,7 @@ jobs:
           ${{ steps.chrome.outputs.chrome-path }} --version || true
           which chromedriver && chromedriver --version || echo "chromedriver not found (yet)"
 
-      # 2) *** Remove preinstalled chromedriver (145) from PATH ***
+      # Remove preinstalled chromedriver from PATH (was 145 on your runner)
       - name: Remove preinstalled chromedriver (avoid version mismatch)
         run: |
           if command -v chromedriver; then
@@ -48,20 +48,19 @@ jobs:
           echo "After removal:"
           command -v chromedriver || echo "chromedriver not found (good)"
 
-      # 3) Build & run only your two tests
-      - name: Build & run tests (debug)
+      - name: Build & run tests (debug) - only 2 classes
         env:
           HEADLESS: "true"
           CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
         run: |
-          # Unset any env var that might point to a stale driver directory:
+          # Ensure Selenium Manager chooses the right driver (no stale PATH hint)
           unset CHROMEWEBDRIVER || true
           mvn -X -B -fae \
             -DskipTests=false \
             -Dheadless=true \
             -Dwebdriver.http.factory=jdk-http-client \
-            -Dtest=TS001_TC001,TS001_TC002 \
             -DchromeBinary="${{ steps.chrome.outputs.chrome-path }}" \
+            -Dtest=TS001_TC001,TS001_TC002 \
             test
 
       - name: Upload Test Reports (Surefire + TestNG + Extent)
