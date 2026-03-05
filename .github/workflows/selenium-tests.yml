@@ -1,4 +1,4 @@
-name: Maven CI (2 tests + Video)
+name: FootLocker Automation CI
 
 on:
   push:
@@ -13,71 +13,69 @@ jobs:
     timeout-minutes: 45
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Set up JDK 17
+      # Checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ---------------- JAVA ----------------
+      - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
           cache: maven
 
-      # Install Chrome stable (predictable version)
-      - name: Install Chrome (stable)
+      # ---------------- CHROME ----------------
+      - name: Install Chrome Stable
         id: chrome
         uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: stable
 
-      - name: Show Chrome binary info
+      - name: Show Chrome Version
         run: |
-          echo "chrome-path: ${{ steps.chrome.outputs.chrome-path }}"
-          ${{ steps.chrome.outputs.chrome-path }} --version || true
-          which chromedriver && chromedriver --version || echo "chromedriver not found (yet)"
+          echo "Chrome path: ${{ steps.chrome.outputs.chrome-path }}"
+          ${{ steps.chrome.outputs.chrome-path }} --version
 
-      # Remove any preinstalled chromedriver from PATH so Selenium Manager picks a matching one
-      - name: Remove preinstalled chromedriver (avoid version mismatch)
+      # Remove Ubuntu's old chromedriver
+      - name: Remove preinstalled chromedriver
         run: |
           if command -v chromedriver; then
-            echo "Removing $(command -v chromedriver)"
             sudo rm -f "$(command -v chromedriver)"
           fi
-          echo "After removal:"
-          command -v chromedriver || echo "chromedriver not found (good)"
+          echo "chromedriver removed"
 
-      # ---- VIDEO RECORDING SETUP (Xvfb + FFmpeg) ----
+      # ---------------- VIDEO SETUP ----------------
       - name: Install Xvfb & FFmpeg
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb ffmpeg
 
-      - name: Start Xvfb (virtual display :99)
+      - name: Start Xvfb on Display :99
         run: |
           export DISPLAY=:99
-          # 1920x1080 @ 24-bit color; keep this in sync with ffmpeg -video_size below
-          Xvfb :99 -screen 0 1920x1080x24 -ac +extension RANDR &
+          Xvfb :99 -screen 0 1920x1080x24 -ac &
+        env:
+          DISPLAY: ":99"
 
-      - name: Start screen recording
+      - name: Start Screen Recording
         run: |
           export DISPLAY=:99
           mkdir -p recordings
-          # -y overwrite; -r 25 fps; H.264 mp4; keep -video_size matching Xvfb screen
-          ffmpeg -y -video_size 1920x1080 -f x11grab -i :99 -r 25 \
-                 -codec:v libx264 -preset veryfast -pix_fmt yuv420p \
-                 recordings/test-run.mp4 > /dev/null 2>&1 &
-
-      # ---- RUN TESTS (headed on the virtual display) ----
-      - name: Build & run tests (debug) - only 2 classes
+          ffmpeg -y -video_size 1920x1080 -f x11grab -i :99 \
+            -r 25 -codec:v libx264 -preset ultrafast \
+            recordings/test-run.mp4 > /dev/null 2>&1 &
         env:
-          # Run headed to actually render UI inside Xvfb
-          HEADLESS: "false"
           DISPLAY: ":99"
+
+      # ---------------- RUN TESTS ----------------
+      - name: Run TS001 Tests
+        env:
+          DISPLAY: ":99"
+          HEADLESS: "false"
           CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
         run: |
-          # Ensure Selenium Manager chooses the right driver (no stale PATH hint)
           unset CHROMEWEBDRIVER || true
           mvn -X -B -fae \
             -DskipTests=false \
@@ -87,18 +85,16 @@ jobs:
             -Dtest=TS001_TC001,TS001_TC002 \
             test
 
-      # ---- STOP RECORDING & UPLOAD ARTIFACTS ----
-      - name: Stop screen recording
+      # ---------------- STOP VIDEO ----------------
+      - name: Stop Screen Recording
         if: always()
         run: |
-          # Gracefully stop ffmpeg so the mp4 is finalized
           pkill -15 ffmpeg || true
-          # small wait to flush the file
           sleep 2
-          # If file wasn't created for any reason, touch a marker to debug
-          test -s recordings/test-run.mp4 || echo "No video captured" > recordings/NO_VIDEO.txt
+          ls -lh recordings
 
-      - name: Upload video & reports
+      # ---------------- ARTIFACTS ----------------
+      - name: Upload Artifacts (Reports + Video)
         if: always()
         uses: actions/upload-artifact@v4
         with:
