@@ -1,22 +1,26 @@
-
 package com.fl.automation.core;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 public class DriverFactory {
+    private static ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 
-    public static WebDriver createDriver(){
-
-        WebDriverManager.chromedriver().setup();
-
+    public static void initDriver() {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--incognito");
         options.addArguments("--start-maximized");
-        options.addArguments("--disable-notifications");
+        driver.set(new ChromeDriver(options));
+    }
 
-        return new ChromeDriver(options);
+    public static WebDriver getDriver() {
+        return driver.get();
+    }
+
+    public static void quitDriver() {
+        if (driver.get() != null) {
+            driver.get().quit();
+            driver.remove();
+        }
     }
 }
