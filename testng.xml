@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Suite" parallel="false" thread-count="1">
+    <test name="Store Locator Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_3193"/>
+            <class name="com.fl.automation.tests.TS001_TC002_3194"/>
+            <class name="com.fl.automation.tests.TS001_TC003_3195"/>
+            <class name="com.fl.automation.tests.TS001_TC004_3196"/>
+            <class name="com.fl.automation.tests.TS001_TC005_3197"/>
+            <class name="com.fl.automation.tests.TS001_TC006_3198"/>
+            <class name="com.fl.automation.tests.TS001_TC007_3199"/>
+            <class name="com.fl.automation.tests.TS001_TC001_3227"/>
+            <class name="com.fl.automation.tests.TS002_TC001_3228"/>
+            <class name="com.fl.automation.tests.TS003_TC001_3229"/>
+            <class name="com.fl.automation.tests.TS004_TC001_3230"/>
+            <class name="com.fl.automation.tests.TS005_TC001_3231"/>
+            <class name="com.fl.automation.tests.TS006_TC001_3232"/>
+            <class name="com.fl.automation.tests.TS007_TC001_3233"/>
+        </classes>
+    </test>
+</suite>
