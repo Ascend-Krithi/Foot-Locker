@@ -1,22 +1,53 @@
-
 package com.fl.automation.core;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 public class DriverFactory {
 
-    public static WebDriver createDriver(){
+    private static ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 
-        WebDriverManager.chromedriver().setup();
+    public static void initDriver() {
+        String browser = ConfigReader.get("browser");
+        WebDriver webDriver = null;
 
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--incognito");
-        options.addArguments("--start-maximized");
-        options.addArguments("--disable-notifications");
+        switch (browser.toLowerCase()) {
+            case "chrome":
+                ChromeOptions chromeOptions = new ChromeOptions();
+                chromeOptions.addArguments("--start-maximized");
+                chromeOptions.addArguments("--disable-notifications");
+                webDriver = new ChromeDriver(chromeOptions);
+                break;
+            case "firefox":
+                FirefoxOptions firefoxOptions = new FirefoxOptions();
+                webDriver = new FirefoxDriver(firefoxOptions);
+                webDriver.manage().window().maximize();
+                break;
+            case "edge":
+                EdgeOptions edgeOptions = new EdgeOptions();
+                edgeOptions.addArguments("--start-maximized");
+                webDriver = new EdgeDriver(edgeOptions);
+                break;
+            default:
+                throw new IllegalArgumentException("Browser not supported: " + browser);
+        }
 
-        return new ChromeDriver(options);
+        driver.set(webDriver);
+    }
+
+    public static WebDriver getDriver() {
+        return driver.get();
+    }
+
+    public static void quitDriver() {
+        if (driver.get() != null) {
+            driver.get().quit();
+            driver.remove();
+        }
     }
 }
