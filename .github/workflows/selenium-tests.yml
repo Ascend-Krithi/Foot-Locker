@@ -1,4 +1,4 @@
-name: Maven CI (TS001_TC001 + TS001_TC002)
+name: Maven CI (2 tests + Video)
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Checkout code
@@ -38,7 +38,7 @@ jobs:
           ${{ steps.chrome.outputs.chrome-path }} --version || true
           which chromedriver && chromedriver --version || echo "chromedriver not found (yet)"
 
-      # Remove preinstalled chromedriver from PATH (was 145 on your runner)
+      # Remove any preinstalled chromedriver from PATH so Selenium Manager picks a matching one
       - name: Remove preinstalled chromedriver (avoid version mismatch)
         run: |
           if command -v chromedriver; then
@@ -48,27 +48,63 @@ jobs:
           echo "After removal:"
           command -v chromedriver || echo "chromedriver not found (good)"
 
+      # ---- VIDEO RECORDING SETUP (Xvfb + FFmpeg) ----
+      - name: Install Xvfb & FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb ffmpeg
+
+      - name: Start Xvfb (virtual display :99)
+        run: |
+          export DISPLAY=:99
+          # 1920x1080 @ 24-bit color; keep this in sync with ffmpeg -video_size below
+          Xvfb :99 -screen 0 1920x1080x24 -ac +extension RANDR &
+
+      - name: Start screen recording
+        run: |
+          export DISPLAY=:99
+          mkdir -p recordings
+          # -y overwrite; -r 25 fps; H.264 mp4; keep -video_size matching Xvfb screen
+          ffmpeg -y -video_size 1920x1080 -f x11grab -i :99 -r 25 \
+                 -codec:v libx264 -preset veryfast -pix_fmt yuv420p \
+                 recordings/test-run.mp4 > /dev/null 2>&1 &
+
+      # ---- RUN TESTS (headed on the virtual display) ----
       - name: Build & run tests (debug) - only 2 classes
         env:
-          HEADLESS: "true"
+          # Run headed to actually render UI inside Xvfb
+          HEADLESS: "false"
+          DISPLAY: ":99"
           CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
         run: |
           # Ensure Selenium Manager chooses the right driver (no stale PATH hint)
           unset CHROMEWEBDRIVER || true
           mvn -X -B -fae \
             -DskipTests=false \
-            -Dheadless=true \
+            -Dheadless=false \
             -Dwebdriver.http.factory=jdk-http-client \
             -DchromeBinary="${{ steps.chrome.outputs.chrome-path }}" \
             -Dtest=TS001_TC001,TS001_TC002 \
             test
 
-      - name: Upload Test Reports (Surefire + TestNG + Extent)
+      # ---- STOP RECORDING & UPLOAD ARTIFACTS ----
+      - name: Stop screen recording
+        if: always()
+        run: |
+          # Gracefully stop ffmpeg so the mp4 is finalized
+          pkill -15 ffmpeg || true
+          # small wait to flush the file
+          sleep 2
+          # If file wasn't created for any reason, touch a marker to debug
+          test -s recordings/test-run.mp4 || echo "No video captured" > recordings/NO_VIDEO.txt
+
+      - name: Upload video & reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports
+          name: run-artifacts
           path: |
+            recordings/test-run.mp4
             **/target/surefire-reports/**
             **/test-output/**
             **/ExtentReport.html
