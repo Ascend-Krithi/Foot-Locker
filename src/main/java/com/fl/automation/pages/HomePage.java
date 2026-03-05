@@ -1,43 +1,36 @@
-
 package com.fl.automation.pages;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.*;
-
-import java.time.Duration;
+import com.fl.automation.core.BrowserUtils;
+import com.fl.automation.core.ConfigReader;
+import com.fl.automation.core.DriverFactory;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 
 public class HomePage {
+    private WebDriver driver;
+    private final By findStoreLink = By.linkText("Find a Store");
+    private final By findStoreLinkCss = By.cssSelector("header a[href*='stores.footlocker.com']");
+    private final By findStoreLinkXpath = By.xpath("//header//a[contains(.,'Find a Store') or contains(.,'Store Locator')]");
 
-    WebDriver driver;
-    WebDriverWait wait;
-
-    public HomePage(WebDriver driver){
-
-        this.driver = driver;
-        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+    public HomePage() {
+        this.driver = DriverFactory.getDriver();
     }
 
-    public void acceptCookiesIfPresent(){
-
-        try{
-            WebElement cookie = wait.until(ExpectedConditions.elementToBeClickable(By.id("onetrust-accept-btn-handler")));
-            cookie.click();
-        }catch(Exception ignored){}
+    public void launch() {
+        driver.get(ConfigReader.get("base.url"));
     }
 
-    public void closeFlxRewardsIfPresent(){
-
-        try{
-            WebElement close = driver.findElement(By.xpath("//button[contains(@aria-label,'close')]"));
-            close.click();
-        }catch(Exception ignored){}
+    public boolean isLoaded() {
+        return driver.getCurrentUrl().contains("footlocker.com");
     }
 
-    public void clickFindAStore(){
-
-        WebElement store = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//*[contains(text(),'Find a Store')]")));
-
-        store.click();
+    public void clickFindStore() {
+        if (BrowserUtils.isDisplayed(driver, findStoreLink)) {
+            BrowserUtils.click(driver, findStoreLink);
+        } else if (BrowserUtils.isDisplayed(driver, findStoreLinkCss)) {
+            BrowserUtils.click(driver, findStoreLinkCss);
+        } else {
+            BrowserUtils.click(driver, findStoreLinkXpath);
+        }
     }
 }
