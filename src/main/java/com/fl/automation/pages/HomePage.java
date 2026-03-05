@@ -1,43 +1,41 @@
-
 package com.fl.automation.pages;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.*;
-
-import java.time.Duration;
+import com.fl.automation.core.BrowserUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 
 public class HomePage {
+    private WebDriver driver;
 
-    WebDriver driver;
-    WebDriverWait wait;
+    private By findStoreLink = By.linkText("Find a Store");
+    private By findStoreLinkCss = By.cssSelector("header a[href*='stores.footlocker.com']");
+    private By findStoreLinkXpath = By.xpath("//header//a[contains(.,'Find a Store') or contains(.,'Store Locator')]");
 
-    public HomePage(WebDriver driver){
-
+    public HomePage(WebDriver driver) {
         this.driver = driver;
-        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
     }
 
-    public void acceptCookiesIfPresent(){
-
-        try{
-            WebElement cookie = wait.until(ExpectedConditions.elementToBeClickable(By.id("onetrust-accept-btn-handler")));
-            cookie.click();
-        }catch(Exception ignored){}
+    public void clickFindAStore() {
+        try {
+            BrowserUtils.click(driver, findStoreLink);
+        } catch (Exception e1) {
+            try {
+                BrowserUtils.click(driver, findStoreLinkCss);
+            } catch (Exception e2) {
+                BrowserUtils.click(driver, findStoreLinkXpath);
+            }
+        }
     }
 
-    public void closeFlxRewardsIfPresent(){
-
-        try{
-            WebElement close = driver.findElement(By.xpath("//button[contains(@aria-label,'close')]"));
-            close.click();
-        }catch(Exception ignored){}
-    }
-
-    public void clickFindAStore(){
-
-        WebElement store = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//*[contains(text(),'Find a Store')]")));
-
-        store.click();
+    public boolean isFindAStoreDisplayed() {
+        try {
+            return BrowserUtils.isDisplayed(driver, findStoreLink);
+        } catch (Exception e1) {
+            try {
+                return BrowserUtils.isDisplayed(driver, findStoreLinkCss);
+            } catch (Exception e2) {
+                return BrowserUtils.isDisplayed(driver, findStoreLinkXpath);
+            }
+        }
     }
 }
