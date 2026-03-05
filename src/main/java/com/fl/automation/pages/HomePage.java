@@ -1,43 +1,37 @@
-
 package com.fl.automation.pages;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.*;
-
-import java.time.Duration;
+import com.fl.automation.core.BrowserUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 
 public class HomePage {
+    private WebDriver driver;
+    private final By findAStoreLink = By.linkText("Find a Store");
+    private final By findAStoreLinkCss = By.cssSelector("header a[href*='stores.footlocker.com']");
+    private final By findAStoreLinkXpath = By.xpath("//header//a[contains(.,'Find a Store') or contains(.,'Store Locator')]");
 
-    WebDriver driver;
-    WebDriverWait wait;
-
-    public HomePage(WebDriver driver){
-
+    public HomePage(WebDriver driver) {
         this.driver = driver;
-        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
     }
 
-    public void acceptCookiesIfPresent(){
-
-        try{
-            WebElement cookie = wait.until(ExpectedConditions.elementToBeClickable(By.id("onetrust-accept-btn-handler")));
-            cookie.click();
-        }catch(Exception ignored){}
+    public void clickFindAStore() {
+        if (BrowserUtils.isDisplayed(driver, findAStoreLink)) {
+            BrowserUtils.click(driver, findAStoreLink);
+        } else if (BrowserUtils.isDisplayed(driver, findAStoreLinkCss)) {
+            BrowserUtils.click(driver, findAStoreLinkCss);
+        } else {
+            BrowserUtils.click(driver, findAStoreLinkXpath);
+        }
     }
 
-    public void closeFlxRewardsIfPresent(){
-
-        try{
-            WebElement close = driver.findElement(By.xpath("//button[contains(@aria-label,'close')]"));
-            close.click();
-        }catch(Exception ignored){}
+    public boolean isFindAStorePopupDisplayed() {
+        // The popup is expected after clicking Find a Store; check for Select My Store link
+        By selectMyStoreLink = By.xpath("//a[contains(.,'Select My Store') or contains(.,'Set My Store') or contains(.,'Make This My Store') or contains(.,'Set as My Store')]");
+        return BrowserUtils.isDisplayed(driver, selectMyStoreLink);
     }
 
-    public void clickFindAStore(){
-
-        WebElement store = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//*[contains(text(),'Find a Store')]")));
-
-        store.click();
+    public boolean isSelectMyStoreLinkVisible() {
+        By selectMyStoreLink = By.xpath("//a[contains(.,'Select My Store') or contains(.,'Set My Store') or contains(.,'Make This My Store') or contains(.,'Set as My Store')]");
+        return BrowserUtils.isDisplayed(driver, selectMyStoreLink);
     }
 }
