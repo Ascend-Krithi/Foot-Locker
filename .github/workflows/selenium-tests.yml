@@ -5,10 +5,13 @@ on:
     branches: [ "main", "feature/**", "Feature-*" ]
   pull_request:
     branches: [ "main" ]
+  # Optional manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout code
@@ -16,6 +19,7 @@ jobs:
         with:
           fetch-depth: 0
 
+      # --- Sanity checks: confirm workspace + POM path
       - name: Print workspace & list files
         run: |
           echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
@@ -24,8 +28,9 @@ jobs:
 
       - name: Ensure pom.xml exists at repo root
         run: |
-          test -f pom.xml && echo "pom.xml found" || (echo "pom.xml NOT found at repo root" && exit 1)
+          test -f pom.xml && echo "pom.xml found at repo root ✅" || (echo "❌ pom.xml NOT found at repo root" && exit 1)
 
+      # --- Java toolchain
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -33,30 +38,60 @@ jobs:
           java-version: '17'
           cache: maven
 
-      # 👉 Full debug + fail at end so all modules run
-      - name: Build & run tests (debug)
-        run: |
-          mvn -X -B -fae -DskipTests=false test
+      # --- If your tests use Selenium/Chrome, UNCOMMENT the next two steps:
+      # - name: Install Chrome
+      #   uses: browser-actions/setup-chrome@v1
+      #
+      # - name: Show Chrome version
+      #   run: chrome --version
 
-      # 👉 Print failing test summaries into the logs (if any)
+      # --- Build & run tests (full debug), fail-at-end to see all failures
+      # Set TEST_PATTERN to run only specific tests (e.g. TS001_TC001,TS001_TC002).
+      # Leave it blank to run the full suite.
+      - name: Build & run tests (debug)
+        env:
+          TEST_PATTERN: ""   # e.g. "TS001_TC001,TS001_TC002"
+        run: |
+          if [ -n "$TEST_PATTERN" ]; then
+            echo "Running only tests: $TEST_PATTERN"
+            mvn -X -B -fae -DskipTests=false -Dtest="$TEST_PATTERN" test
+          else
+            echo "Running full test suite"
+            mvn -X -B -fae -DskipTests=false test
+          fi
+
+      # --- Print summaries into the job logs for quick triage
       - name: Show Surefire/TestNG failures in logs
         if: always()
         run: |
-          echo "===== Searching for surefire reports ====="
-          find . -type d -path "*/target/surefire-reports" -print
-          echo "===== Failures (if any) ====="
-          # Print failure/error summaries if files exist
+          echo "===== surefire report directories ====="
+          find . -type d -path "*/target/surefire-reports" -print || true
+
+          echo "===== surefire *.txt (first 200 lines each) ====="
+          found=false
           for f in $(find . -type f -path "*/target/surefire-reports/*.txt"); do
+            found=true
             echo "----- $f -----"
             sed -n '1,200p' "$f"
           done
-          # Also print top lines of TestNG emailable-report.html (if present)
+          if [ "$found" = false ]; then
+            echo "No surefire .txt files found."
+          fi
+
+          echo "===== TestNG emailable-report.html (first 200 lines if present) ====="
           for h in $(find . -type f -path "*/test-output/emailable-report.html"); do
-            echo "----- $h (first 200 lines) -----"
+            echo "----- $h -----"
             sed -n '1,200p' "$h" || true
           done
 
-      - name: Upload TestNG/Surefire reports as artifacts
+          echo "===== ExtentReport.html (first 200 lines if present) ====="
+          for e in $(find . -type f -name "ExtentReport.html"); do
+            echo "----- $e -----"
+            sed -n '1,200p' "$e" || true
+          done
+
+      # --- Upload reports so you can download & view them
+      - name: Upload Test Reports (Surefire + TestNG + Extent)
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -64,4 +99,5 @@ jobs:
           path: |
             **/target/surefire-reports/**
             **/test-output/**
+            **/ExtentReport.html
           if-no-files-found: warn
