@@ -1,0 +1,1 @@
+<StoreLocatorPage class with provided locators and actions>

@@ -1,0 +1,1 @@
+<BrowserUtils class with click, type, isDisplayed, getText, scrollIntoView>
