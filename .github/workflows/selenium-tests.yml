@@ -7,9 +7,6 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -18,8 +15,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup JDK 17
         uses: actions/setup-java@v4
@@ -28,7 +23,6 @@ jobs:
           java-version: '17'
           cache: maven
 
-      # TEMP safety-net POM
       - name: Write clean pom.xml (temporary safety-net)
         run: |
           cat > pom.xml <<'XML'
@@ -39,7 +33,6 @@ jobs:
             <groupId>com.fl</groupId>
             <artifactId>footlocker-automation</artifactId>
             <version>1.0-SNAPSHOT</version>
-
             <properties>
               <maven.compiler.source>17</maven.compiler.source>
               <maven.compiler.target>17</maven.compiler.target>
@@ -47,34 +40,28 @@ jobs:
               <lombok.version>1.18.32</lombok.version>
               <surefire.version>3.2.5</surefire.version>
             </properties>
-
             <dependencies>
               <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
                 <artifactId>selenium-java</artifactId>
                 <version>4.21.0</version>
               </dependency>
-
               <dependency>
                 <groupId>io.github.bonigarcia</groupId>
                 <artifactId>webdrivermanager</artifactId>
                 <version>5.9.2</version>
               </dependency>
-
               <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>7.10.2</version>
                 <scope>test</scope>
               </dependency>
-
               <dependency>
                 <groupId>com.aventstack</groupId>
                 <artifactId>extentreports</artifactId>
                 <version>5.1.1</version>
               </dependency>
-
-              <!-- FIXED LINE (your line ~194) -->
               <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
@@ -82,13 +69,14 @@ jobs:
                 <scope>provided</scope>
               </dependency>
             </dependencies>
-
             <build>
               <plugins>
                 <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-compiler-plugin</artifactId>
-                  <version>3                    <source>${maven.compiler.source}</source>
+                  <version>3.13.0</version>
+                  <configuration>
+                    <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <annotationProcessorPaths>
@@ -98,9 +86,17 @@ jobs:
                         <version>${lombok.version}</version>
                       </path>
                     </annotationProcessorPaths>
+                    <compilerArgs>
+                      <arg>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                      <arg>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                      <arg>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+                      <arg>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+                      <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                      <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                      <arg>--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+                    </compilerArgs>
                   </configuration>
                 </plugin>
-
                 <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-surefire-plugin</artifactId>
@@ -129,7 +125,7 @@ jobs:
       - name: Show Chrome version
         run: |
           echo "Chrome path: ${{ steps.chrome.outputs.chrome-path }}"
-          "${{ steps.chrome.outputs.chrome-path }}" --version
+          ${{ steps.chrome.outputs.chrome-path }} --version
 
       - name: Remove preinstalled chromedriver (avoid mismatch)
         run: |
@@ -139,7 +135,7 @@ jobs:
 
       - name: Install Xvfb & FFmpeg
         run: |
-          sudo apt-get update -y
+          sudo apt-get update
           sudo apt-get install -y xvfb ffmpeg
 
       - name: Start Xvfb
