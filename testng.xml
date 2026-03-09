@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Suite" parallel="methods" thread-count="3">
+    <test name="Store Locator Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC3193_"/>
+            <class name="com.fl.automation.tests.TS001_TC3194_"/>
+            <class name="com.fl.automation.tests.TS001_TC3195_"/>
+            <class name="com.fl.automation.tests.TS001_TC3196_"/>
+            <class name="com.fl.automation.tests.TS001_TC3197_"/>
+            <class name="com.fl.automation.tests.TS001_TC3198_"/>
+            <class name="com.fl.automation.tests.TS001_TC3199_"/>
+            <class name="com.fl.automation.tests.TS001_TC3227_"/>
+            <class name="com.fl.automation.tests.TS002_TC3228_"/>
+            <class name="com.fl.automation.tests.TS003_TC3229_"/>
+            <class name="com.fl.automation.tests.TS004_TC3230_"/>
+            <class name="com.fl.automation.tests.TS005_TC3231_"/>
+            <class name="com.fl.automation.tests.TS006_TC3232_"/>
+            <class name="com.fl.automation.tests.TS007_TC3233_"/>
+            <class name="com.fl.automation.tests.TS001_TC3234_"/>
+            <class name="com.fl.automation.tests.TS002_TC3235_"/>
+            <class name="com.fl.automation.tests.TS003_TC3236_"/>
+            <class name="com.fl.automation.tests.TS004_TC3237_"/>
+            <class name="com.fl.automation.tests.TS005_TC3238_"/>
+            <class name="com.fl.automation.tests.TS006_TC3239_"/>
+            <class name="com.fl.automation.tests.TS007_TC3240_"/>
+            <class name="com.fl.automation.tests.TS008_TC3241_"/>
+            <class name="com.fl.automation.tests.TS009_TC3242_"/>
+            <class name="com.fl.automation.tests.TS010_TC3243_"/>
+            <class name="com.fl.automation.tests.TS011_TC3244_"/>
+            <class name="com.fl.automation.tests.TS012_TC3245_"/>
+            <class name="com.fl.automation.tests.TS013_TC3246_"/>
+        </classes>
+    </test>
+</suite>
