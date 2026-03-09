@@ -1,0 +1,1 @@
+<complete TS006_TC3232_.java content>
