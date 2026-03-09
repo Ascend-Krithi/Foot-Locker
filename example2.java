@@ -1,0 +1,1 @@
+public class Example2 { public void test() { System.out.println("Test method"); } }
