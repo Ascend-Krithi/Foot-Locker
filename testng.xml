@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="SCRUM-17166 Store Locator Suite" parallel="false">
+    <test name="Store Locator Tests">
+        <classes>
+            <class name="tests.TC3193_FindAStorePopup"/>
+            <class name="tests.TC3194_SelectMyStorePopup"/>
+            <class name="tests.TC3195_SearchBostonResults"/>
+            <class name="tests.TC3196_VerifyBostonStoreInResults"/>
+            <class name="tests.TC3197_SetMyStoreBoston"/>
+            <class name="tests.TC3198_ConfirmationIndicator"/>
+            <class name="tests.TC3199_StorePersistsNavigation"/>
+            <class name="tests.TC3227_FindAStorePopup"/>
+            <class name="tests.TC3228_SelectMyStoreSearchElements"/>
+            <class name="tests.TC3229_SearchBostonResults"/>
+            <class name="tests.TC3230_VerifyBostonStoreAddress"/>
+            <class name="tests.TC3231_SetPreferredStore"/>
+            <class name="tests.TC3232_ConfirmationAndStoreDisplay"/>
+            <class name="tests.TC3233_StorePersistence"/>
+            <class name="tests.TC3234_FindAStoreLinkPopup"/>
+            <class name="tests.TC3235_PopupSearchElements"/>
+            <class name="tests.TC3236_SearchBostonResults"/>
+            <class name="tests.TC3237_SearchInvalidLocation"/>
+            <class name="tests.TC3238_EmptyLocationValidation"/>
+            <class name="tests.TC3239_ExactStoreAddressMatch"/>
+            <class name="tests.TC3240_NoTyposStoreAddress"/>
+            <class name="tests.TC3241_SetStoreConfirmation"/>
+            <class name="tests.TC3242_StoreNotInResults"/>
+            <class name="tests.TC3243_ConfirmationIndicatorDisplay"/>
+            <class name="tests.TC3244_StoreConsistencyAcrossPages"/>
+            <class name="tests.TC3245_StorePersistenceProductPage"/>
+            <class name="tests.TC3246_StorePersistenceMultiplePages"/>
+        </classes>
+    </test>
+</suite>
