@@ -1,22 +1,40 @@
-
 package com.fl.automation.core;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import java.util.concurrent.TimeUnit;
 
 public class DriverFactory {
+    private static ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 
-    public static WebDriver createDriver(){
+    public static void initDriver() {
+        String browser = ConfigReader.getProperty("browser");
+        if (browser == null) browser = "chrome";
+        switch (browser.toLowerCase()) {
+            case "firefox":
+                WebDriverManager.firefoxdriver().setup();
+                driver.set(new FirefoxDriver());
+                break;
+            case "chrome":
+            default:
+                WebDriverManager.chromedriver().setup();
+                driver.set(new ChromeDriver());
+                break;
+        }
+        getDriver().manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        getDriver().manage().window().maximize();
+    }
 
-        WebDriverManager.chromedriver().setup();
+    public static WebDriver getDriver() {
+        return driver.get();
+    }
 
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--incognito");
-        options.addArguments("--start-maximized");
-        options.addArguments("--disable-notifications");
-
-        return new ChromeDriver(options);
+    public static void quitDriver() {
+        if (driver.get() != null) {
+            driver.get().quit();
+            driver.remove();
+        }
     }
 }
