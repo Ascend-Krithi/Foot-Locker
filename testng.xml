@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="FootLocker Automation Suite" parallel="methods" thread-count="3">
+    <test name="AllTests">
+        <classes>
+            <class name="TS001_TC3193_"/>
+            <class name="TS001_TC3194_"/>
+            <class name="TS001_TC3195_"/>
+            <class name="TS001_TC3196_"/>
+            <class name="TS001_TC3197_"/>
+            <class name="TS001_TC3198_"/>
+            <class name="TS001_TC3199_"/>
+            <class name="TS001_TC3227_"/>
+            <class name="TS002_TC3228_"/>
+            <class name="TS003_TC3229_"/>
+            <class name="TS004_TC3230_"/>
+            <class name="TS005_TC3231_"/>
+            <class name="TS006_TC3232_"/>
+            <class name="TS007_TC3233_"/>
+            <class name="TS001_TC3234_"/>
+            <class name="TS002_TC3235_"/>
+            <class name="TS003_TC3236_"/>
+            <class name="TS004_TC3237_"/>
+            <class name="TS005_TC3238_"/>
+            <class name="TS006_TC3239_"/>
+            <class name="TS007_TC3240_"/>
+            <class name="TS008_TC3241_"/>
+            <class name="TS009_TC3242_"/>
+            <class name="TS010_TC3243_"/>
+            <class name="TS011_TC3244_"/>
+            <class name="TS012_TC3245_"/>
+            <class name="TS013_TC3246_"/>
+        </classes>
+    </test>
+</suite>
