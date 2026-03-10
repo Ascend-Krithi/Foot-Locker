@@ -3,92 +3,149 @@ package com.fl.automation.pages;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 
 public class HomePage {
-
     private final WebDriver driver;
-    private final WebDriverWait waitShort;
-    private final WebDriverWait wait;
+
+    // Locators as per strict fallback order
+    private final List<By> findStoreHeaderLocators = Arrays.asList(
+            By.linkText("Find a Store"),
+            By.cssSelector("header a[href*='stores.footlocker.com']"),
+            By.xpath("//header//a[contains(.,'Find a Store') or contains(.,'Store Locator')]")
+    );
+    private final List<By> selectMyStoreLocators = Arrays.asList(
+            By.xpath("//a[contains(.,'Select My Store') or contains(.,'Set My Store') or contains(.,'Make This My Store') or contains(.,'Set as My Store')]") ,
+            By.xpath("//button[contains(.,'Select My Store') or contains(.,'Set My Store') or contains(.,'Make This My Store') or contains(.,'Set as My Store')]")
+    );
+    private final List<By> searchInputLocators = Arrays.asList(
+            By.cssSelector("input[type='search']"),
+            By.cssSelector("input[name='q']"),
+            By.cssSelector("input[aria-label*='Search']"),
+            By.cssSelector("input[placeholder*='Search' i], input[placeholder*='City' i], input[placeholder*='ZIP' i]")
+    );
+    private final List<By> storeResultCardLocators = Arrays.asList(
+            By.cssSelector("[data-qa='location'], .c-location-card, .location, [class*='location-card']")
+    );
+    private final List<By> storeAddressLocators = Arrays.asList(
+            By.cssSelector("[data-qa='address'], .c-address, address, .address, [class*='address']")
+    );
+    private final List<By> setMyStoreButtonLocators = Arrays.asList(
+            By.xpath(".//button[contains(.,'Select My Store') or contains(.,'Set My Store') or contains(.,'Make This My Store') or contains(.,'Set as My Store') or contains(.,'My Store')]")
+    );
+    private final List<By> emptyResultsMessageLocators = Arrays.asList(
+            By.xpath("//*[contains(.,'There are no locations in your search area')]")
+    );
 
     public HomePage(WebDriver driver) {
         this.driver = driver;
-        this.waitShort = new WebDriverWait(driver, Duration.ofSeconds(8));
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(40));
     }
 
-    // --- Utilities to dismiss typical overlays ---
-
-    public void acceptCookiesIfPresent() {
-        // Common cookie banners (OneTrust + variations)
-        By[] cookieCandidates = new By[] {
-            By.id("onetrust-accept-btn-handler"),
-            By.cssSelector("button#onetrust-accept-btn-handler"),
-            By.xpath("//button[contains(.,'Accept All Cookies') or contains(.,'Accept Cookies') or contains(.,'I Accept')]"),
-            By.xpath("//div[contains(@class,'cookie') or contains(@id,'cookie')]//button[contains(.,'Accept')]")
-        };
-        for (By by : cookieCandidates) {
+    public boolean waitForFindStoreHeader(WebDriverWait wait) {
+        for (By locator : findStoreHeaderLocators) {
             try {
-                WebElement btn = waitShort.until(ExpectedConditions.visibilityOfElementLocated(by));
-                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
-                break;
-            } catch (TimeoutException ignored) { /* try next */ }
-            catch (Exception ignored) { /* overlay may not exist */ }
+                wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+                return true;
+            } catch (TimeoutException ignored) {}
         }
+        return false;
     }
 
-    public void closeFlxRewardsIfPresent() {
-        // Close possible modal drawers/popups that can block header
-        By[] closeCandidates = new By[] {
-            By.xpath("//button[@aria-label='Close' or contains(@class,'close')]"),
-            By.xpath("//div[contains(@class,'modal') or contains(@id,'modal')]//button[contains(@aria-label,'Close')]"),
-            By.cssSelector("button[aria-label='Close']")
-        };
-        for (By by : closeCandidates) {
+    public boolean clickSelectMyStore(WebDriverWait wait) {
+        for (By locator : selectMyStoreLocators) {
             try {
-                WebElement btn = waitShort.until(ExpectedConditions.visibilityOfElementLocated(by));
-                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
-                break;
-            } catch (TimeoutException ignored) { /* try next */ }
-            catch (Exception ignored) { /* overlay may not exist */ }
+                WebElement el = wait.until(ExpectedConditions.elementToBeClickable(locator));
+                try {
+                    el.click();
+                } catch (ElementClickInterceptedException e) {
+                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", el);
+                }
+                return true;
+            } catch (TimeoutException ignored) {}
         }
+        return false;
     }
 
-    // --- Action: Click header "Find a Store" ---
-
-    public void clickFindAStore() {
-        // Ensure obvious overlays are cleared before interacting
-        try { acceptCookiesIfPresent(); } catch (Exception ignored) {}
-        try { closeFlxRewardsIfPresent(); } catch (Exception ignored) {}
-
-        // Try a few robust locators for the header item
-        By[] candidates = new By[] {
-            By.xpath("//*[normalize-space()='Find a Store' or normalize-space()='Find a store']"),
-            By.xpath("//a[contains(@href,'store-locator')]"),
-            By.xpath("//button[contains(.,'Find a Store') or contains(.,'Find a store')]"),
-            // Sometimes hidden in a flyout; try a generic link with store words
-            By.xpath("//a[contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'find a store')]")
-        };
-
-        WebElement target = null;
-        for (By by : candidates) {
+    public boolean enterLocationAndSearch(WebDriverWait wait, String location) {
+        for (By locator : searchInputLocators) {
             try {
-                target = wait.until(ExpectedConditions.visibilityOfElementLocated(by));
-                break;
-            } catch (TimeoutException ignored) { /* try next */ }
+                WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+                input.clear();
+                input.sendKeys(location);
+                input.sendKeys(Keys.ENTER);
+                return true;
+            } catch (TimeoutException ignored) {}
         }
+        return false;
+    }
 
-        if (target == null) {
-            throw new TimeoutException("Could not locate 'Find a Store' control using known locators.");
+    public boolean isStoreAddressPresent(WebDriverWait wait, String address) {
+        for (By cardLocator : storeResultCardLocators) {
+            try {
+                List<WebElement> cards = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(cardLocator));
+                for (WebElement card : cards) {
+                    for (By addrLocator : storeAddressLocators) {
+                        try {
+                            WebElement addrEl = card.findElement(addrLocator);
+                            if (addrEl.getText().replaceAll("\\s+", " ").trim().contains(address)) {
+                                return true;
+                            }
+                        } catch (NoSuchElementException ignored) {}
+                    }
+                }
+            } catch (TimeoutException ignored) {}
         }
+        return false;
+    }
 
+    public boolean setMyStoreForAddress(WebDriverWait wait, String address) {
+        for (By cardLocator : storeResultCardLocators) {
+            try {
+                List<WebElement> cards = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(cardLocator));
+                for (WebElement card : cards) {
+                    for (By addrLocator : storeAddressLocators) {
+                        try {
+                            WebElement addrEl = card.findElement(addrLocator);
+                            if (addrEl.getText().replaceAll("\\s+", " ").trim().contains(address)) {
+                                for (By btnLocator : setMyStoreButtonLocators) {
+                                    try {
+                                        WebElement btn = card.findElement(btnLocator);
+                                        try {
+                                            btn.click();
+                                        } catch (ElementClickInterceptedException e) {
+                                            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
+                                        }
+                                        return true;
+                                    } catch (NoSuchElementException ignored) {}
+                                }
+                            }
+                        } catch (NoSuchElementException ignored) {}
+                    }
+                }
+            } catch (TimeoutException ignored) {}
+        }
+        return false;
+    }
+
+    public boolean isConfirmationIndicatorVisible(WebDriverWait wait) {
+        // Confirmation indicator is typically a visual cue, e.g., a checkmark or label
+        // For demo, check for a class or aria-label containing 'confirmed' or 'my-store'
         try {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", target);
-            wait.until(ExpectedConditions.elementToBeClickable(target)).click();
+            return driver.findElements(By.cssSelector("[class*='confirmed'], [class*='my-store'], [aria-label*='confirmed'], [aria-label*='My Store']")).size() > 0;
         } catch (Exception e) {
-            // Final fallback to ensure the click happens even if overlay/layout blocks
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", target);
+            return false;
         }
+    }
+
+    public boolean isEmptyResultsMessageVisible(WebDriverWait wait) {
+        for (By locator : emptyResultsMessageLocators) {
+            try {
+                wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+                return true;
+            } catch (TimeoutException ignored) {}
+        }
+        return false;
     }
 }

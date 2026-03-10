@@ -1,68 +1,41 @@
 package com.fl.automation.core;
 
+import com.fl.automation.utils.ExtentManager;
+import com.fl.automation.utils.ScreenshotUtil;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-
-import java.time.Duration;
-import java.util.Arrays;
+import org.testng.ITestResult;
+import org.testng.annotations.*;
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
 
 public class BaseTest {
     protected WebDriver driver;
+    protected ExtentReports extent;
+    protected ExtentTest test;
 
-    @BeforeMethod
+    @BeforeSuite(alwaysRun = true)
+    public void setupSuite() {
+        extent = ExtentManager.getInstance();
+    }
+
+    @BeforeMethod(alwaysRun = true)
     public void setup() {
-        // IMPORTANT:
-        // Do NOT call WebDriverManager.chromedriver().setup() here.
-        // Selenium 4.21+ uses Selenium Manager to fetch a matching Chromedriver
-        // for the Chrome that is installed on the GitHub runner.
-
-        ChromeOptions options = new ChromeOptions();
-
-        // Headless ON in CI by default (can override locally)
-        boolean headless = Boolean.parseBoolean(
-                System.getProperty("headless",
-                        System.getenv().getOrDefault("HEADLESS", "true"))
-        );
-        if (headless) {
-            options.addArguments("--headless=new");
-        }
-
-        // MUST-HAVE flags for Linux CI stability
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--window-size=1920,1080");
-
-        // Make automation less detectable (helps retail UIs in headless)
-        options.addArguments("--lang=en-US");
-        options.addArguments("--disable-blink-features=AutomationControlled");
-        options.addArguments("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                + "(KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36");
-        options.setExperimentalOption("excludeSwitches", Arrays.asList("enable-automation"));
-        options.setExperimentalOption("useAutomationExtension", false);
-
-        // Honor Chrome binary path from workflow if present
-        String chromeBinary = System.getProperty("chromeBinary",
-                System.getenv("CHROME_PATH"));
-        if (chromeBinary != null && !chromeBinary.isBlank()) {
-            options.setBinary(chromeBinary);
-        }
-
-        driver = new ChromeDriver(options);
-
-        // Safer timeouts in CI
-        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(90));
-        driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(30));
-
-        // Always start from base URL (change if you use a different domain)
-        String baseUrl = System.getProperty("baseUrl", "https://www.footlocker.com/");
-        driver.get(baseUrl);
+        DriverFactory.initDriver();
+        driver = DriverFactory.getDriver();
     }
 
     @AfterMethod(alwaysRun = true)
-    public void teardown() {
-        if (driver != null) driver.quit();
+    public void tearDown(ITestResult result) {
+        if (result.getStatus() == ITestResult.FAILURE) {
+            ScreenshotUtil.takeScreenshot(driver, result.getName());
+        }
+        DriverFactory.quitDriver();
+    }
+
+    @AfterSuite(alwaysRun = true)
+    public void tearDownSuite() {
+        if (extent != null) {
+            extent.flush();
+        }
     }
 }

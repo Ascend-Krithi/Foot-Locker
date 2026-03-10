@@ -1,45 +1,92 @@
-
 package com.fl.automation.helpers;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.*;
-
+import com.fl.automation.pages.HomePage;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
+import java.util.List;
 
 public class StoreLocatorHelper {
+    private final WebDriver driver;
+    private final HomePage homePage;
+    private final WebDriverWait wait;
 
-    WebDriver driver;
-    WebDriverWait wait;
-
-    public StoreLocatorHelper(WebDriver driver){
-
+    public StoreLocatorHelper(WebDriver driver) {
         this.driver = driver;
-        wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+        this.homePage = new HomePage(driver);
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(50));
     }
 
-    public void openStoreLocator(){
-
-        WebElement selectStore = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//*[contains(text(),'Select my store')]")));
-
-        ((JavascriptExecutor)driver).executeScript("arguments[0].click();", selectStore);
+    public void openHomePage() {
+        driver.get("https://www.footlocker.com");
     }
 
-    public WebElement getLocationTextbox(){
-
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//input[@placeholder='Enter address, city or post code']")));
+    public boolean isFindStorePopupVisible() {
+        try {
+            return homePage.waitForFindStoreHeader(wait);
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
-    public void searchLocation(String location){
+    public boolean clickSelectMyStore() {
+        try {
+            return homePage.clickSelectMyStore(wait);
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
 
-        WebElement box = getLocationTextbox();
-        box.clear();
-        box.sendKeys(location);
+    public boolean enterLocationAndSearch(String location) {
+        try {
+            return homePage.enterLocationAndSearch(wait, location);
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
 
-        WebElement searchBtn = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//button[contains(text(),'Search for Stores')]")));
+    public boolean verifyStoreAddressInResults(String address) {
+        try {
+            return homePage.isStoreAddressPresent(wait, address);
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
 
-        ((JavascriptExecutor)driver).executeScript("arguments[0].click();", searchBtn);
+    public boolean setMyStoreForAddress(String address) {
+        try {
+            return homePage.setMyStoreForAddress(wait, address);
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
+    public boolean isConfirmationIndicatorVisible() {
+        try {
+            return homePage.isConfirmationIndicatorVisible(wait);
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
+    public boolean isStorePersistedAfterNavigation() {
+        try {
+            driver.navigate().to("https://www.footlocker.com/product/nike-air-force-1-low-mens/42010001.html");
+            return homePage.isConfirmationIndicatorVisible(wait);
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
+    public boolean isEmptyResultsMessageVisible() {
+        try {
+            return homePage.isEmptyResultsMessageVisible(wait);
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 }
