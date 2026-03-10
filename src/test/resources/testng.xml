@@ -1,19 +1,12 @@
-
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-
-<suite name="Footlocker Suite">
-
+<suite name="FL-Automation-Suite" parallel="false">
     <listeners>
         <listener class-name="com.fl.automation.listeners.TestListener"/>
     </listeners>
-
-    <test name="StoreLocatorTests">
-
-        <classes>
-            <class name="com.fl.automation.tests.TS001_TC001"/>
-            <class name="com.fl.automation.tests.TS001_TC002"/>
-        </classes>
-
+    <test name="Store Locator Tests">
+        <packages>
+            <package name="com.fl.automation.tests"/>
+        </packages>
     </test>
-
 </suite>
