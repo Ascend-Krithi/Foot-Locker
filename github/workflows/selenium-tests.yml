@@ -1,0 +1,61 @@
+name: FootLocker Automation CI
+
+on:
+  push:
+    branches: [ "main", "feature/**", "Feature-*" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Install Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Verify Chrome Installation
+        run: |
+          google-chrome --version
+          which google-chrome
+
+      - name: Build with Maven
+        run: mvn clean compile -B
+
+      - name: Run Tests
+        run: mvn test -B
+        env:
+          HEADLESS: true
+          CHROME_PATH: /usr/bin/google-chrome
+
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            test-output/
+            target/surefire-reports/
+          retention-days: 30
+
+      - name: Upload Screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: test-output/screenshots/
+          retention-days: 30
