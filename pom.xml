@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -47,11 +48,16 @@
       <version>${lombok.version}</version>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.15.1</version>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -60,7 +66,6 @@
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
           <encoding>${project.build.sourceEncoding}</encoding>
-
           <annotationProcessorPaths>
             <path>
               <groupId>org.projectlombok</groupId>
@@ -68,7 +73,6 @@
               <version>${lombok.version}</version>
             </path>
           </annotationProcessorPaths>
-
           <compilerArgs>
             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
@@ -92,8 +96,6 @@
           <testFailureIgnore>false</testFailureIgnore>
         </configuration>
       </plugin>
-
     </plugins>
   </build>
-
 </project>
