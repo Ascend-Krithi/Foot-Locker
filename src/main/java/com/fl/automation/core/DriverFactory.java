@@ -1,4 +1,3 @@
-
 package com.fl.automation.core;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -9,7 +8,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 public class DriverFactory {
 
     public static WebDriver createDriver(){
-
         WebDriverManager.chromedriver().setup();
 
         ChromeOptions options = new ChromeOptions();

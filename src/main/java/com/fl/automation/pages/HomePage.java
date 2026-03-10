@@ -12,16 +12,19 @@ public class HomePage {
     private final WebDriverWait waitShort;
     private final WebDriverWait wait;
 
+    private final By[] FIND_STORE_LOCATORS = new By[] {
+        By.linkText("Find a Store"),
+        By.cssSelector("header a[href*='stores.footlocker.com']"),
+        By.xpath("//header//a[contains(.,'Find a Store') or contains(.,'Store Locator')]")
+    };
+
     public HomePage(WebDriver driver) {
         this.driver = driver;
         this.waitShort = new WebDriverWait(driver, Duration.ofSeconds(8));
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(40));
     }
 
-    // --- Utilities to dismiss typical overlays ---
-
     public void acceptCookiesIfPresent() {
-        // Common cookie banners (OneTrust + variations)
         By[] cookieCandidates = new By[] {
             By.id("onetrust-accept-btn-handler"),
             By.cssSelector("button#onetrust-accept-btn-handler"),
@@ -33,13 +36,12 @@ public class HomePage {
                 WebElement btn = waitShort.until(ExpectedConditions.visibilityOfElementLocated(by));
                 ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
                 break;
-            } catch (TimeoutException ignored) { /* try next */ }
-            catch (Exception ignored) { /* overlay may not exist */ }
+            } catch (TimeoutException ignored) {}
+            catch (Exception ignored) {}
         }
     }
 
     public void closeFlxRewardsIfPresent() {
-        // Close possible modal drawers/popups that can block header
         By[] closeCandidates = new By[] {
             By.xpath("//button[@aria-label='Close' or contains(@class,'close')]"),
             By.xpath("//div[contains(@class,'modal') or contains(@id,'modal')]//button[contains(@aria-label,'Close')]"),
@@ -50,45 +52,57 @@ public class HomePage {
                 WebElement btn = waitShort.until(ExpectedConditions.visibilityOfElementLocated(by));
                 ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
                 break;
-            } catch (TimeoutException ignored) { /* try next */ }
-            catch (Exception ignored) { /* overlay may not exist */ }
+            } catch (TimeoutException ignored) {}
+            catch (Exception ignored) {}
         }
     }
 
-    // --- Action: Click header "Find a Store" ---
-
     public void clickFindAStore() {
-        // Ensure obvious overlays are cleared before interacting
         try { acceptCookiesIfPresent(); } catch (Exception ignored) {}
         try { closeFlxRewardsIfPresent(); } catch (Exception ignored) {}
 
-        // Try a few robust locators for the header item
-        By[] candidates = new By[] {
-            By.xpath("//*[normalize-space()='Find a Store' or normalize-space()='Find a store']"),
-            By.xpath("//a[contains(@href,'store-locator')]"),
-            By.xpath("//button[contains(.,'Find a Store') or contains(.,'Find a store')]"),
-            // Sometimes hidden in a flyout; try a generic link with store words
-            By.xpath("//a[contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'find a store')]")
-        };
-
         WebElement target = null;
-        for (By by : candidates) {
+        for (By by : FIND_STORE_LOCATORS) {
             try {
                 target = wait.until(ExpectedConditions.visibilityOfElementLocated(by));
                 break;
-            } catch (TimeoutException ignored) { /* try next */ }
+            } catch (TimeoutException ignored) {}
         }
 
         if (target == null) {
-            throw new TimeoutException("Could not locate 'Find a Store' control using known locators.");
+            throw new TimeoutException("Could not locate 'Find a Store' control using STRICT LOCATOR POLICY.");
         }
 
         try {
             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", target);
             wait.until(ExpectedConditions.elementToBeClickable(target)).click();
         } catch (Exception e) {
-            // Final fallback to ensure the click happens even if overlay/layout blocks
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", target);
         }
+    }
+
+    public boolean isSelectMyStoreLinkVisible(){
+        By selectMyStoreLink = By.xpath("//a[contains(.,'Select My Store') or contains(.,'Set My Store') or contains(.,'Make This My Store') or contains(.,'Set as My Store')]");
+        try {
+            new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOfElementLocated(selectMyStoreLink));
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
+    public boolean isPopupDisplayed(){
+        By[] popupCandidates = new By[] {
+            By.xpath("//*[contains(.,'Choose a preferred store to make shopping easier')]"),
+            By.xpath("//div[contains(@class,'popup') or contains(@class,'modal') or contains(@class,'drawer')]"),
+            By.cssSelector("[role='dialog'], [class*='popup'], [class*='modal']")
+        };
+        for (By by : popupCandidates) {
+            try {
+                new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOfElementLocated(by));
+                return true;
+            } catch (TimeoutException ignored) {}
+        }
+        return false;
     }
 }
