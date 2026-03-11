@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Footlocker Automation Test Suite" parallel="false" thread-count="1" verbose="1">
+    
+    <listeners>
+        <listener class-name="com.fl.automation.listeners.TestListener"/>
+    </listeners>
+    
+    <test name="Store Locator Tests - SCRUM-17166">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_SCRUM17166"/>
+            <class name="com.fl.automation.tests.TS001_TC002_SCRUM17166"/>
+            <class name="com.fl.automation.tests.TS001_TC003_SCRUM17166"/>
+        </classes>
+    </test>
+    
+</suite>

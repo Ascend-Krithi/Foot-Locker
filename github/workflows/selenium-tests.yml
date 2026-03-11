@@ -1,0 +1,74 @@
+name: Selenium TestNG Automation Tests
+
+on:
+  push:
+    branches: [ main, develop, feature/** ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  selenium-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+        
+    - name: Install Chrome
+      uses: browser-actions/setup-chrome@latest
+      with:
+        chrome-version: stable
+        
+    - name: Verify Chrome installation
+      run: |
+        which google-chrome
+        google-chrome --version
+        
+    - name: Build with Maven
+      run: mvn clean compile
+      
+    - name: Run Selenium Tests
+      run: mvn test
+      continue-on-error: true
+      
+    - name: Upload Test Reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-reports
+        path: |
+          test-output/
+          target/surefire-reports/
+        retention-days: 30
+        
+    - name: Upload ExtentReports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: extent-reports
+        path: test-output/ExtentReport.html
+        retention-days: 30
+        
+    - name: Upload Screenshots
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: failure-screenshots
+        path: test-output/screenshots/
+        retention-days: 30
+        
+    - name: Publish Test Results
+      if: always()
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      with:
+        files: target/surefire-reports/*.xml
+        check_name: TestNG Results
+        comment_title: Test Results Summary
