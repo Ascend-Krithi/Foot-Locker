@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="FootLocker Test Suite" parallel="false">
+    <test name="FootLocker Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_3193"/>
+            <class name="com.fl.automation.tests.TS001_TC002_3194"/>
+            <class name="com.fl.automation.tests.TS001_TC003_3195"/>
+        </classes>
+    </test>
+</suite>
