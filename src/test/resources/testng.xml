@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Suite" parallel="false">
+    <listeners>
+        <listener class-name="com.fl.automation.listeners.TestListener"/>
+    </listeners>
+    <test name="Store Locator Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_"/>
+            <class name="com.fl.automation.tests.TS001_TC002_"/>
+            <class name="com.fl.automation.tests.TS001_TC003_"/>
+        </classes>
+    </test>
+</suite>
