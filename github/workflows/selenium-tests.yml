@@ -1,0 +1,64 @@
+name: FootLocker Automation CI
+
+on:
+  push:
+    branches: [ "main", "feature/**", "Feature-*" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Validate POM
+        run: mvn -q -B validate
+
+      - name: Install Chrome (stable)
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Show Chrome version
+        run: |
+          echo "Chrome path: ${{ steps.chrome.outputs.chrome-path }}"
+          ${{ steps.chrome.outputs.chrome-path }} --version
+
+      - name: Compile Project
+        run: mvn -B clean compile
+
+      - name: Run Tests
+        run: mvn -B test
+        env:
+          CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
+
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            target/surefire-reports/
+            test-output/
+          retention-days: 7
+
+      - name: Upload Extent Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-report
+          path: test-output/ExtentReport.html
+          retention-days: 7
