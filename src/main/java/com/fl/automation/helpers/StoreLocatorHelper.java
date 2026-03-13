@@ -11,7 +11,6 @@ import java.time.Duration;
 import java.util.List;
 
 public class StoreLocatorHelper {
-
     private final WebDriver driver;
     private final WebDriverWait wait;
     private final JavascriptExecutor js;
@@ -35,8 +34,7 @@ public class StoreLocatorHelper {
     private static final By SEARCH_INPUT_2 = By.cssSelector("input[name='q']");
     private static final By SEARCH_INPUT_3 = By.cssSelector("input[aria-label*='Search']");
 
-    private static final By LOCATOR_SEARCH_BTN_1 = By.xpath(
-            "//*[self::button or self::a][contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'search for store')]");
+    private static final By LOCATOR_SEARCH_BTN_1 = By.xpath("//*[self::button or self::a][contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'search for store')]");
     private static final By LOCATOR_SEARCH_BTN_2 = By.cssSelector("[aria-label*='Search for store' i]");
 
     private static final By STORE_RESULT_CARDS_1 = By.cssSelector("[data-qa='location']");
@@ -49,40 +47,42 @@ public class StoreLocatorHelper {
 
     public StoreLocatorHelper(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(50));
         this.js = (JavascriptExecutor) driver;
     }
 
     public void handleCookieConsent() {
-        WebElement cookieButton = findElementWithFallback(COOKIE_ACCEPT_1, COOKIE_ACCEPT_2, COOKIE_ACCEPT_3, COOKIE_ACCEPT_4);
-        if (cookieButton != null) {
-            clickWithJsFallback(cookieButton);
-            waitUntilInvisible(cookieButton);
-        } else {
-            System.out.println("No cookie consent button found.");
+        try {
+            WebElement cookieButton = findElementWithFallback(
+                COOKIE_ACCEPT_1, COOKIE_ACCEPT_2, COOKIE_ACCEPT_3, COOKIE_ACCEPT_4
+            );
+            if (cookieButton != null) {
+                clickWithJsFallback(cookieButton);
+            }
+        } catch (Exception e) {
+            // ignore
         }
     }
 
     public void closeModalIfPresent() {
-        WebElement closeButton = findElementWithFallback(MODAL_CLOSE_1, MODAL_CLOSE_2);
-        if (closeButton != null) {
-            clickWithJsFallback(closeButton);
-            waitUntilInvisible(closeButton);
-        } else {
-            System.out.println("No modal to close.");
+        try {
+            WebElement closeButton = findElementWithFallback(MODAL_CLOSE_1, MODAL_CLOSE_2);
+            if (closeButton != null) {
+                clickWithJsFallback(closeButton);
+            }
+        } catch (Exception e) {
+            // ignore
         }
     }
 
     public WebElement findStoreLink() {
-        WebElement link = findElementWithFallback(HEADER_FIND_A_STORE_1, HEADER_FIND_A_STORE_2, HEADER_FIND_A_STORE_3);
-        if (link == null) System.out.println("Find a Store link NOT found!");
-        return link;
+        return findElementWithFallback(
+            HEADER_FIND_A_STORE_1, HEADER_FIND_A_STORE_2, HEADER_FIND_A_STORE_3
+        );
     }
 
     public WebElement findSelectMyStoreLink() {
-        WebElement link = findElementWithFallback(SELECT_MY_STORE_1, SELECT_MY_STORE_2);
-        if (link == null) System.out.println("Select My Store link NOT found!");
-        return link;
+        return findElementWithFallback(SELECT_MY_STORE_1, SELECT_MY_STORE_2);
     }
 
     public WebElement findSearchInput() {
@@ -94,9 +94,17 @@ public class StoreLocatorHelper {
     }
 
     public List<WebElement> findStoreResultCards() {
-        List<WebElement> cards = findElementsWithFallback(STORE_RESULT_CARDS_1, STORE_RESULT_CARDS_2);
-        if (cards.isEmpty()) System.out.println("No store results found!");
-        return cards;
+        try {
+            wait.until(ExpectedConditions.presenceOfElementLocated(STORE_RESULT_CARDS_1));
+            return driver.findElements(STORE_RESULT_CARDS_1);
+        } catch (Exception e) {
+            try {
+                wait.until(ExpectedConditions.presenceOfElementLocated(STORE_RESULT_CARDS_2));
+                return driver.findElements(STORE_RESULT_CARDS_2);
+            } catch (Exception ex) {
+                return List.of();
+            }
+        }
     }
 
     public String getStoreAddress(WebElement storeCard) {
@@ -121,47 +129,22 @@ public class StoreLocatorHelper {
         }
     }
 
-    public void searchForStore(String location) {
-        WebElement searchInput = findSearchInput();
-        if (searchInput != null) {
-            searchInput.clear();
-            searchInput.sendKeys(location);
-            WebElement searchButton = findSearchButton();
-            if (searchButton != null) {
-                clickWithJsFallback(searchButton);
-                waitUntilResultsLoaded();
-            } else {
-                System.out.println("Search button NOT found!");
-            }
-        } else {
-            System.out.println("Search input NOT found!");
-        }
-    }
-
-    /* ----------------- Private Utility Methods ----------------- */
-
     private WebElement findElementWithFallback(By... locators) {
         for (By locator : locators) {
             try {
-                WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-                if (element != null) return element;
-            } catch (Exception ignored) {}
+                WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+                if (element != null && element.isDisplayed()) {
+                    return element;
+                }
+            } catch (Exception e) {
+                // ignore
+            }
         }
         return null;
     }
 
-    private List<WebElement> findElementsWithFallback(By... locators) {
-        for (By locator : locators) {
-            try {
-                wait.until(ExpectedConditions.presenceOfElementLocated(locator));
-                List<WebElement> elements = driver.findElements(locator);
-                if (!elements.isEmpty()) return elements;
-            } catch (Exception ignored) {}
-        }
-        return List.of();
-    }
-
-    private void clickWithJsFallback(WebElement element) {
+    // 🔹 Changed from private → public
+    public void clickWithJsFallback(WebElement element) {
         try {
             wait.until(ExpectedConditions.elementToBeClickable(element));
             element.click();
@@ -170,15 +153,15 @@ public class StoreLocatorHelper {
         }
     }
 
-    private void waitUntilInvisible(WebElement element) {
-        try {
-            wait.until(ExpectedConditions.invisibilityOf(element));
-        } catch (Exception ignored) {}
-    }
-
-    private void waitUntilResultsLoaded() {
-        try {
-            wait.until(driver -> !findStoreResultCards().isEmpty());
-        } catch (Exception ignored) {}
+    public void searchForStore(String location) {
+        WebElement searchInput = findSearchInput();
+        if (searchInput != null) {
+            searchInput.clear();
+            searchInput.sendKeys(location);
+            WebElement searchButton = findSearchButton();
+            if (searchButton != null) {
+                clickWithJsFallback(searchButton);
+            }
+        }
     }
 }
