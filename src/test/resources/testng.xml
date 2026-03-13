@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Test Suite" parallel="tests" thread-count="3">
+    <listeners>
+        <listener class-name="com.fl.automation.listeners.TestListener"/>
+    </listeners>
+    
+    <test name="Store Locator Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_VerifyFindAStorePopup"/>
+            <class name="com.fl.automation.tests.TS001_TC002_VerifyStoreLocatorPopup"/>
+            <class name="com.fl.automation.tests.TS001_TC003_SearchStoresByLocation"/>
+            <class name="com.fl.automation.tests.TS024_TC001_VerifyFindAStorePopupWorkflow"/>
+            <class name="com.fl.automation.tests.TS025_TC001_SearchStoresByBostonMA"/>
+            <class name="com.fl.automation.tests.TS026_TC001_VerifySpecificStoreAddress"/>
+            <class name="com.fl.automation.tests.TS027_TC001_SetPreferredStore"/>
+            <class name="com.fl.automation.tests.TS028_TC001_VerifyPreferredStoreConfirmation"/>
+            <class name="com.fl.automation.tests.TS029_TC001_VerifyPreferredStorePersistence"/>
+        </classes>
+    </test>
+    
+    <test name="Eco Home Hub Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS002_TC001_EcoHomeHubCustomerRegistration"/>
+            <class name="com.fl.automation.tests.TS002_TC002_EcoHomeHubLoanApplication"/>
+            <class name="com.fl.automation.tests.TS002_TC003_EcoHomeHubInstallerSearch"/>
+            <class name="com.fl.automation.tests.TS002_TC004_EcoHomeHubSendProjectLead"/>
+            <class name="com.fl.automation.tests.TS003_TC001_AdminApproveInstallerApplication"/>
+            <class name="com.fl.automation.tests.TS003_TC002_AdminVetInstallerCertifications"/>
+            <class name="com.fl.automation.tests.TS003_TC003_VerifyApprovedInstallerInMarketplace"/>
+            <class name="com.fl.automation.tests.TS004_TC001_InstallerPortalLogin"/>
+            <class name="com.fl.automation.tests.TS004_TC002_InstallerViewProjectLeads"/>
+        </classes>
+    </test>
+    
+    <test name="Security and Deployment Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS005_TC001_VerifyDataEncryptionAtRest"/>
+            <class name="com.fl.automation.tests.TS005_TC002_VerifyDataEncryptionInTransit"/>
+            <class name="com.fl.automation.tests.TS006_TC001_ProductionDeploymentVerification"/>
+            <class name="com.fl.automation.tests.TS006_TC002_ProductionMonitoringVerification"/>
+        </classes>
+    </test>
+    
+    <test name="Analytics Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS007_TC001_AnalyticsLoanApplicationsStarted"/>
+            <class name="com.fl.automation.tests.TS007_TC002_AnalyticsLoanApplicationsCompleted"/>
+            <class name="com.fl.automation.tests.TS007_TC003_AnalyticsLeadsSentToInstallers"/>
+        </classes>
+    </test>
+    
+    <test name="Validation Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS008_TC001_LoanApplicationMissingFieldsValidation"/>
+            <class name="com.fl.automation.tests.TS008_TC002_LoanApplicationInvalidValuesValidation"/>
+            <class name="com.fl.automation.tests.TS009_TC001_InstallerMinimumCertifications"/>
+            <class name="com.fl.automation.tests.TS009_TC002_InstallerMaximumCertifications"/>
+        </classes>
+    </test>
+    
+    <test name="Marketplace Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS010_TC001_MarketplaceHomePageLoad"/>
+            <class name="com.fl.automation.tests.TS010_TC002_MarketplaceSearchByKeyword"/>
+            <class name="com.fl.automation.tests.TS010_TC003_MarketplaceSearchByCategory"/>
+            <class name="com.fl.automation.tests.TS011_TC001_ViewProjectDetails"/>
+            <class name="com.fl.automation.tests.TS012_TC001_ContactProjectOwner"/>
+            <class name="com.fl.automation.tests.TS013_TC001_MarketplaceLoginValidCredentials"/>
+            <class name="com.fl.automation.tests.TS013_TC002_MarketplaceLoginInvalidCredentials"/>
+            <class name="com.fl.automation.tests.TS014_TC001_UserRegistration"/>
+            <class name="com.fl.automation.tests.TS015_TC001_UserDashboardAccess"/>
+            <class name="com.fl.automation.tests.TS016_TC001_ApplyToProject"/>
+            <class name="com.fl.automation.tests.TS017_TC001_EditUserProfile"/>
+            <class name="com.fl.automation.tests.TS018_TC001_UserLogout"/>
+            <class name="com.fl.automation.tests.TS019_TC001_SubmitProjectReview"/>
+            <class name="com.fl.automation.tests.TS020_TC001_ViewEcoCertifications"/>
+            <class name="com.fl.automation.tests.TS021_TC001_ShareProjectViaEmail"/>
+            <class name="com.fl.automation.tests.TS021_TC002_ShareProjectViaSocialMedia"/>
+            <class name="com.fl.automation.tests.TS022_TC001_SaveProjectToFavorites"/>
+            <class name="com.fl.automation.tests.TS023_TC001_AccessHelpAndSupport"/>
+        </classes>
+    </test>
+</suite>
