@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Suite" parallel="tests" thread-count="3">
+    <listeners>
+        <listener class-name="com.fl.automation.listeners.TestListener"/>
+    </listeners>
+    
+    <test name="Store Locator Tests - SCRUM-17166">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_SCRUM17166"/>
+            <class name="com.fl.automation.tests.TS001_TC002_SCRUM17166"/>
+            <class name="com.fl.automation.tests.TS001_TC003_SCRUM17166"/>
+        </classes>
+    </test>
+    
+    <test name="Eco Home Hub Tests - SCRUM-19509">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS002_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS003_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS004_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS005_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS006_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS007_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS008_TC001_SCRUM19509"/>
+        </classes>
+    </test>
+    
+    <test name="Marketplace Tests - SCRUM-19509">
+        <classes>
+            <class name="com.fl.automation.tests.TS009_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS010_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS011_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS012_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS013_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS014_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS015_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS016_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS017_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS018_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS019_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS020_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS021_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS022_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS023_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS024_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS025_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS026_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS027_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS028_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS029_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS030_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS031_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS032_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS033_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS034_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS035_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS036_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS037_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS038_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS039_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS040_TC001_SCRUM19509"/>
+            <class name="com.fl.automation.tests.TS041_TC001_SCRUM19509"/>
+        </classes>
+    </test>
+</suite>
