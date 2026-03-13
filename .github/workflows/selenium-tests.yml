@@ -166,7 +166,7 @@ jobs:
             -Dheadless=false \
             -Dwebdriver.http.factory=jdk-http-client \
             -DchromeBinary="${{ steps.chrome.outputs.chrome-path }}" \
-            -Dtest=TS001_TC001,TS001_TC002 \
+            -Dtest=TS001_TC001*,TS001_TC002* \
             test
 
       - name: Stop screen recording
