@@ -29,7 +29,9 @@ public class StoreLocatorHelper {
         this.js = (JavascriptExecutor) driver;
     }
 
-    // Basic click helper
+    // =======================
+    // Core Click Helper
+    // =======================
     public void clickWithJsFallback(WebElement element) {
         try {
             wait.until(ExpectedConditions.elementToBeClickable(element));
@@ -39,15 +41,16 @@ public class StoreLocatorHelper {
         }
     }
 
-    // Finds the header "Find a Store" link
+    // =======================
+    // Find Elements Methods (tests expect these exact names)
+    // =======================
+
+    // Find header link "Find a Store"
     public WebElement findStoreLink() {
-        try {
-            return wait.until(ExpectedConditions.presenceOfElementLocated(HEADER_FIND_A_STORE_LINK));
-        } catch (Exception ignored) {}
-        return null;
+        return wait.until(ExpectedConditions.presenceOfElementLocated(HEADER_FIND_A_STORE_LINK));
     }
 
-    // Finds the "Select My Store" link if exists
+    // Find "Select My Store" link
     public WebElement findSelectMyStoreLink() {
         try {
             return wait.until(ExpectedConditions.presenceOfElementLocated(SELECT_MY_STORE_LINK));
@@ -56,32 +59,40 @@ public class StoreLocatorHelper {
         }
     }
 
-    // Searches for a store by name
-    public void searchForStore(String storeName) {
-        WebElement searchInput = wait.until(ExpectedConditions.visibilityOfElementLocated(SEARCH_INPUT));
-        searchInput.clear();
-        searchInput.sendKeys(storeName);
-
-        WebElement searchBtn = wait.until(ExpectedConditions.elementToBeClickable(SEARCH_BTN));
-        clickWithJsFallback(searchBtn);
-        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(STORE_RESULT_CARD));
+    // Search input field (matches your tests)
+    public WebElement findSearchInput() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(SEARCH_INPUT));
     }
 
-    // Returns all store result cards
-    public List<WebElement> getStoreResultCards() {
+    // Search button (matches your tests)
+    public WebElement findSearchButton() {
+        return wait.until(ExpectedConditions.elementToBeClickable(SEARCH_BTN));
+    }
+
+    // Store result cards (matches your tests)
+    public List<WebElement> findStoreResultCards() {
         return driver.findElements(STORE_RESULT_CARD);
     }
 
-    // Extracts address text from a store card element
+    // Search for a store by name (alternative usage)
+    public void searchForStore(String storeName) {
+        WebElement input = findSearchInput();
+        input.clear();
+        input.sendKeys(storeName);
+        clickWithJsFallback(findSearchButton());
+        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(STORE_RESULT_CARD));
+    }
+
+    // Get store address from a card
     public String getStoreAddress(WebElement storeCard) {
         try {
-            return storeCard.getText(); // or customize to extract specific child elements
+            return storeCard.getText();
         } catch (Exception e) {
             return "";
         }
     }
 
-    // Finds the "Set My Store" button inside a store card
+    // Find "Set My Store" button inside a store card
     public WebElement findSetMyStoreButton(WebElement storeCard) {
         try {
             return storeCard.findElement(SET_MY_STORE_BTN);
