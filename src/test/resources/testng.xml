@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Suite" parallel="tests" thread-count="3">
+    <listeners>
+        <listener class-name="com.fl.automation.listeners.TestListener"/>
+    </listeners>
+    
+    <test name="Store Locator Tests">
+        <parameter name="browser" value="chrome"/>
+        <parameter name="url" value="https://www.footlocker.com"/>
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_VerifyFindStorePopup"/>
+            <class name="com.fl.automation.tests.TS001_TC002_VerifyStoreLocatorPopup"/>
+            <class name="com.fl.automation.tests.TS001_TC003_SearchStoresBoston"/>
+            <class name="com.fl.automation.tests.TS001_TC001_FindAStoreCompleteFlow"/>
+            <class name="com.fl.automation.tests.TS002_TC001_SearchStoresBostonMA"/>
+            <class name="com.fl.automation.tests.TS003_TC001_VerifySpecificStoreAddress"/>
+            <class name="com.fl.automation.tests.TS004_TC001_SetMyStore"/>
+            <class name="com.fl.automation.tests.TS005_TC001_VerifyStoreConfirmation"/>
+            <class name="com.fl.automation.tests.TS006_TC001_VerifyStorePersistence"/>
+        </classes>
+    </test>
+    
+    <test name="Eco Home Hub Tests">
+        <parameter name="browser" value="chrome"/>
+        <parameter name="url" value="https://www.footlocker.com"/>
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_EcoHomeHubCustomerRegistration"/>
+            <class name="com.fl.automation.tests.TS001_TC002_EcoHomeHubLoanApplication"/>
+            <class name="com.fl.automation.tests.TS001_TC003_EcoHomeHubInstallerSearch"/>
+            <class name="com.fl.automation.tests.TS001_TC004_EcoHomeHubSendProjectLead"/>
+            <class name="com.fl.automation.tests.TS002_TC001_AdminApproveInstaller"/>
+            <class name="com.fl.automation.tests.TS002_TC002_AdminVetCertifications"/>
+            <class name="com.fl.automation.tests.TS002_TC003_VerifyApprovedInstallerInMarketplace"/>
+            <class name="com.fl.automation.tests.TS003_TC001_InstallerLogin"/>
+            <class name="com.fl.automation.tests.TS003_TC002_InstallerViewProjectLeads"/>
+            <class name="com.fl.automation.tests.TS004_TC001_VerifyDataEncryptionAtRest"/>
+            <class name="com.fl.automation.tests.TS004_TC002_VerifyDataEncryptionInTransit"/>
+            <class name="com.fl.automation.tests.TS005_TC001_ProductionDeployment"/>
+            <class name="com.fl.automation.tests.TS005_TC002_ProductionMonitoring"/>
+            <class name="com.fl.automation.tests.TS006_TC001_AnalyticsLoanApplicationsStarted"/>
+            <class name="com.fl.automation.tests.TS006_TC002_AnalyticsLoanApplicationsCompleted"/>
+            <class name="com.fl.automation.tests.TS006_TC003_AnalyticsLeadsSentToInstallers"/>
+            <class name="com.fl.automation.tests.TS007_TC001_LoanApplicationMissingFieldsValidation"/>
+            <class name="com.fl.automation.tests.TS007_TC002_LoanApplicationInvalidValuesValidation"/>
+            <class name="com.fl.automation.tests.TS008_TC001_InstallerMinimumCertifications"/>
+            <class name="com.fl.automation.tests.TS008_TC002_InstallerMaximumCertifications"/>
+        </classes>
+    </test>
+    
+    <test name="Marketplace Tests">
+        <parameter name="browser" value="chrome"/>
+        <parameter name="url" value="https://www.footlocker.com"/>
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_MarketplaceHomePageLoad"/>
+            <class name="com.fl.automation.tests.TS002_TC001_MarketplaceSearchByKeyword"/>
+            <class name="com.fl.automation.tests.TS002_TC002_MarketplaceSearchByCategory"/>
+            <class name="com.fl.automation.tests.TS003_TC001_ProjectDetailsPage"/>
+            <class name="com.fl.automation.tests.TS004_TC001_ContactProjectOwner"/>
+            <class name="com.fl.automation.tests.TS005_TC001_ValidLogin"/>
+            <class name="com.fl.automation.tests.TS005_TC002_InvalidLogin"/>
+            <class name="com.fl.automation.tests.TS006_TC001_UserRegistration"/>
+            <class name="com.fl.automation.tests.TS007_TC001_UserDashboard"/>
+            <class name="com.fl.automation.tests.TS008_TC001_ApplyToProject"/>
+            <class name="com.fl.automation.tests.TS009_TC001_EditProfile"/>
+            <class name="com.fl.automation.tests.TS010_TC001_Logout"/>
+            <class name="com.fl.automation.tests.TS011_TC001_SubmitReview"/>
+            <class name="com.fl.automation.tests.TS012_TC001_ViewEcoCertifications"/>
+            <class name="com.fl.automation.tests.TS013_TC001_ShareProjectViaEmail"/>
+            <class name="com.fl.automation.tests.TS013_TC002_ShareProjectViaSocialMedia"/>
+            <class name="com.fl.automation.tests.TS014_TC001_SaveToFavorites"/>
+            <class name="com.fl.automation.tests.TS015_TC001_AccessHelpResources"/>
+        </classes>
+    </test>
+</suite>
