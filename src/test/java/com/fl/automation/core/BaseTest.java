@@ -1,35 +1,36 @@
 package com.fl.automation.core;
 
-import com.aventstack.extentreports.Status;
-import com.fl.automation.listeners.TestListener;
-import com.fl.automation.utils.ExtentManager;
-import com.fl.automation.utils.ScreenshotUtil;
 import org.openqa.selenium.WebDriver;
-import org.testng.ITestResult;
-import org.testng.annotations.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 
-@Listeners(TestListener.class)
+import java.time.Duration;
+
 public class BaseTest {
-    protected WebDriver driver;
-    protected static final String BASE_URL = "https://www.footlocker.com";
+
+    // ThreadLocal ensures each test thread gets its own WebDriver
+    private static ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 
     @BeforeMethod
     public void setUp() {
-        driver = DriverFactory.getDriver();
+        WebDriver localDriver = new ChromeDriver();
+        localDriver.manage().window().maximize();
+        localDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
+        driver.set(localDriver);
+        driver.get("https://www.footlocker.com"); // Base URL
     }
 
     @AfterMethod
-    public void tearDown(ITestResult result) {
-        if (result.getStatus() == ITestResult.FAILURE) {
-            String screenshotPath = ScreenshotUtil.captureScreenshot(driver, result.getName());
-            if (screenshotPath != null && ExtentManager.getTest() != null) {
-                try {
-                    ExtentManager.getTest().addScreenCaptureFromPath(screenshotPath);
-                } catch (Exception e) {
-                    ExtentManager.getTest().log(Status.WARNING, "Failed to attach screenshot: " + e.getMessage());
-                }
-            }
+    public void tearDown() {
+        if (driver.get() != null) {
+            driver.get().quit();
+            driver.remove();
         }
-        DriverFactory.quitDriver();
+    }
+
+    // Accessor for child classes
+    public WebDriver getDriver() {
+        return driver.get();
     }
 }
