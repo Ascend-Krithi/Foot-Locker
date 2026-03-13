@@ -114,11 +114,11 @@ jobs:
       - name: Validate POM
         run: mvn -q -B validate
 
-      - name: Install Chrome (stable)
+      - name: Install Chrome (compatible version)
         id: chrome
         uses: browser-actions/setup-chrome@v1
         with:
-          chrome-version: stable
+          chrome-version: 124
 
       - name: Show Chrome version
         run: |
@@ -143,13 +143,11 @@ jobs:
           Xvfb :99 -screen 0 1920x1080x24 -ac >/dev/null 2>&1 &
           sleep 2
 
-      # ---------- UPDATED: recording with H.264 + yuv420p + faststart ----------
       - name: Start screen recording (playable MP4)
         env:
           DISPLAY: ":99"
         run: |
           mkdir -p recordings
-          # Use input-side framerate for x11grab, H.264, yuv420p, faststart
           ffmpeg -y \
             -f x11grab -framerate 30 -video_size 1920x1080 -i ${DISPLAY} \
             -c:v libx264 -pix_fmt yuv420p -preset veryfast -crf 23 \
@@ -171,18 +169,15 @@ jobs:
             -Dtest=TS001_TC001,TS001_TC002 \
             test
 
-      # ---------- UPDATED: graceful stop + optional remux safety ----------
       - name: Stop screen recording
         if: always()
         run: |
           if [ -f ffmpeg.pid ]; then
-            # Graceful stop so MP4 finalizes moov atom
             kill -INT "$(cat ffmpeg.pid)" || true
             sleep 2
           fi
           ls -lh recordings || true
 
-          # Safety remux to ensure +faststart if FFmpeg ended abruptly
           if [ -s recordings/test-run.mp4 ]; then
             ffmpeg -y -i recordings/test-run.mp4 -c copy -movflags +faststart recordings/test-run_faststart.mp4 >/dev/null 2>&1 || true
             if [ -s recordings/test-run_faststart.mp4 ]; then
