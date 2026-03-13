@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Suite" parallel="tests" thread-count="3">
+    <listeners>
+        <listener class-name="com.fl.automation.listeners.TestListener"/>
+    </listeners>
+    
+    <test name="Store Locator Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_SCRUM17166"/>
+            <class name="com.fl.automation.tests.TS001_TC002_SCRUM17166"/>
+            <class name="com.fl.automation.tests.TS001_TC003_SCRUM17166"/>
+        </classes>
+    </test>
+    
+    <test name="Eco Home Hub Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS002_TC001_EcoHomeHub"/>
+            <class name="com.fl.automation.tests.TS002_TC002_EcoHomeHub"/>
+            <class name="com.fl.automation.tests.TS002_TC003_EcoHomeHub"/>
+            <class name="com.fl.automation.tests.TS002_TC004_EcoHomeHub"/>
+            <class name="com.fl.automation.tests.TS002_TC005_EcoHomeHub"/>
+        </classes>
+    </test>
+    
+    <test name="Marketplace Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS003_TC001_Marketplace"/>
+            <class name="com.fl.automation.tests.TS003_TC002_Marketplace"/>
+            <class name="com.fl.automation.tests.TS003_TC003_Marketplace"/>
+            <class name="com.fl.automation.tests.TS003_TC004_Marketplace"/>
+            <class name="com.fl.automation.tests.TS003_TC005_Marketplace"/>
+            <class name="com.fl.automation.tests.TS003_TC006_Marketplace"/>
+            <class name="com.fl.automation.tests.TS003_TC007_Marketplace"/>
+            <class name="com.fl.automation.tests.TS003_TC008_Marketplace"/>
+            <class name="com.fl.automation.tests.TS003_TC009_Marketplace"/>
+            <class name="com.fl.automation.tests.TS003_TC010_Marketplace"/>
+        </classes>
+    </test>
+</suite>
