@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Test Suite" parallel="tests" thread-count="3">
+    <listeners>
+        <listener class-name="com.fl.automation.listeners.TestListener"/>
+    </listeners>
+    
+    <test name="Foot Locker Store Locator Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001"/>
+            <class name="com.fl.automation.tests.TS001_TC002"/>
+            <class name="com.fl.automation.tests.TS001_TC003"/>
+            <class name="com.fl.automation.tests.TS001_TC042"/>
+            <class name="com.fl.automation.tests.TS002_TC043"/>
+            <class name="com.fl.automation.tests.TS003_TC044"/>
+            <class name="com.fl.automation.tests.TS004_TC045"/>
+            <class name="com.fl.automation.tests.TS005_TC046"/>
+            <class name="com.fl.automation.tests.TS006_TC047"/>
+        </classes>
+    </test>
+    
+    <test name="Eco Home Hub Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC004"/>
+            <class name="com.fl.automation.tests.TS001_TC005"/>
+            <class name="com.fl.automation.tests.TS001_TC006"/>
+            <class name="com.fl.automation.tests.TS001_TC007"/>
+            <class name="com.fl.automation.tests.TS002_TC001"/>
+            <class name="com.fl.automation.tests.TS002_TC002"/>
+            <class name="com.fl.automation.tests.TS002_TC003"/>
+            <class name="com.fl.automation.tests.TS003_TC001"/>
+            <class name="com.fl.automation.tests.TS003_TC002"/>
+            <class name="com.fl.automation.tests.TS004_TC001"/>
+            <class name="com.fl.automation.tests.TS004_TC002"/>
+            <class name="com.fl.automation.tests.TS005_TC001"/>
+            <class name="com.fl.automation.tests.TS005_TC002"/>
+            <class name="com.fl.automation.tests.TS006_TC001"/>
+            <class name="com.fl.automation.tests.TS006_TC002"/>
+            <class name="com.fl.automation.tests.TS006_TC003"/>
+            <class name="com.fl.automation.tests.TS007_TC001"/>
+            <class name="com.fl.automation.tests.TS007_TC002"/>
+            <class name="com.fl.automation.tests.TS008_TC001"/>
+            <class name="com.fl.automation.tests.TS008_TC002"/>
+        </classes>
+    </test>
+    
+    <test name="Marketplace Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC024"/>
+            <class name="com.fl.automation.tests.TS002_TC025"/>
+            <class name="com.fl.automation.tests.TS002_TC026"/>
+            <class name="com.fl.automation.tests.TS003_TC027"/>
+            <class name="com.fl.automation.tests.TS004_TC028"/>
+            <class name="com.fl.automation.tests.TS005_TC029"/>
+            <class name="com.fl.automation.tests.TS005_TC030"/>
+            <class name="com.fl.automation.tests.TS006_TC031"/>
+            <class name="com.fl.automation.tests.TS007_TC032"/>
+            <class name="com.fl.automation.tests.TS008_TC033"/>
+            <class name="com.fl.automation.tests.TS009_TC034"/>
+            <class name="com.fl.automation.tests.TS010_TC035"/>
+            <class name="com.fl.automation.tests.TS011_TC036"/>
+            <class name="com.fl.automation.tests.TS012_TC037"/>
+            <class name="com.fl.automation.tests.TS013_TC038"/>
+            <class name="com.fl.automation.tests.TS013_TC039"/>
+            <class name="com.fl.automation.tests.TS014_TC040"/>
+            <class name="com.fl.automation.tests.TS015_TC041"/>
+        </classes>
+    </test>
+</suite>
