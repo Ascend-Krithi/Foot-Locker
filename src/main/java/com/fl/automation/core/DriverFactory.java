@@ -12,17 +12,15 @@ public class DriverFactory {
 
     public static WebDriver getDriver() {
         if (driver.get() == null) {
+            // Automatically match ChromeDriver version to local Chrome
             WebDriverManager.chromedriver().setup();
+
             ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless=new");
-            options.addArguments("--no-sandbox");
-            options.addArguments("--disable-dev-shm-usage");
-            options.addArguments("--window-size=1920,1080");
-            options.addArguments("--disable-gpu");
-            options.addArguments("--disable-extensions");
-            options.addArguments("--disable-popup-blocking");
+            options.addArguments("--incognito");
             options.addArguments("--start-maximized");
-            
+            options.addArguments("--disable-notifications");
+            options.addArguments("--remote-allow-origins=*"); // KB recommended
+
             WebDriver webDriver = new ChromeDriver(options);
             webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
             webDriver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(60));
