@@ -1,34 +1,33 @@
 package com.fl.automation.core;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+
+import java.time.Duration;
 
 public class BaseTest {
 
-    // Keep driver private
-    private ThreadLocal<WebDriver> driver = new ThreadLocal<>();
+protected WebDriver driver;
 
-    // Initialize driver
-    public void setDriver(WebDriver webDriver) {
-        driver.set(webDriver);
-    }
+@BeforeMethod
+public void setup() {
 
-    // Public getter to access driver safely
-    public WebDriver getDriver() {
-        return driver.get();
-    }
+    // Driver must always be created using DriverFactory
+    driver = DriverFactory.createDriver();
 
-    // Quit driver
-    public void quitDriver() {
-        if (driver.get() != null) {
-            driver.get().quit();
-            driver.remove();
-        }
-    }
+    driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(90));
+    driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(30));
 
-    // Example: start driver
-    public void initializeDriver() {
-        WebDriver webDriver = new ChromeDriver();
-        setDriver(webDriver);
+    driver.get("https://www.footlocker.com/");
+}
+
+@AfterMethod(alwaysRun = true)
+public void teardown() {
+
+    if(driver != null){
+        driver.quit();
     }
 }
+
+} 
