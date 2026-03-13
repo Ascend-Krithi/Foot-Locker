@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Test Suite" parallel="tests" thread-count="3">
+    <listeners>
+        <listener class-name="com.fl.automation.listeners.TestListener"/>
+    </listeners>
+    
+    <test name="Store Locator Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_VerifyFindAStorePopup"/>
+            <class name="com.fl.automation.tests.TS001_TC002_VerifyStoreLocatorWindow"/>
+            <class name="com.fl.automation.tests.TS001_TC003_SearchStoresByLocation"/>
+            <class name="com.fl.automation.tests.TS023_TC001_VerifyFindAStoreFlow"/>
+            <class name="com.fl.automation.tests.TS024_TC001_SearchStoresBoston"/>
+            <class name="com.fl.automation.tests.TS025_TC001_VerifySpecificStoreAddress"/>
+            <class name="com.fl.automation.tests.TS026_TC001_SetPreferredStore"/>
+            <class name="com.fl.automation.tests.TS027_TC001_VerifyPreferredStoreConfirmation"/>
+            <class name="com.fl.automation.tests.TS028_TC001_VerifyPreferredStorePersistence"/>
+            <class name="com.fl.automation.tests.TS029_TC001_VerifyFindAStorePopupMessage"/>
+            <class name="com.fl.automation.tests.TS029_TC002_VerifyStoreLocatorComponents"/>
+            <class name="com.fl.automation.tests.TS029_TC003_SearchStoresBostonMA"/>
+            <class name="com.fl.automation.tests.TS029_TC004_VerifyBostonStoreAddress"/>
+            <class name="com.fl.automation.tests.TS029_TC005_SetMyStoreBoston"/>
+            <class name="com.fl.automation.tests.TS029_TC006_VerifyPreferredStoreIndicator"/>
+            <class name="com.fl.automation.tests.TS029_TC007_VerifyPreferredStorePersistsAcrossPages"/>
+        </classes>
+    </test>
+    
+    <test name="Eco Home Hub Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS002_TC001_CustomerRegistration"/>
+            <class name="com.fl.automation.tests.TS002_TC002_LoanApplication"/>
+            <class name="com.fl.automation.tests.TS002_TC003_InstallerSearch"/>
+            <class name="com.fl.automation.tests.TS002_TC004_SendProjectLead"/>
+            <class name="com.fl.automation.tests.TS003_TC001_AdminApproveInstaller"/>
+            <class name="com.fl.automation.tests.TS003_TC002_VetInstallerCertifications"/>
+            <class name="com.fl.automation.tests.TS003_TC003_VerifyApprovedInstallerInMarketplace"/>
+            <class name="com.fl.automation.tests.TS004_TC001_InstallerLogin"/>
+            <class name="com.fl.automation.tests.TS004_TC002_ViewProjectLeads"/>
+            <class name="com.fl.automation.tests.TS005_TC001_VerifyDataEncryptionAtRest"/>
+            <class name="com.fl.automation.tests.TS005_TC002_VerifyDataEncryptionInTransit"/>
+            <class name="com.fl.automation.tests.TS006_TC001_VerifyProductionDeployment"/>
+            <class name="com.fl.automation.tests.TS006_TC002_VerifyMonitoringAndErrorTracking"/>
+            <class name="com.fl.automation.tests.TS007_TC001_TrackLoanApplicationsStarted"/>
+            <class name="com.fl.automation.tests.TS007_TC002_TrackLoanApplicationsCompleted"/>
+            <class name="com.fl.automation.tests.TS007_TC003_TrackLeadsSentToInstallers"/>
+            <class name="com.fl.automation.tests.TS008_TC001_ValidateMissingRequiredFields"/>
+            <class name="com.fl.automation.tests.TS008_TC002_ValidateInvalidFieldValues"/>
+            <class name="com.fl.automation.tests.TS009_TC001_OnboardInstallerWithMinimumCertifications"/>
+            <class name="com.fl.automation.tests.TS009_TC002_OnboardInstallerWithMaximumCertifications"/>
+        </classes>
+    </test>
+    
+    <test name="Marketplace Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS010_TC001_VerifyMarketplaceHomePage"/>
+            <class name="com.fl.automation.tests.TS010_TC002_SearchByKeyword"/>
+            <class name="com.fl.automation.tests.TS010_TC003_SearchByCategory"/>
+            <class name="com.fl.automation.tests.TS011_TC001_ViewProjectDetails"/>
+            <class name="com.fl.automation.tests.TS011_TC002_ContactProjectOwner"/>
+            <class name="com.fl.automation.tests.TS012_TC001_LoginWithValidCredentials"/>
+            <class name="com.fl.automation.tests.TS012_TC002_LoginWithInvalidCredentials"/>
+            <class name="com.fl.automation.tests.TS013_TC001_RegisterNewUser"/>
+            <class name="com.fl.automation.tests.TS014_TC001_VerifyUserDashboard"/>
+            <class name="com.fl.automation.tests.TS015_TC001_ApplyToProject"/>
+            <class name="com.fl.automation.tests.TS016_TC001_EditUserProfile"/>
+            <class name="com.fl.automation.tests.TS017_TC001_LogoutUser"/>
+            <class name="com.fl.automation.tests.TS018_TC001_SubmitProjectReview"/>
+            <class name="com.fl.automation.tests.TS019_TC001_ViewEcoCertificationDetails"/>
+            <class name="com.fl.automation.tests.TS020_TC001_ShareProjectViaEmail"/>
+            <class name="com.fl.automation.tests.TS020_TC002_ShareProjectViaSocialMedia"/>
+            <class name="com.fl.automation.tests.TS021_TC001_SaveProjectToFavorites"/>
+            <class name="com.fl.automation.tests.TS022_TC001_AccessHelpAndSupport"/>
+        </classes>
+    </test>
+    
+    <test name="Platform Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS030_TC001_ManagerLoginAndDashboard"/>
+            <class name="com.fl.automation.tests.TS030_TC002_VerifyDashboardModules"/>
+            <class name="com.fl.automation.tests.TS030_TC003_VerifyDashboardUIUX"/>
+            <class name="com.fl.automation.tests.TS031_TC001_StaffAccessIncidentReportingForm"/>
+            <class name="com.fl.automation.tests.TS031_TC002_VerifyIncidentFormSimplicity"/>
+            <class name="com.fl.automation.tests.TS031_TC003_SubmitIncidentReport"/>
+            <class name="com.fl.automation.tests.TS031_TC004_ValidateIncidentFormRequiredFields"/>
+            <class name="com.fl.automation.tests.TS032_TC001_VerifyBrandConsistencyAcrossScreens"/>
+            <class name="com.fl.automation.tests.TS032_TC002_VerifyInteractiveElementsStyling"/>
+            <class name="com.fl.automation.tests.TS032_TC003_VerifyMessagesAndPopupsBranding"/>
+        </classes>
+    </test>
+</suite>
