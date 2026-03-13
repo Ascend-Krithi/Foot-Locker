@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="FL-Automation-Suite" parallel="false" thread-count="1">
+    <listeners>
+        <listener class-name="com.fl.automation.listeners.TestListener"/>
+    </listeners>
+    <test name="Foot Locker Tests">
+        <packages>
+            <package name="com.fl.automation.tests"/>
+        </packages>
+    </test>
+</suite>
