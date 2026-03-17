@@ -1,6 +1,8 @@
 package com.fl.automation.helpers;
 
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -10,36 +12,48 @@ import java.util.List;
 public class StoreLocatorHelper {
 
     private WebDriver driver;
-    private WebDriverWait wait;
 
     public StoreLocatorHelper(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
 
-    // 🔥 Flexible locators
-    private By locationInput = By.xpath("//input[contains(@placeholder,'location') or contains(@aria-label,'location')]");
-    private By searchButton = By.xpath("//button[contains(.,'Search') or contains(.,'Stores')]");
-    private By storeResults = By.xpath("//div[contains(@class,'store') or contains(@class,'result')]");
-    private By confirmationMessage = By.xpath("//*[contains(text(),'store') and contains(text(),'set')]");
-
-    // ✅ Wait for popup
+    /**
+     * Wait for Store Locator modal + elements to fully load (CI safe)
+     */
     public void waitForStoreLocatorToLoad() {
-        int attempts = 0;
+        int retries = 3;
 
-        while (attempts < 3) {
+        for (int i = 1; i <= retries; i++) {
             try {
-                driver.switchTo().defaultContent();
+                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(25));
 
-                wait.until(ExpectedConditions.visibilityOfElementLocated(locationInput));
-                wait.until(ExpectedConditions.elementToBeClickable(searchButton));
+                // 🔥 Wait for modal/dialog to appear
+                wait.until(ExpectedConditions.visibilityOfElementLocated(
+                        By.cssSelector("div[role='dialog'], .store-locator-modal")
+                ));
 
-                System.out.println("[INFO] Store locator fully loaded.");
+                // 🔥 Handle iframe if present
+                List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
+                if (!iframes.isEmpty()) {
+                    driver.switchTo().frame(iframes.get(0));
+                    System.out.println("[INFO] Switched to iframe");
+                }
+
+                // 🔥 Wait for location input field
+                wait.until(ExpectedConditions.visibilityOfElementLocated(
+                        By.xpath("//input[contains(@placeholder,'location') or contains(@aria-label,'location')]")
+                ));
+
+                // 🔥 Wait for search button
+                wait.until(ExpectedConditions.visibilityOfElementLocated(
+                        By.xpath("//button[contains(text(),'Search') or contains(.,'Store')]")
+                ));
+
+                System.out.println("[INFO] Store locator loaded successfully");
                 return;
 
             } catch (Exception e) {
-                attempts++;
-                System.out.println("[WARN] Retry loading store locator... Attempt: " + attempts);
+                System.out.println("[WARN] Retry loading store locator... Attempt: " + i);
 
                 try {
                     Thread.sleep(3000);
@@ -50,72 +64,27 @@ public class StoreLocatorHelper {
         throw new RuntimeException("Store locator input load failed");
     }
 
-    // ✅ Enter location
-    public void enterLocation(String location) {
-        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locationInput));
-        input.clear();
-        input.sendKeys(location);
-        System.out.println("[INFO] Entered location: " + location);
-    }
-
-    // ✅ Click search
-    public void clickSearchButton() {
-        wait.until(ExpectedConditions.elementToBeClickable(searchButton)).click();
-        System.out.println("[INFO] Clicked search button.");
-    }
-
-    // ✅ Validate results
-    public boolean areStoreResultsDisplayed() {
-        try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(storeResults));
-            return driver.findElements(storeResults).size() > 0;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // ✅ Validate specific store
-    public boolean isSpecificStoreDisplayed(String storeName) {
-        try {
-            return driver.getPageSource().toLowerCase().contains(storeName.toLowerCase());
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // ✅ Click "Set My Store"
-    public void clickSetMyStoreForAddress(String storeName) {
-        try {
-            By setStoreBtn = By.xpath("//*[contains(text(),'" + storeName + "')]/following::button[contains(.,'Set') or contains(.,'Store')][1]");
-            wait.until(ExpectedConditions.elementToBeClickable(setStoreBtn)).click();
-            System.out.println("[INFO] Clicked Set My Store for: " + storeName);
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to click Set My Store for: " + storeName);
-        }
-    }
-
-    // ✅ Confirmation validation
-    public boolean isStoreConfirmationDisplayed() {
-        try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(confirmationMessage));
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // Existing validations
+    /**
+     * Verify location search input is displayed
+     */
     public boolean isLocationSearchInputDisplayed() {
         try {
-            return driver.findElement(locationInput).isDisplayed();
+            return driver.findElement(
+                    By.xpath("//input[contains(@placeholder,'location') or contains(@aria-label,'location')]")
+            ).isDisplayed();
         } catch (Exception e) {
             return false;
         }
     }
 
+    /**
+     * Verify search button is displayed
+     */
     public boolean isSearchButtonDisplayed() {
         try {
-            return driver.findElement(searchButton).isDisplayed();
+            return driver.findElement(
+                    By.xpath("//button[contains(text(),'Search') or contains(.,'Store')]")
+            ).isDisplayed();
         } catch (Exception e) {
             return false;
         }
