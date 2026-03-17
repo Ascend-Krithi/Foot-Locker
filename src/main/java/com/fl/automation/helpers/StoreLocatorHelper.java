@@ -21,7 +21,7 @@ public class StoreLocatorHelper {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
 
-    // 🔥 Broadened locator — covers all known Foot Locker input variants
+    // 🔥 Broadened locator
     private By locationInput = By.xpath(
         "//input[" +
             "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'location') or " +
@@ -30,12 +30,12 @@ public class StoreLocatorHelper {
             "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'postal') or " +
             "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'address') or " +
             "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'state') or " +
-            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'search') or " +
+            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'store') or " +
             "contains(translate(@aria-label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'location') or " +
             "contains(translate(@aria-label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'store') or " +
             "contains(translate(@aria-label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'search') or " +
-            "contains(@id,'store') or contains(@id,'location') or contains(@id,'search') or " +
-            "contains(@name,'store') or contains(@name,'location') or contains(@name,'search')" +
+            "contains(@id,'store') or contains(@id,'location') or " +
+            "contains(@name,'store') or contains(@name,'location')" +
         "]"
     );
 
@@ -44,7 +44,7 @@ public class StoreLocatorHelper {
     private By setMyStoreButton = By.xpath("//button[contains(.,'Set') or contains(.,'My Store')]");
     private By confirmationMessage = By.xpath("//*[contains(text(),'store') and contains(text(),'set')]");
 
-    // ✅ Wait for popup — with diagnostic logging on failure
+    // ✅ Wait for popup — with iframe + Shadow DOM detection
     public void waitForStoreLocatorToLoad() {
         int retries = 3;
 
@@ -52,119 +52,23 @@ public class StoreLocatorHelper {
             try {
                 System.out.println("[INFO] Waiting for store locator modal... Attempt: " + i);
 
-                // Wait for ANY input to be present first
-                wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("input")));
-
-                // Log all inputs found for diagnostics
-                logAllInputsOnPage();
-
-                // Now try the broad locator
-                WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locationInput));
-
-                if (input.isDisplayed()) {
-                    System.out.println("[INFO] Store locator loaded successfully.");
-                    return;
+                // Step 1: Log all iframes on page
+                List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
+                System.out.println("[DEBUG] Total iframes found: " + iframes.size());
+                for (int j = 0; j < iframes.size(); j++) {
+                    WebElement f = iframes.get(j);
+                    System.out.println("[DEBUG] iframe[" + j + "] id='" + f.getAttribute("id") +
+                        "' src='" + f.getAttribute("src") +
+                        "' title='" + f.getAttribute("title") + "'");
                 }
 
-            } catch (Exception e) {
-                System.out.println("[WARN] Retry loading store locator... Attempt: " + i);
-                try { Thread.sleep(2000); } catch (InterruptedException ignored) {}
-            }
-        }
-
-        throw new RuntimeException("Store locator input load failed");
-    }
-
-    // 🛠️ Diagnostic helper — prints ALL inputs on page so you can see exactly what's there
-    private void logAllInputsOnPage() {
-        try {
-            List<WebElement> inputs = driver.findElements(By.tagName("input"));
-            System.out.println("[DEBUG] Total <input> elements found on page: " + inputs.size());
-            for (int i = 0; i < inputs.size(); i++) {
-                WebElement el = inputs.get(i);
-                System.out.println("[DEBUG] Input[" + i + "] " +
-                    "placeholder='" + el.getAttribute("placeholder") + "' " +
-                    "aria-label='" + el.getAttribute("aria-label") + "' " +
-                    "id='" + el.getAttribute("id") + "' " +
-                    "name='" + el.getAttribute("name") + "' " +
-                    "type='" + el.getAttribute("type") + "' " +
-                    "visible=" + el.isDisplayed());
-            }
-        } catch (Exception e) {
-            System.out.println("[WARN] Could not log inputs: " + e.getMessage());
-        }
-    }
-
-    // ✅ Enter location
-    public void enterLocation(String location) {
-        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locationInput));
-        input.clear();
-        input.sendKeys(location);
-        input.sendKeys(Keys.ENTER);
-        System.out.println("[INFO] Entered location: " + location);
-    }
-
-    // ✅ Click search
-    public void clickSearchButton() {
-        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(searchButton));
-        btn.click();
-        System.out.println("[INFO] Clicked search button");
-    }
-
-    // ✅ Validate results
-    public boolean areStoreResultsDisplayed() {
-        try {
-            List<WebElement> results = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(storeResults));
-            return results.size() > 0;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // ✅ Validate specific store
-    public boolean isSpecificStoreDisplayed(String storeText) {
-        try {
-            return driver.findElement(By.xpath("//*[contains(text(),'" + storeText + "')]")).isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // ✅ Click Set My Store
-    public void clickSetMyStoreForAddress(String storeText) {
-        try {
-            WebElement store = driver.findElement(By.xpath("//*[contains(text(),'" + storeText + "')]/ancestor::div"));
-            WebElement btn = store.findElement(By.xpath(".//button[contains(.,'Set')]"));
-            btn.click();
-            System.out.println("[INFO] Clicked Set My Store for: " + storeText);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to click Set My Store for: " + storeText);
-        }
-    }
-
-    // ✅ Confirmation
-    public boolean isStoreConfirmationDisplayed() {
-        try {
-            return wait.until(ExpectedConditions.visibilityOfElementLocated(confirmationMessage)).isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // ✅ Existing validations (your TC002)
-    public boolean isLocationSearchInputDisplayed() {
-        try {
-            return wait.until(ExpectedConditions.visibilityOfElementLocated(locationInput)).isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public boolean isSearchButtonDisplayed() {
-        try {
-            return wait.until(ExpectedConditions.visibilityOfElementLocated(searchButton)).isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
-    }
-}
+                // Step 2: Try switching into each iframe to find the store input
+                boolean foundInIframe = false;
+                for (int j = 0; j < iframes.size(); j++) {
+                    try {
+                        driver.switchTo().frame(iframes.get(j));
+                        List<WebElement> inputs = driver.findElements(By.tagName("input"));
+                        System.out.println("[DEBUG] Inputs inside iframe[" + j + "]: " + inputs.size());
+                        for (WebElement inp : inputs) {
+                            System.out.println("[DEBUG]   -> placeholder='" + inp.getAttribute("placeholder") +
+                                "' id='" + inp.getAttribute("id"
