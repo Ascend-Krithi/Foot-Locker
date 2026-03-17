@@ -16,39 +16,64 @@ public class StoreLocatorHelper {
     private WebDriver driver;
     private WebDriverWait wait;
 
+    private static final String DEFAULT_CITY = "Boston";
+
     public StoreLocatorHelper(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(40));
     }
 
+    // ✅ Locator — matches "Enter address, city or post code"
     private By locationInput = By.xpath(
         "//input[" +
-            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'location') or " +
-            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'city') or " +
-            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'zip') or " +
-            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'postal') or " +
-            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'address') or " +
-            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'state') or " +
-            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'store') or " +
-            "contains(translate(@aria-label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'location') or " +
-            "contains(translate(@aria-label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'store') or " +
-            "contains(translate(@aria-label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'search') or " +
-            "contains(@id,'store') or contains(@id,'location') or " +
-            "contains(@name,'store') or contains(@name,'location')" +
+            "contains(@placeholder,'address') or " +
+            "contains(@placeholder,'city') or " +
+            "contains(@placeholder,'post code') or " +
+            "contains(@placeholder,'zip') or " +
+            "contains(@placeholder,'location') or " +
+            "contains(@aria-label,'address') or " +
+            "contains(@aria-label,'location') or " +
+            "contains(@aria-label,'store') or " +
+            "contains(@id,'store-search') or " +
+            "contains(@id,'location') or " +
+            "contains(@name,'location') or " +
+            "contains(@name,'store')" +
         "]"
     );
 
-    private By searchButton = By.xpath("//button[.//text()[contains(.,'Search')]]");
-    private By storeResults = By.xpath("//div[contains(@class,'store') or contains(@class,'result')]");
-    private By setMyStoreButton = By.xpath("//button[contains(.,'Set') or contains(.,'My Store')]");
-    private By confirmationMessage = By.xpath("//*[contains(text(),'store') and contains(text(),'set')]");
+    private By searchButton = By.xpath(
+        "//button[contains(.,'Search for Stores') or contains(.,'Search Stores') or contains(.,'Search')]"
+    );
 
+    private By storeResults = By.xpath(
+        "//div[contains(@class,'store') or contains(@class,'result')]"
+    );
+
+    private By confirmationMessage = By.xpath(
+        "//*[contains(text(),'store') and contains(text(),'set')]"
+    );
+
+    // ✅ Wait for modal — tries main DOM, then iframes, then Shadow DOM
     public void waitForStoreLocatorToLoad() {
         int retries = 3;
+
         for (int i = 1; i <= retries; i++) {
             try {
                 System.out.println("[INFO] Waiting for store locator modal... Attempt: " + i);
 
+                // Try main DOM first
+                try {
+                    WebElement input = new WebDriverWait(driver, Duration.ofSeconds(15))
+                        .until(ExpectedConditions.visibilityOfElementLocated(locationInput));
+                    if (input.isDisplayed()) {
+                        System.out.println("[INFO] Store locator input found in main DOM.");
+                        return;
+                    }
+                } catch (Exception ignored) {
+                    System.out.println("[DEBUG] Input not found in main DOM, checking iframes...");
+                }
+
+                // Try iframes
                 List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
                 System.out.println("[DEBUG] Total iframes found: " + iframes.size());
                 for (int j = 0; j < iframes.size(); j++) {
@@ -56,12 +81,8 @@ public class StoreLocatorHelper {
                     System.out.println("[DEBUG] iframe[" + j + "] id='" + f.getAttribute("id")
                         + "' src='" + f.getAttribute("src")
                         + "' title='" + f.getAttribute("title") + "'");
-                }
-
-                boolean foundInIframe = false;
-                for (int j = 0; j < iframes.size(); j++) {
                     try {
-                        driver.switchTo().frame(iframes.get(j));
+                        driver.switchTo().frame(f);
                         List<WebElement> inputs = driver.findElements(By.tagName("input"));
                         System.out.println("[DEBUG] Inputs inside iframe[" + j + "]: " + inputs.size());
                         for (WebElement inp : inputs) {
@@ -70,18 +91,15 @@ public class StoreLocatorHelper {
                                 + "' name='" + inp.getAttribute("name")
                                 + "' visible=" + inp.isDisplayed());
                         }
-                        if (!inputs.isEmpty()) {
-                            try {
-                                WebElement input = new WebDriverWait(driver, Duration.ofSeconds(10))
-                                    .until(ExpectedConditions.visibilityOfElementLocated(locationInput));
-                                if (input.isDisplayed()) {
-                                    System.out.println("[INFO] Store locator input found inside iframe[" + j + "]");
-                                    foundInIframe = true;
-                                    return;
-                                }
-                            } catch (Exception inner) {
-                                System.out.println("[DEBUG] locationInput not matched in iframe[" + j + "]");
+                        try {
+                            WebElement input = new WebDriverWait(driver, Duration.ofSeconds(10))
+                                .until(ExpectedConditions.visibilityOfElementLocated(locationInput));
+                            if (input.isDisplayed()) {
+                                System.out.println("[INFO] Store locator input found inside iframe[" + j + "]");
+                                return;
                             }
+                        } catch (Exception inner) {
+                            System.out.println("[DEBUG] locationInput not matched in iframe[" + j + "]");
                         }
                         driver.switchTo().defaultContent();
                     } catch (Exception ex) {
@@ -90,27 +108,26 @@ public class StoreLocatorHelper {
                     }
                 }
 
-                if (!foundInIframe) {
-                    System.out.println("[DEBUG] Trying Shadow DOM piercing via JavaScript...");
-                    JavascriptExecutor js = (JavascriptExecutor) driver;
-                    String script =
-                        "var allInputs = [];" +
-                        "function findInputs(root) {" +
-                        "  root.querySelectorAll('input').forEach(function(el) {" +
-                        "    allInputs.push(el.placeholder + '|' + el.id + '|' + el.name + '|' + el.type);" +
-                        "  });" +
-                        "  root.querySelectorAll('*').forEach(function(el) {" +
-                        "    if (el.shadowRoot) findInputs(el.shadowRoot);" +
-                        "  });" +
-                        "}" +
-                        "findInputs(document);" +
-                        "return allInputs;";
-                    @SuppressWarnings("unchecked")
-                    List<String> shadowInputs = (List<String>) js.executeScript(script);
-                    System.out.println("[DEBUG] Inputs found via Shadow DOM pierce: " + shadowInputs.size());
-                    for (String s : shadowInputs) {
-                        System.out.println("[DEBUG] Shadow input: " + s);
-                    }
+                // Try Shadow DOM
+                System.out.println("[DEBUG] Trying Shadow DOM piercing via JavaScript...");
+                JavascriptExecutor js = (JavascriptExecutor) driver;
+                String script =
+                    "var allInputs = [];" +
+                    "function findInputs(root) {" +
+                    "  root.querySelectorAll('input').forEach(function(el) {" +
+                    "    allInputs.push(el.placeholder + '|' + el.id + '|' + el.name + '|' + el.type);" +
+                    "  });" +
+                    "  root.querySelectorAll('*').forEach(function(el) {" +
+                    "    if (el.shadowRoot) findInputs(el.shadowRoot);" +
+                    "  });" +
+                    "}" +
+                    "findInputs(document);" +
+                    "return allInputs;";
+                @SuppressWarnings("unchecked")
+                List<String> shadowInputs = (List<String>) js.executeScript(script);
+                System.out.println("[DEBUG] Inputs found via Shadow DOM pierce: " + shadowInputs.size());
+                for (String s : shadowInputs) {
+                    System.out.println("[DEBUG] Shadow input: " + s);
                 }
 
             } catch (Exception e) {
@@ -125,37 +142,49 @@ public class StoreLocatorHelper {
         throw new RuntimeException("Store locator input load failed");
     }
 
-    public void enterLocation(String location) {
+    // ✅ Enter city only — post code ignored
+    public void enterLocation(String city) {
         WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locationInput));
         input.clear();
-        input.sendKeys(location);
+        input.sendKeys(city);
+        System.out.println("[INFO] Entered city: " + city);
         input.sendKeys(Keys.ENTER);
-        System.out.println("[INFO] Entered location: " + location);
     }
 
+    // ✅ Enter default city "Boston"
+    public void enterDefaultCity() {
+        enterLocation(DEFAULT_CITY);
+    }
+
+    // ✅ Click Search for Stores
     public void clickSearchButton() {
         WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(searchButton));
         btn.click();
-        System.out.println("[INFO] Clicked search button");
+        System.out.println("[INFO] Clicked Search for Stores button");
     }
 
+    // ✅ Validate results
     public boolean areStoreResultsDisplayed() {
         try {
-            List<WebElement> results = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(storeResults));
+            List<WebElement> results = wait.until(
+                ExpectedConditions.presenceOfAllElementsLocatedBy(storeResults));
             return results.size() > 0;
         } catch (Exception e) {
             return false;
         }
     }
 
+    // ✅ Validate specific store
     public boolean isSpecificStoreDisplayed(String storeText) {
         try {
-            return driver.findElement(By.xpath("//*[contains(text(),'" + storeText + "')]")).isDisplayed();
+            return driver.findElement(
+                By.xpath("//*[contains(text(),'" + storeText + "')]")).isDisplayed();
         } catch (Exception e) {
             return false;
         }
     }
 
+    // ✅ Click Set My Store
     public void clickSetMyStoreForAddress(String storeText) {
         try {
             WebElement store = driver.findElement(
@@ -168,25 +197,31 @@ public class StoreLocatorHelper {
         }
     }
 
+    // ✅ Confirmation
     public boolean isStoreConfirmationDisplayed() {
         try {
-            return wait.until(ExpectedConditions.visibilityOfElementLocated(confirmationMessage)).isDisplayed();
+            return wait.until(
+                ExpectedConditions.visibilityOfElementLocated(confirmationMessage)).isDisplayed();
         } catch (Exception e) {
             return false;
         }
     }
 
+    // ✅ TC002 — checks location input is visible
     public boolean isLocationSearchInputDisplayed() {
         try {
-            return wait.until(ExpectedConditions.visibilityOfElementLocated(locationInput)).isDisplayed();
+            return wait.until(
+                ExpectedConditions.visibilityOfElementLocated(locationInput)).isDisplayed();
         } catch (Exception e) {
             return false;
         }
     }
 
+    // ✅ TC002 — checks Search for Stores button is visible
     public boolean isSearchButtonDisplayed() {
         try {
-            return wait.until(ExpectedConditions.visibilityOfElementLocated(searchButton)).isDisplayed();
+            return wait.until(
+                ExpectedConditions.visibilityOfElementLocated(searchButton)).isDisplayed();
         } catch (Exception e) {
             return false;
         }
