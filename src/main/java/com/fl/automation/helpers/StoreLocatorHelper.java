@@ -16,7 +16,9 @@ public class StoreLocatorHelper {
     private By findStoreButton = By.xpath("//span[contains(text(),'Find a Store')]");
     private By storePopupHeader = By.xpath("//*[contains(text(),'Select my store')]");
 
-    private By locationSearchInput = By.xpath("//input[contains(@placeholder,'Zip') or contains(@aria-label,'location')]");
+    // 🔥 UPDATED (more reliable for CI)
+    private By locationSearchInput = By.xpath("//input[contains(@placeholder,'City') or contains(@placeholder,'Zip') or contains(@aria-label,'location')]");
+
     private By searchButton = By.xpath("//button[@type='submit' or contains(.,'Search')]");
 
     private By storeCards = By.xpath("//*[contains(@class,'location') or contains(@class,'store')]");
@@ -29,7 +31,7 @@ public class StoreLocatorHelper {
     // ====== CONSTRUCTOR ======
     public StoreLocatorHelper(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(40)); // ⬆️ increased for CI
     }
 
     // ====== STEP 1: HANDLE COOKIES ======
@@ -37,6 +39,7 @@ public class StoreLocatorHelper {
         try {
             WebElement accept = wait.until(ExpectedConditions.elementToBeClickable(acceptCookiesBtn));
             accept.click();
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(acceptCookiesBtn));
         } catch (Exception ignored) {
         }
     }
@@ -50,6 +53,18 @@ public class StoreLocatorHelper {
             wait.until(ExpectedConditions.visibilityOfElementLocated(storePopupHeader));
         } catch (Exception e) {
             throw new RuntimeException("Unable to open Store Locator popup", e);
+        }
+    }
+
+    // ====== 🔥 NEW: WAIT FOR FULL LOAD (CRITICAL FIX) ======
+    public void waitForStoreLocatorToLoad() {
+        try {
+            // small buffer for React rendering in CI
+            Thread.sleep(2000);
+
+            wait.until(ExpectedConditions.visibilityOfElementLocated(locationSearchInput));
+        } catch (Exception e) {
+            throw new RuntimeException("Store locator did not load properly", e);
         }
     }
 
