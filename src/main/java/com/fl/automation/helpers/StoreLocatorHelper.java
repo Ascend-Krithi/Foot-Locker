@@ -1,9 +1,6 @@
 package com.fl.automation.helpers;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -15,45 +12,52 @@ public class StoreLocatorHelper {
     private WebDriver driver;
     private WebDriverWait wait;
 
-    private By[] locationSearchInputLocators = {
-        By.cssSelector("input[type='search']"),
-        By.cssSelector("input[name='q']"),
-        By.cssSelector("input[aria-label*='Search']"),
-        By.cssSelector("input[placeholder*='Search' i]")
-    };
+    // ====== LOCATORS ======
+    private By findStoreButton = By.xpath("//span[contains(text(),'Find a Store')]");
+    private By storePopupHeader = By.xpath("//*[contains(text(),'Select my store')]");
 
-    private By[] searchButtonLocators = {
-        By.xpath("//*[self::button or self::a][contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'search for store')]"),
-        By.cssSelector("[aria-label*='Search for store' i]"),
-        By.cssSelector("button[type='submit']")
-    };
+    private By locationSearchInput = By.xpath("//input[contains(@placeholder,'Zip') or contains(@aria-label,'location')]");
+    private By searchButton = By.xpath("//button[@type='submit' or contains(.,'Search')]");
 
-    private By[] storeResultCardsLocators = {
-        By.cssSelector("[data-qa='location']"),
-        By.cssSelector(".c-location-card"),
-        By.cssSelector(".location"),
-        By.cssSelector("[class*='location-card']")
-    };
+    private By storeCards = By.xpath("//*[contains(@class,'location') or contains(@class,'store')]");
+    private By storeAddress = By.xpath(".//address | .//*[contains(@class,'address')]");
 
-    private By[] storeAddressLocators = {
-        By.cssSelector("[data-qa='address']"),
-        By.cssSelector(".c-address"),
-        By.cssSelector("address"),
-        By.cssSelector(".address"),
-        By.cssSelector("[class*='address']")
-    };
+    private By setMyStoreButton = By.xpath(".//button[contains(.,'Set My Store')]");
 
-    private By setMyStoreButtonLocator = By.xpath(".//button[contains(.,'Set My Store')]");
+    private By acceptCookiesBtn = By.id("onetrust-accept-btn-handler");
 
+    // ====== CONSTRUCTOR ======
     public StoreLocatorHelper(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(40));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
 
+    // ====== STEP 1: HANDLE COOKIES ======
+    public void handleCookies() {
+        try {
+            WebElement accept = wait.until(ExpectedConditions.elementToBeClickable(acceptCookiesBtn));
+            accept.click();
+        } catch (Exception ignored) {
+        }
+    }
+
+    // ====== STEP 2: OPEN STORE LOCATOR ======
+    public void openStoreLocator() {
+        try {
+            WebElement findStore = wait.until(ExpectedConditions.elementToBeClickable(findStoreButton));
+            safeClick(findStore);
+
+            wait.until(ExpectedConditions.visibilityOfElementLocated(storePopupHeader));
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to open Store Locator popup", e);
+        }
+    }
+
+    // ====== VALIDATIONS ======
     public boolean isLocationSearchInputDisplayed() {
         try {
-            WebElement locationInput = findElementWithFallback(locationSearchInputLocators);
-            return wait.until(ExpectedConditions.visibilityOf(locationInput)).isDisplayed();
+            WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locationSearchInput));
+            return input.isDisplayed();
         } catch (Exception e) {
             return false;
         }
@@ -61,45 +65,41 @@ public class StoreLocatorHelper {
 
     public boolean isSearchButtonDisplayed() {
         try {
-            WebElement searchButton = findElementWithFallback(searchButtonLocators);
-            return searchButton.isDisplayed();
+            WebElement btn = wait.until(ExpectedConditions.visibilityOfElementLocated(searchButton));
+            return btn.isDisplayed();
         } catch (Exception e) {
             return false;
         }
     }
 
+    // ====== ACTIONS ======
     public void enterLocation(String location) {
-        WebElement locationInput = findElementWithFallback(locationSearchInputLocators);
-        wait.until(ExpectedConditions.visibilityOf(locationInput));
-        locationInput.clear();
-        locationInput.sendKeys(location);
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locationSearchInput));
+        input.clear();
+        input.sendKeys(location);
     }
 
     public void clickSearchButton() {
-        WebElement searchButton = findElementWithFallback(searchButtonLocators);
-        wait.until(ExpectedConditions.elementToBeClickable(searchButton));
-        try {
-            searchButton.click();
-        } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", searchButton);
-        }
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(searchButton));
+        safeClick(btn);
     }
 
+    // ====== RESULTS ======
     public boolean areStoreResultsDisplayed() {
         try {
-            List<WebElement> storeCards = findElementsWithFallback(storeResultCardsLocators);
-            return storeCards.size() > 0;
+            List<WebElement> cards = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(storeCards));
+            return cards.size() > 0;
         } catch (Exception e) {
             return false;
         }
     }
 
-    public boolean isSpecificStoreDisplayed(String address) {
+    public boolean isSpecificStoreDisplayed(String addressText) {
         try {
-            List<WebElement> storeCards = findElementsWithFallback(storeResultCardsLocators);
-            for (WebElement card : storeCards) {
-                WebElement addressElement = findAddressInCard(card);
-                if (addressElement != null && addressElement.getText().contains(address)) {
+            List<WebElement> cards = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(storeCards));
+            for (WebElement card : cards) {
+                WebElement address = findAddressInCard(card);
+                if (address != null && address.getText().contains(addressText)) {
                     return true;
                 }
             }
@@ -109,22 +109,20 @@ public class StoreLocatorHelper {
         }
     }
 
-    public void clickSetMyStoreForAddress(String address) {
-        List<WebElement> storeCards = findElementsWithFallback(storeResultCardsLocators);
-        for (WebElement card : storeCards) {
-            WebElement addressElement = findAddressInCard(card);
-            if (addressElement != null && addressElement.getText().contains(address)) {
-                WebElement setMyStoreButton = card.findElement(setMyStoreButtonLocator);
-                wait.until(ExpectedConditions.elementToBeClickable(setMyStoreButton));
-                try {
-                    setMyStoreButton.click();
-                } catch (Exception e) {
-                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", setMyStoreButton);
-                }
+    public void clickSetMyStoreForAddress(String addressText) {
+        List<WebElement> cards = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(storeCards));
+
+        for (WebElement card : cards) {
+            WebElement address = findAddressInCard(card);
+            if (address != null && address.getText().contains(addressText)) {
+                WebElement button = card.findElement(setMyStoreButton);
+                wait.until(ExpectedConditions.elementToBeClickable(button));
+                safeClick(button);
                 return;
             }
         }
-        throw new RuntimeException("Store with address " + address + " not found");
+
+        throw new RuntimeException("Store with address " + addressText + " not found");
     }
 
     public boolean isStoreConfirmationDisplayed() {
@@ -136,39 +134,20 @@ public class StoreLocatorHelper {
         }
     }
 
-    private WebElement findElementWithFallback(By[] locators) {
-        for (By locator : locators) {
-            try {
-                return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
-            } catch (Exception e) {
-                continue;
-            }
-        }
-        throw new RuntimeException("Element not found with any of the provided locators");
-    }
-
-    private List<WebElement> findElementsWithFallback(By[] locators) {
-        for (By locator : locators) {
-            try {
-                List<WebElement> elements = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
-                if (elements.size() > 0) {
-                    return elements;
-                }
-            } catch (Exception e) {
-                continue;
-            }
-        }
-        throw new RuntimeException("Elements not found with any of the provided locators");
-    }
-
+    // ====== UTIL METHODS ======
     private WebElement findAddressInCard(WebElement card) {
-        for (By locator : storeAddressLocators) {
-            try {
-                return card.findElement(locator);
-            } catch (Exception e) {
-                continue;
-            }
+        try {
+            return card.findElement(storeAddress);
+        } catch (Exception e) {
+            return null;
         }
-        return null;
+    }
+
+    private void safeClick(WebElement element) {
+        try {
+            element.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+        }
     }
 }
