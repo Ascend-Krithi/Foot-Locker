@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
 
 public class TS001_TC002_VerifyStoreLocatorPopup extends BaseTest {
 
-    @Test(description = "TC4201 - TS-001 TC-002: Click Find a Store, verify Location textbox and Search for Stores button")
+    @Test(description = "TC4201 - TS-001 TC-002: Click Find a Store, click Select My Store, verify Location textbox and Search for Stores button")
     public void testVerifyStoreLocatorPopup() {
 
         HomePage homePage = new HomePage(driver);
@@ -17,26 +17,25 @@ public class TS001_TC002_VerifyStoreLocatorPopup extends BaseTest {
         // Step 1: Handle cookies
         homePage.acceptCookiesIfPresent();
 
-        // Step 2: Click "Find a Store" — opens the store locator popup
-        // and waits internally for the popup header to appear
+        // Step 2: Click "Find a Store" → opens dropdown with "Select my store"
         homePage.clickFindStore();
 
-        // Step 3: Wait for search input inside the popup to be ready
-        // NOTE: clickSelectMyStore() was REMOVED — it was clicking a second time
-        // inside the popup which was dismissing it or changing its state,
-        // causing the search input to never appear. The input is already
-        // visible after clickFindStore() succeeds.
+        // Step 3: Click "Select my store" → opens the Find a Store modal
+        // with "Enter address, city or post code" input and "Search for Stores" button
+        homePage.clickSelectMyStore();
+
+        // Step 4: Wait for the search input inside the modal to be ready
         storeLocatorHelper.waitForStoreLocatorToLoad();
 
-        // Step 4: Assertions
+        // Step 5: Assertions — confirmed from live page screenshot
         Assert.assertTrue(
             storeLocatorHelper.isLocationSearchInputDisplayed(),
-            "Location search input should be displayed inside the store locator popup"
+            "Location input (placeholder: 'Enter address, city or post code') should be displayed"
         );
 
         Assert.assertTrue(
             storeLocatorHelper.isSearchButtonDisplayed(),
-            "Search for Stores button should be displayed inside the store locator popup"
+            "'Search for Stores' button should be displayed"
         );
     }
 }
