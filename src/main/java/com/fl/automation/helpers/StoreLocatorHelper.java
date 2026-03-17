@@ -1,6 +1,7 @@
 package com.fl.automation.helpers;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.Keys;
@@ -20,14 +21,30 @@ public class StoreLocatorHelper {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
 
-    // 🔥 Locators (robust)
-    private By locationInput = By.xpath("//input[contains(@placeholder,'location') or contains(@aria-label,'location')]");
+    // 🔥 Broadened locator — covers all known Foot Locker input variants
+    private By locationInput = By.xpath(
+        "//input[" +
+            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'location') or " +
+            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'city') or " +
+            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'zip') or " +
+            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'postal') or " +
+            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'address') or " +
+            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'state') or " +
+            "contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'search') or " +
+            "contains(translate(@aria-label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'location') or " +
+            "contains(translate(@aria-label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'store') or " +
+            "contains(translate(@aria-label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'search') or " +
+            "contains(@id,'store') or contains(@id,'location') or contains(@id,'search') or " +
+            "contains(@name,'store') or contains(@name,'location') or contains(@name,'search')" +
+        "]"
+    );
+
     private By searchButton = By.xpath("//button[.//text()[contains(.,'Search')]]");
     private By storeResults = By.xpath("//div[contains(@class,'store') or contains(@class,'result')]");
     private By setMyStoreButton = By.xpath("//button[contains(.,'Set') or contains(.,'My Store')]");
     private By confirmationMessage = By.xpath("//*[contains(text(),'store') and contains(text(),'set')]");
 
-    // ✅ Wait for popup
+    // ✅ Wait for popup — with diagnostic logging on failure
     public void waitForStoreLocatorToLoad() {
         int retries = 3;
 
@@ -35,7 +52,13 @@ public class StoreLocatorHelper {
             try {
                 System.out.println("[INFO] Waiting for store locator modal... Attempt: " + i);
 
+                // Wait for ANY input to be present first
                 wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("input")));
+
+                // Log all inputs found for diagnostics
+                logAllInputsOnPage();
+
+                // Now try the broad locator
                 WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locationInput));
 
                 if (input.isDisplayed()) {
@@ -50,6 +73,26 @@ public class StoreLocatorHelper {
         }
 
         throw new RuntimeException("Store locator input load failed");
+    }
+
+    // 🛠️ Diagnostic helper — prints ALL inputs on page so you can see exactly what's there
+    private void logAllInputsOnPage() {
+        try {
+            List<WebElement> inputs = driver.findElements(By.tagName("input"));
+            System.out.println("[DEBUG] Total <input> elements found on page: " + inputs.size());
+            for (int i = 0; i < inputs.size(); i++) {
+                WebElement el = inputs.get(i);
+                System.out.println("[DEBUG] Input[" + i + "] " +
+                    "placeholder='" + el.getAttribute("placeholder") + "' " +
+                    "aria-label='" + el.getAttribute("aria-label") + "' " +
+                    "id='" + el.getAttribute("id") + "' " +
+                    "name='" + el.getAttribute("name") + "' " +
+                    "type='" + el.getAttribute("type") + "' " +
+                    "visible=" + el.isDisplayed());
+            }
+        } catch (Exception e) {
+            System.out.println("[WARN] Could not log inputs: " + e.getMessage());
+        }
     }
 
     // ✅ Enter location
