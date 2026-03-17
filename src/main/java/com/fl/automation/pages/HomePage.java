@@ -14,80 +14,69 @@ public class HomePage {
     private WebDriver driver;
     private WebDriverWait wait;
 
-    private By[] findStoreLinkLocators = {
-        By.linkText("Find a Store"),
-        By.cssSelector("header a[href*='stores.footlocker.com']"),
-        By.xpath("//header//a[contains(.,'Find a Store')]")
-    };
+    // ===== LOCATORS =====
+    private By findStoreButton = By.xpath("//span[contains(text(),'Find a Store')]");
+    private By selectMyStoreText = By.xpath("//*[contains(text(),'Select my store')]");
 
-    private By[] selectMyStoreLinkLocators = {
-        By.xpath("//a[contains(.,'Select My Store')]"),
-        By.xpath("//button[contains(.,'Select My Store')]")
-    };
+    private By cookieAcceptButton = By.id("onetrust-accept-btn-handler");
 
-    private By cookieAcceptLocator = By.id("onetrust-accept-btn-handler");
-
+    // ===== CONSTRUCTOR =====
     public HomePage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(40));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
 
+    // ===== HANDLE COOKIE POPUP =====
     public void acceptCookiesIfPresent() {
         try {
-            WebElement cookieButton = wait.until(ExpectedConditions.elementToBeClickable(cookieAcceptLocator));
-            cookieButton.click();
-            Thread.sleep(1000);
+            WebElement cookieBtn = wait.until(
+                    ExpectedConditions.elementToBeClickable(cookieAcceptButton)
+            );
+            cookieBtn.click();
+
+            // wait until popup disappears
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(cookieAcceptButton));
+
         } catch (Exception e) {
-            System.out.println("Cookie consent not present or already accepted");
+            System.out.println("Cookie popup not present or already handled");
         }
     }
 
-    public void clickFindStore() {
-        WebElement findStoreLink = findElementWithFallback(findStoreLinkLocators);
-        wait.until(ExpectedConditions.elementToBeClickable(findStoreLink));
-        try {
-            findStoreLink.click();
-        } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", findStoreLink);
-        }
-    }
-
+    // ===== VALIDATION =====
     public boolean isFindStoreLinkDisplayed() {
         try {
-            WebElement findStoreLink = findElementWithFallback(findStoreLinkLocators);
-            return findStoreLink.isDisplayed();
+            WebElement findStore = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(findStoreButton)
+            );
+            return findStore.isDisplayed();
         } catch (Exception e) {
             return false;
         }
     }
 
-    public boolean isSelectMyStoreLinkDisplayed() {
+    // ===== ACTION =====
+    public void clickFindStore() {
         try {
-            WebElement selectMyStoreLink = findElementWithFallback(selectMyStoreLinkLocators);
-            return wait.until(ExpectedConditions.visibilityOf(selectMyStoreLink)).isDisplayed();
+            WebElement findStore = wait.until(
+                    ExpectedConditions.elementToBeClickable(findStoreButton)
+            );
+
+            safeClick(findStore);
+
+            // wait for popup to open
+            wait.until(ExpectedConditions.visibilityOfElementLocated(selectMyStoreText));
+
         } catch (Exception e) {
-            return false;
+            throw new RuntimeException("Failed to click 'Find a Store' and open popup", e);
         }
     }
 
-    public void clickSelectMyStore() {
-        WebElement selectMyStoreLink = findElementWithFallback(selectMyStoreLinkLocators);
-        wait.until(ExpectedConditions.elementToBeClickable(selectMyStoreLink));
+    // ===== UTIL METHOD =====
+    private void safeClick(WebElement element) {
         try {
-            selectMyStoreLink.click();
+            element.click();
         } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", selectMyStoreLink);
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
         }
-    }
-
-    private WebElement findElementWithFallback(By[] locators) {
-        for (By locator : locators) {
-            try {
-                return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
-            } catch (Exception e) {
-                continue;
-            }
-        }
-        throw new RuntimeException("Element not found with any of the provided locators");
     }
 }
