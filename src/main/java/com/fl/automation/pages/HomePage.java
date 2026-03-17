@@ -34,7 +34,6 @@ public class HomePage {
             );
             cookieBtn.click();
 
-            // wait until popup disappears
             wait.until(ExpectedConditions.invisibilityOfElementLocated(cookieAcceptButton));
 
         } catch (Exception e) {
@@ -54,7 +53,7 @@ public class HomePage {
         }
     }
 
-    // ===== ACTION =====
+    // ===== CLICK FIND STORE =====
     public void clickFindStore() {
         try {
             WebElement findStore = wait.until(
@@ -63,15 +62,41 @@ public class HomePage {
 
             safeClick(findStore);
 
-            // wait for popup to open
+            // wait for popup
             wait.until(ExpectedConditions.visibilityOfElementLocated(selectMyStoreText));
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to click 'Find a Store' and open popup", e);
+            throw new RuntimeException("Failed to click 'Find a Store'", e);
         }
     }
 
-    // ===== UTIL METHOD =====
+    // ===== REQUIRED BY YOUR TESTS (RE-ADDED) =====
+
+    public boolean isSelectMyStoreLinkDisplayed() {
+        try {
+            WebElement element = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(selectMyStoreText)
+            );
+            return element.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void clickSelectMyStore() {
+        try {
+            WebElement element = wait.until(
+                    ExpectedConditions.elementToBeClickable(selectMyStoreText)
+            );
+
+            safeClick(element);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to click 'Select My Store'", e);
+        }
+    }
+
+    // ===== UTIL =====
     private void safeClick(WebElement element) {
         try {
             element.click();
