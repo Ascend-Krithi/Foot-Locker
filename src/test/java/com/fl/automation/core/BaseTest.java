@@ -14,7 +14,13 @@ public class BaseTest {
     public void setup() {
         driver = DriverFactory.createDriver();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-        driver.get("https://www.footlocker.com");
+
+        // FIX: Navigate to a category page instead of homepage.
+        // On the homepage, "Select my store" navigates away instead of
+        // opening the Find a Store modal with the search input.
+        // On a category page, the full modal opens correctly as confirmed
+        // from the live page screenshot.
+        driver.get("https://www.footlocker.com/en/category/shoes/sneakers.html");
     }
 
     @AfterMethod
