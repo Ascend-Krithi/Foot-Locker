@@ -1,8 +1,6 @@
 package com.fl.automation.helpers;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -17,9 +15,8 @@ public class StoreLocatorHelper {
         this.driver = driver;
     }
 
-    /**
-     * Wait for Store Locator modal + elements to fully load (CI safe)
-     */
+    // ================= WAIT =================
+
     public void waitForStoreLocatorToLoad() {
         int retries = 3;
 
@@ -27,46 +24,59 @@ public class StoreLocatorHelper {
             try {
                 WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(25));
 
-                // 🔥 Wait for modal/dialog to appear
                 wait.until(ExpectedConditions.visibilityOfElementLocated(
                         By.cssSelector("div[role='dialog'], .store-locator-modal")
                 ));
 
-                // 🔥 Handle iframe if present
+                // iframe handling
                 List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
                 if (!iframes.isEmpty()) {
                     driver.switchTo().frame(iframes.get(0));
-                    System.out.println("[INFO] Switched to iframe");
                 }
 
-                // 🔥 Wait for location input field
                 wait.until(ExpectedConditions.visibilityOfElementLocated(
                         By.xpath("//input[contains(@placeholder,'location') or contains(@aria-label,'location')]")
                 ));
 
-                // 🔥 Wait for search button
                 wait.until(ExpectedConditions.visibilityOfElementLocated(
                         By.xpath("//button[contains(text(),'Search') or contains(.,'Store')]")
                 ));
 
-                System.out.println("[INFO] Store locator loaded successfully");
                 return;
 
             } catch (Exception e) {
                 System.out.println("[WARN] Retry loading store locator... Attempt: " + i);
-
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException ignored) {}
+                try { Thread.sleep(3000); } catch (Exception ignored) {}
             }
         }
 
         throw new RuntimeException("Store locator input load failed");
     }
 
-    /**
-     * Verify location search input is displayed
-     */
+    // ================= ACTIONS =================
+
+    public void enterLocation(String location) {
+        WebElement input = driver.findElement(
+                By.xpath("//input[contains(@placeholder,'location') or contains(@aria-label,'location')]")
+        );
+        input.clear();
+        input.sendKeys(location);
+    }
+
+    public void clickSearchButton() {
+        driver.findElement(
+                By.xpath("//button[contains(text(),'Search') or contains(.,'Store')]")
+        ).click();
+    }
+
+    public void clickSetMyStoreForAddress(String address) {
+        driver.findElement(
+                By.xpath("//div[contains(text(),'" + address + "')]/ancestor::div[contains(@class,'store')]//button")
+        ).click();
+    }
+
+    // ================= VALIDATIONS =================
+
     public boolean isLocationSearchInputDisplayed() {
         try {
             return driver.findElement(
@@ -77,13 +87,40 @@ public class StoreLocatorHelper {
         }
     }
 
-    /**
-     * Verify search button is displayed
-     */
     public boolean isSearchButtonDisplayed() {
         try {
             return driver.findElement(
                     By.xpath("//button[contains(text(),'Search') or contains(.,'Store')]")
+            ).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean areStoreResultsDisplayed() {
+        try {
+            return driver.findElements(
+                    By.cssSelector(".store-result, .store-list-item")
+            ).size() > 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isSpecificStoreDisplayed(String address) {
+        try {
+            return driver.findElement(
+                    By.xpath("//*[contains(text(),'" + address + "')]")
+            ).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isStoreConfirmationDisplayed() {
+        try {
+            return driver.findElement(
+                    By.xpath("//*[contains(text(),'selected') or contains(text(),'My Store')]")
             ).isDisplayed();
         } catch (Exception e) {
             return false;
