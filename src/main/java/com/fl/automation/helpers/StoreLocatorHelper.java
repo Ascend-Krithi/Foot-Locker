@@ -20,29 +20,27 @@ public class StoreLocatorHelper {
 
     public StoreLocatorHelper(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(40));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
 
-    // ✅ Locator — matches "Enter address, city or post code"
+    // ✅ Scoped inside StoreLocatorDropdown — confirmed from debug logs
     private By locationInput = By.xpath(
-        "//input[" +
-            "contains(@placeholder,'address') or " +
-            "contains(@placeholder,'city') or " +
-            "contains(@placeholder,'post code') or " +
-            "contains(@placeholder,'zip') or " +
-            "contains(@placeholder,'location') or " +
-            "contains(@aria-label,'address') or " +
-            "contains(@aria-label,'location') or " +
-            "contains(@aria-label,'store') or " +
-            "contains(@id,'store-search') or " +
-            "contains(@id,'location') or " +
-            "contains(@name,'location') or " +
-            "contains(@name,'store')" +
-        "]"
+        "//*[contains(@class,'StoreLocatorDropdown')]//input | " +
+        "//*[contains(@class,'store-locator')]//input | " +
+        "//input[contains(@placeholder,'address') or " +
+                "contains(@placeholder,'city') or " +
+                "contains(@placeholder,'post code') or " +
+                "contains(@placeholder,'zip') or " +
+                "contains(@placeholder,'store') or " +
+                "contains(@placeholder,'location')]"
     );
 
+    // ✅ Search button scoped inside dropdown
     private By searchButton = By.xpath(
-        "//button[contains(.,'Search for Stores') or contains(.,'Search Stores') or contains(.,'Search')]"
+        "//*[contains(@class,'StoreLocatorDropdown')]//button[contains(.,'Search')] | " +
+        "//button[contains(.,'Search for Stores')] | " +
+        "//button[contains(.,'Search Stores')] | " +
+        "//button[contains(.,'Search')]"
     );
 
     private By storeResults = By.xpath(
@@ -53,96 +51,37 @@ public class StoreLocatorHelper {
         "//*[contains(text(),'store') and contains(text(),'set')]"
     );
 
-    // ✅ Wait for modal — tries main DOM, then iframes, then Shadow DOM
+    // ✅ Wait for input inside StoreLocatorDropdown — no iframe, no Shadow DOM
     public void waitForStoreLocatorToLoad() {
-        int retries = 3;
+        System.out.println("[INFO] Waiting for store locator input inside StoreLocatorDropdown...");
+        try {
+            // Step 1: Wait for dropdown container
+            new WebDriverWait(driver, Duration.ofSeconds(20))
+                .until(ExpectedConditions.presenceOfElementLocated(
+                    By.xpath("//*[contains(@class,'StoreLocatorDropdown')]")));
+            System.out.println("[INFO] StoreLocatorDropdown container found.");
 
-        for (int i = 1; i <= retries; i++) {
-            try {
-                System.out.println("[INFO] Waiting for store locator modal... Attempt: " + i);
+            // Step 2: Wait for input inside dropdown
+            WebElement input = new WebDriverWait(driver, Duration.ofSeconds(20))
+                .until(ExpectedConditions.visibilityOfElementLocated(locationInput));
 
-                // Try main DOM first
-                try {
-                    WebElement input = new WebDriverWait(driver, Duration.ofSeconds(15))
-                        .until(ExpectedConditions.visibilityOfElementLocated(locationInput));
-                    if (input.isDisplayed()) {
-                        System.out.println("[INFO] Store locator input found in main DOM.");
-                        return;
-                    }
-                } catch (Exception ignored) {
-                    System.out.println("[DEBUG] Input not found in main DOM, checking iframes...");
-                }
+            System.out.println("[INFO] Store locator input is visible. placeholder='"
+                + input.getAttribute("placeholder") + "'");
 
-                // Try iframes
-                List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
-                System.out.println("[DEBUG] Total iframes found: " + iframes.size());
-                for (int j = 0; j < iframes.size(); j++) {
-                    WebElement f = iframes.get(j);
-                    System.out.println("[DEBUG] iframe[" + j + "] id='" + f.getAttribute("id")
-                        + "' src='" + f.getAttribute("src")
-                        + "' title='" + f.getAttribute("title") + "'");
-                    try {
-                        driver.switchTo().frame(f);
-                        List<WebElement> inputs = driver.findElements(By.tagName("input"));
-                        System.out.println("[DEBUG] Inputs inside iframe[" + j + "]: " + inputs.size());
-                        for (WebElement inp : inputs) {
-                            System.out.println("[DEBUG]   -> placeholder='" + inp.getAttribute("placeholder")
-                                + "' id='" + inp.getAttribute("id")
-                                + "' name='" + inp.getAttribute("name")
-                                + "' visible=" + inp.isDisplayed());
-                        }
-                        try {
-                            WebElement input = new WebDriverWait(driver, Duration.ofSeconds(10))
-                                .until(ExpectedConditions.visibilityOfElementLocated(locationInput));
-                            if (input.isDisplayed()) {
-                                System.out.println("[INFO] Store locator input found inside iframe[" + j + "]");
-                                return;
-                            }
-                        } catch (Exception inner) {
-                            System.out.println("[DEBUG] locationInput not matched in iframe[" + j + "]");
-                        }
-                        driver.switchTo().defaultContent();
-                    } catch (Exception ex) {
-                        System.out.println("[DEBUG] iframe[" + j + "] error: " + ex.getMessage());
-                        driver.switchTo().defaultContent();
-                    }
-                }
-
-                // Try Shadow DOM
-                System.out.println("[DEBUG] Trying Shadow DOM piercing via JavaScript...");
-                JavascriptExecutor js = (JavascriptExecutor) driver;
-                String script =
-                    "var allInputs = [];" +
-                    "function findInputs(root) {" +
-                    "  root.querySelectorAll('input').forEach(function(el) {" +
-                    "    allInputs.push(el.placeholder + '|' + el.id + '|' + el.name + '|' + el.type);" +
-                    "  });" +
-                    "  root.querySelectorAll('*').forEach(function(el) {" +
-                    "    if (el.shadowRoot) findInputs(el.shadowRoot);" +
-                    "  });" +
-                    "}" +
-                    "findInputs(document);" +
-                    "return allInputs;";
-                @SuppressWarnings("unchecked")
-                List<String> shadowInputs = (List<String>) js.executeScript(script);
-                System.out.println("[DEBUG] Inputs found via Shadow DOM pierce: " + shadowInputs.size());
-                for (String s : shadowInputs) {
-                    System.out.println("[DEBUG] Shadow input: " + s);
-                }
-
-            } catch (Exception e) {
-                System.out.println("[WARN] Retry loading store locator... Attempt: " + i + " | Error: " + e.getMessage());
-                driver.switchTo().defaultContent();
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ignored) {}
-            }
+        } catch (Exception e) {
+            // Log all inputs for diagnosis
+            System.out.println("[DEBUG] Dumping all inputs on page:");
+            driver.findElements(By.tagName("input")).forEach(el ->
+                System.out.println("[DEBUG] Input: placeholder='" + el.getAttribute("placeholder")
+                    + "' id='" + el.getAttribute("id")
+                    + "' class='" + el.getAttribute("class")
+                    + "' visible=" + el.isDisplayed())
+            );
+            throw new RuntimeException("Store locator input did not appear. " + e.getMessage());
         }
-
-        throw new RuntimeException("Store locator input load failed");
     }
 
-    // ✅ Enter city only — post code ignored
+    // ✅ Enter city only — post code ignored, default is "Boston"
     public void enterLocation(String city) {
         WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locationInput));
         input.clear();
