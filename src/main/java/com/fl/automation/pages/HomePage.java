@@ -1,5 +1,5 @@
 package com.fl.automation.pages;
- 
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.JavascriptExecutor;
@@ -8,42 +8,54 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
- 
+
 import java.time.Duration;
- 
+
 public class HomePage {
- 
+
     private WebDriver driver;
     private WebDriverWait wait;
- 
+
     // ===== LOCATORS =====
- 
-    // FIX #1: Broadened to match <a>, <span>, or <button> wrappers — consistent
-    // with StoreLocatorHelper. If still failing, inspect footlocker.com and replace
-    // with the real attribute (e.g. data-testid, href, aria-label).
+
+    // "Find a Store" button in the header
     private By findStoreButton = By.xpath(
         "//a[contains(@href,'store-locator')] | " +
         "//a[contains(normalize-space(),'Find a Store')] | " +
         "//span[contains(normalize-space(),'Find a Store')] | " +
         "//button[contains(normalize-space(),'Find a Store')]"
     );
- 
-    // FIX #4: selectMyStoreText is kept here only to verify the popup opened.
-    // All interactions inside the popup belong in StoreLocatorHelper — not here.
-    private By selectMyStoreText = By.xpath(
-        "//*[contains(text(),'Select my store') or " +
-        "contains(text(),'Find a Store') or " +
-        "contains(text(),'Store Locator')]"
+
+    // The dropdown that appears after clicking "Find a Store"
+    // Contains "Choose a preferred store to make shopping easier"
+    private By storeDropdown = By.xpath(
+        "//*[contains(text(),'Choose a preferred store') or " +
+        "contains(text(),'Select my store') or " +
+        "contains(text(),'Find a Store')]"
     );
- 
+
+    // CONFIRMED from screenshot: exact text is "Select my store" with arrow →
+    // Targets the clickable link/button inside the dropdown
+    private By selectMyStoreLink = By.xpath(
+        "//a[contains(normalize-space(),'Select my store')] | " +
+        "//button[contains(normalize-space(),'Select my store')] | " +
+        "//*[contains(@class,'store') and contains(normalize-space(),'Select my store')]"
+    );
+
+    // The modal header — confirms modal opened
+    private By findAStoreModalHeader = By.xpath(
+        "//*[normalize-space()='Find a Store'] | " +
+        "//*[contains(@class,'modal') and contains(text(),'Find')]"
+    );
+
     private By cookieAcceptButton = By.id("onetrust-accept-btn-handler");
- 
+
     // ===== CONSTRUCTOR =====
     public HomePage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
- 
+
     // ===== HANDLE COOKIE POPUP =====
     public void acceptCookiesIfPresent() {
         try {
@@ -57,7 +69,28 @@ public class HomePage {
             System.out.println("[INFO] Cookie popup not present or already handled.");
         }
     }
- 
+
+    // ===== CLICK FIND STORE — opens the small dropdown =====
+    public void clickFindStore() {
+        try {
+            WebElement findStore = wait.until(
+                ExpectedConditions.elementToBeClickable(findStoreButton)
+            );
+            safeClick(findStore);
+            System.out.println("[INFO] Clicked 'Find a Store' button.");
+
+            // Wait for dropdown to appear
+            wait.until(ExpectedConditions.visibilityOfElementLocated(storeDropdown));
+            System.out.println("[INFO] Store locator dropdown is visible.");
+        } catch (TimeoutException e) {
+            throw new RuntimeException(
+                "'Find a Store' button not clickable or dropdown did not appear. " +
+                "URL: " + driver.getCurrentUrl() +
+                " | Title: " + driver.getTitle(), e
+            );
+        }
+    }
+
     // ===== VALIDATION =====
     public boolean isFindStoreLinkDisplayed() {
         try {
@@ -70,69 +103,41 @@ public class HomePage {
             return false;
         }
     }
- 
-    // ===== CLICK FIND STORE =====
-    public void clickFindStore() {
-        // FIX #2: Split into two separate try/catch blocks so you know exactly
-        // which step failed — the button click or the popup appearance.
-        WebElement findStore;
-        try {
-            findStore = wait.until(ExpectedConditions.elementToBeClickable(findStoreButton));
-            safeClick(findStore);
-            System.out.println("[INFO] Clicked 'Find a Store' button.");
-        } catch (TimeoutException e) {
-            throw new RuntimeException(
-                "'Find a Store' button not clickable after 30s. " +
-                "URL: " + driver.getCurrentUrl() +
-                " | Title: " + driver.getTitle(), e
-            );
-        }
- 
-        try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(selectMyStoreText));
-            System.out.println("[INFO] Store locator popup opened successfully.");
-        } catch (TimeoutException e) {
-            throw new RuntimeException(
-                "Store locator popup did not appear after clicking 'Find a Store'. " +
-                "URL: " + driver.getCurrentUrl(), e
-            );
-        }
-    }
- 
-    // ===== POPUP VISIBILITY CHECK =====
-    // FIX #4: This method only checks the popup opened — it does NOT drive
-    // interactions inside the popup. Use StoreLocatorHelper for that.
+
+    // ===== CLICK SELECT MY STORE — opens the full Find a Store modal =====
     public boolean isSelectMyStoreLinkDisplayed() {
         try {
             WebElement element = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(selectMyStoreText)
+                ExpectedConditions.visibilityOfElementLocated(selectMyStoreLink)
             );
             return element.isDisplayed();
         } catch (Exception e) {
-            System.out.println("[WARN] 'Select My Store' text not visible: " + e.getMessage());
+            System.out.println("[WARN] 'Select My Store' link not visible: " + e.getMessage());
             return false;
         }
     }
- 
+
     public void clickSelectMyStore() {
         try {
+            // Wait for "Select my store" link in dropdown to be clickable
             WebElement element = wait.until(
-                ExpectedConditions.elementToBeClickable(selectMyStoreText)
+                ExpectedConditions.elementToBeClickable(selectMyStoreLink)
             );
             safeClick(element);
-            System.out.println("[INFO] Clicked 'Select My Store'.");
+            System.out.println("[INFO] Clicked 'Select my store' link.");
+
+            // Wait for the full "Find a Store" modal to appear
+            wait.until(ExpectedConditions.visibilityOfElementLocated(findAStoreModalHeader));
+            System.out.println("[INFO] 'Find a Store' modal opened successfully.");
         } catch (TimeoutException e) {
             throw new RuntimeException(
-                "Failed to click 'Select My Store'. " +
+                "Failed to open 'Find a Store' modal after clicking 'Select my store'. " +
                 "URL: " + driver.getCurrentUrl(), e
             );
         }
     }
- 
+
     // ===== UTIL =====
-    // FIX #3: Catch only ElementClickInterceptedException on the primary click.
-    // This prevents silent fallthrough to JS click when the element is genuinely
-    // missing or stale — those should surface as real errors.
     private void safeClick(WebElement element) {
         try {
             element.click();
