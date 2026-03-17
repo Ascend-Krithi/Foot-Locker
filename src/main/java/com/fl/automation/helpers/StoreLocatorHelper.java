@@ -12,7 +12,7 @@ public class StoreLocatorHelper {
     private WebDriver driver;
     private WebDriverWait wait;
 
-    // ====== LOCATORS — confirmed from live Foot Locker DOM ======
+    // ====== LOCATORS ======
 
     private By findStoreButton = By.xpath(
         "//a[contains(@href,'store-locator')] | " +
@@ -25,19 +25,11 @@ public class StoreLocatorHelper {
         "//*[contains(text(),'Select my store') or contains(text(),'Find a Store') or contains(text(),'Store Locator')]"
     );
 
-    // Using contains() to handle locale variations:
-    // "Enter address, city or post code" (UK/AU)
-    // "Enter address, city or zip code" (US)
-    // "Enter address, city or postal code" (CA)
-    private By locationSearchInput = By.xpath(
-        "//input[contains(@placeholder,'address') or " +
-        "contains(@placeholder,'city') or " +
-        "contains(@placeholder,'post code') or " +
-        "contains(@placeholder,'zip') or " +
-        "contains(@placeholder,'postal')]"
+    // 🔥 UPDATED (more robust)
+    private By locationSearchInput = By.cssSelector(
+        "input[type='search'], input[type='text'], input[aria-label*='Search'], input[placeholder]"
     );
 
-    // CONFIRMED from screenshot: button text = "Search for Stores"
     private By searchButton = By.xpath(
         "//button[normalize-space()='Search for Stores']"
     );
@@ -90,8 +82,10 @@ public class StoreLocatorHelper {
             WebElement findStore = wait.until(ExpectedConditions.elementToBeClickable(findStoreButton));
             safeClick(findStore);
             System.out.println("[INFO] Clicked 'Find a Store' button.");
+
             wait.until(ExpectedConditions.visibilityOfElementLocated(storePopupHeader));
             System.out.println("[INFO] Store locator popup header is visible.");
+
         } catch (TimeoutException e) {
             throw new RuntimeException(
                 "Unable to open Store Locator popup. Current URL: " + driver.getCurrentUrl() +
@@ -100,12 +94,35 @@ public class StoreLocatorHelper {
         }
     }
 
-    // ====== STEP 3: WAIT FOR STORE LOCATOR INPUT TO LOAD ======
+    // ====== STEP 3: WAIT FOR STORE LOCATOR INPUT ======
     public void waitForStoreLocatorToLoad() {
         try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(locationSearchInput));
-            System.out.println("[INFO] Store locator search input is visible and ready.");
-        } catch (TimeoutException e) {
+            driver.switchTo().defaultContent();
+
+            // Try main DOM first
+            if (isElementPresent(locationSearchInput, 5)) {
+                System.out.println("[INFO] Search input found in main DOM.");
+                return;
+            }
+
+            // Try inside iframes
+            List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
+            System.out.println("[INFO] Checking " + iframes.size() + " iframes...");
+
+            for (WebElement frame : iframes) {
+                driver.switchTo().frame(frame);
+
+                if (isElementPresent(locationSearchInput, 5)) {
+                    System.out.println("[INFO] Search input found inside iframe.");
+                    return;
+                }
+
+                driver.switchTo().defaultContent();
+            }
+
+            throw new TimeoutException("Search input not found in DOM or iframes");
+
+        } catch (Exception e) {
             throw new RuntimeException(
                 "Store locator search input did not appear within 40s. " +
                 "Current URL: " + driver.getCurrentUrl(), e
@@ -174,7 +191,6 @@ public class StoreLocatorHelper {
                     return true;
                 }
             }
-            System.out.println("[WARN] Store with address '" + addressText + "' not found in results.");
             return false;
         } catch (Exception e) {
             System.out.println("[WARN] Error checking for specific store: " + e.getMessage());
@@ -186,20 +202,23 @@ public class StoreLocatorHelper {
         List<WebElement> cards = wait.until(
             ExpectedConditions.visibilityOfAllElementsLocatedBy(storeCards)
         );
+
         for (WebElement card : cards) {
             WebElement address = findAddressInCard(card);
             if (address != null && address.getText().contains(addressText)) {
+
                 WebElement button = card.findElement(setMyStoreButton);
                 wait.until(ExpectedConditions.elementToBeClickable(button));
+
                 safeClick(button);
                 System.out.println("[INFO] Clicked 'Set My Store' for address: " + addressText);
                 return;
             }
         }
+
         throw new RuntimeException(
             "Store with address '" + addressText + "' not found. " +
-            "Total cards found: " + cards.size() + ". " +
-            "Current URL: " + driver.getCurrentUrl()
+            "Total cards found: " + cards.size()
         );
     }
 
@@ -227,8 +246,18 @@ public class StoreLocatorHelper {
         try {
             element.click();
         } catch (ElementClickInterceptedException e) {
-            System.out.println("[INFO] Direct click intercepted, falling back to JS click.");
+            System.out.println("[INFO] Click intercepted, using JS click.");
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+        }
+    }
+
+    private boolean isElementPresent(By locator, int seconds) {
+        try {
+            WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(seconds));
+            shortWait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
