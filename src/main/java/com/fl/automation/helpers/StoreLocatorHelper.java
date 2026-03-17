@@ -21,13 +21,12 @@ public class StoreLocatorHelper {
         "//button[contains(normalize-space(),'Find a Store')]"
     );
 
-    private By storePopupHeader = By.xpath(
-        "//*[contains(text(),'Select my store') or contains(text(),'Find a Store') or contains(text(),'Store Locator')]"
+    private By selectMyStoreLink = By.xpath(
+        "//a[contains(text(),'Select my store')] | //button[contains(text(),'Select my store')]"
     );
 
-    // 🔥 UPDATED (more robust)
-    private By locationSearchInput = By.cssSelector(
-        "input[type='search'], input[type='text'], input[aria-label*='Search'], input[placeholder]"
+    private By storePopupHeader = By.xpath(
+        "//*[contains(text(),'Find a Store') or contains(text(),'Store Locator')]"
     );
 
     private By searchButton = By.xpath(
@@ -41,27 +40,23 @@ public class StoreLocatorHelper {
     );
 
     private By storeAddress = By.xpath(
-        ".//address | .//*[contains(@class,'address') or contains(@class,'Address') or " +
-        "@data-testid='store-address']"
+        ".//address | .//*[contains(@class,'address') or @data-testid='store-address']"
     );
 
     private By setMyStoreButton = By.xpath(
-        ".//button[contains(normalize-space(),'Set My Store') or " +
-        "contains(normalize-space(),'Set as My Store') or " +
-        "@data-testid='set-my-store']"
+        ".//button[contains(normalize-space(),'Set My Store') or @data-testid='set-my-store']"
     );
 
     private By acceptCookiesBtn = By.id("onetrust-accept-btn-handler");
 
     private By storeConfirmationBanner = By.xpath(
-        "//*[contains(@class,'my-store') or contains(@class,'MyStore') or " +
-        "contains(text(),'My Store') or @data-testid='my-store-confirmation']"
+        "//*[contains(text(),'My Store') or @data-testid='my-store-confirmation']"
     );
 
     // ====== CONSTRUCTOR ======
     public StoreLocatorHelper(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(40));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
 
     // ====== STEP 1: HANDLE COOKIES ======
@@ -81,88 +76,94 @@ public class StoreLocatorHelper {
         try {
             WebElement findStore = wait.until(ExpectedConditions.elementToBeClickable(findStoreButton));
             safeClick(findStore);
-            System.out.println("[INFO] Clicked 'Find a Store' button.");
+            System.out.println("[INFO] Clicked 'Find a Store'");
+
+            // Click "Select my store" if present
+            try {
+                WebElement selectStore = wait.until(ExpectedConditions.elementToBeClickable(selectMyStoreLink));
+                safeClick(selectStore);
+                System.out.println("[INFO] Clicked 'Select my store'");
+            } catch (Exception e) {
+                System.out.println("[INFO] 'Select my store' not required");
+            }
 
             wait.until(ExpectedConditions.visibilityOfElementLocated(storePopupHeader));
-            System.out.println("[INFO] Store locator popup header is visible.");
+            System.out.println("[INFO] Store locator modal opened");
 
-        } catch (TimeoutException e) {
-            throw new RuntimeException(
-                "Unable to open Store Locator popup. Current URL: " + driver.getCurrentUrl() +
-                " | Page title: " + driver.getTitle(), e
-            );
+        } catch (Exception e) {
+            throw new RuntimeException("❌ Unable to open Store Locator", e);
         }
     }
 
-    // ====== STEP 3: WAIT FOR STORE LOCATOR INPUT ======
-    public void waitForStoreLocatorToLoad() {
+    // ====== 🔥 SHADOW DOM HANDLING ======
+    private WebElement getShadowSearchInput() {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
         try {
-            driver.switchTo().defaultContent();
+            // Try multiple possible shadow hosts
+            List<WebElement> hosts = driver.findElements(By.cssSelector("fl-store-locator, fl-store-selector"));
 
-            // Try main DOM first
-            if (isElementPresent(locationSearchInput, 5)) {
-                System.out.println("[INFO] Search input found in main DOM.");
-                return;
-            }
+            for (WebElement host : hosts) {
+                WebElement shadowRoot = (WebElement) js.executeScript(
+                        "return arguments[0].shadowRoot", host);
 
-            // Try inside iframes
-            List<WebElement> iframes = driver.findElements(By.tagName("iframe"));
-            System.out.println("[INFO] Checking " + iframes.size() + " iframes...");
+                if (shadowRoot != null) {
+                    List<WebElement> inputs = shadowRoot.findElements(By.cssSelector("input"));
 
-            for (WebElement frame : iframes) {
-                driver.switchTo().frame(frame);
-
-                if (isElementPresent(locationSearchInput, 5)) {
-                    System.out.println("[INFO] Search input found inside iframe.");
-                    return;
+                    if (!inputs.isEmpty()) {
+                        System.out.println("[INFO] Found input inside Shadow DOM");
+                        return inputs.get(0);
+                    }
                 }
-
-                driver.switchTo().defaultContent();
             }
 
-            throw new TimeoutException("Search input not found in DOM or iframes");
+            throw new RuntimeException("Shadow input not found");
 
         } catch (Exception e) {
-            throw new RuntimeException(
-                "Store locator search input did not appear within 40s. " +
-                "Current URL: " + driver.getCurrentUrl(), e
-            );
+            throw new RuntimeException("❌ Unable to locate search input inside Shadow DOM", e);
         }
     }
 
-    // ====== VALIDATIONS ======
-    public boolean isLocationSearchInputDisplayed() {
-        try {
-            WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locationSearchInput));
-            return input.isDisplayed();
-        } catch (Exception e) {
-            System.out.println("[WARN] Location search input not displayed: " + e.getMessage());
-            return false;
-        }
-    }
+    private WebElement getShadowSearchButton() {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
 
-    public boolean isSearchButtonDisplayed() {
         try {
-            WebElement btn = wait.until(ExpectedConditions.visibilityOfElementLocated(searchButton));
-            return btn.isDisplayed();
+            List<WebElement> hosts = driver.findElements(By.cssSelector("fl-store-locator, fl-store-selector"));
+
+            for (WebElement host : hosts) {
+                WebElement shadowRoot = (WebElement) js.executeScript(
+                        "return arguments[0].shadowRoot", host);
+
+                if (shadowRoot != null) {
+                    List<WebElement> buttons = shadowRoot.findElements(By.xpath(".//button"));
+
+                    for (WebElement btn : buttons) {
+                        if (btn.getText().contains("Search")) {
+                            return btn;
+                        }
+                    }
+                }
+            }
+
+            throw new RuntimeException("Search button not found");
+
         } catch (Exception e) {
-            System.out.println("[WARN] Search button not displayed: " + e.getMessage());
-            return false;
+            throw new RuntimeException("❌ Unable to locate search button inside Shadow DOM", e);
         }
     }
 
     // ====== ACTIONS ======
     public void enterLocation(String location) {
-        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locationSearchInput));
+        WebElement input = getShadowSearchInput();
         input.clear();
         input.sendKeys(location);
         System.out.println("[INFO] Entered location: " + location);
     }
 
     public void clickSearchButton() {
-        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(searchButton));
+        WebElement btn = getShadowSearchButton();
         safeClick(btn);
-        System.out.println("[INFO] Clicked search button.");
+        System.out.println("[INFO] Clicked search button");
     }
 
     // ====== RESULTS ======
@@ -171,29 +172,9 @@ public class StoreLocatorHelper {
             List<WebElement> cards = wait.until(
                 ExpectedConditions.visibilityOfAllElementsLocatedBy(storeCards)
             );
-            System.out.println("[INFO] Store results count: " + cards.size());
+            System.out.println("[INFO] Store results: " + cards.size());
             return !cards.isEmpty();
         } catch (Exception e) {
-            System.out.println("[WARN] No store result cards found: " + e.getMessage());
-            return false;
-        }
-    }
-
-    public boolean isSpecificStoreDisplayed(String addressText) {
-        try {
-            List<WebElement> cards = wait.until(
-                ExpectedConditions.visibilityOfAllElementsLocatedBy(storeCards)
-            );
-            for (WebElement card : cards) {
-                WebElement address = findAddressInCard(card);
-                if (address != null && address.getText().contains(addressText)) {
-                    System.out.println("[INFO] Found store with address: " + addressText);
-                    return true;
-                }
-            }
-            return false;
-        } catch (Exception e) {
-            System.out.println("[WARN] Error checking for specific store: " + e.getMessage());
             return false;
         }
     }
@@ -205,35 +186,28 @@ public class StoreLocatorHelper {
 
         for (WebElement card : cards) {
             WebElement address = findAddressInCard(card);
+
             if (address != null && address.getText().contains(addressText)) {
-
                 WebElement button = card.findElement(setMyStoreButton);
-                wait.until(ExpectedConditions.elementToBeClickable(button));
-
                 safeClick(button);
-                System.out.println("[INFO] Clicked 'Set My Store' for address: " + addressText);
+                System.out.println("[INFO] Set store for: " + addressText);
                 return;
             }
         }
 
-        throw new RuntimeException(
-            "Store with address '" + addressText + "' not found. " +
-            "Total cards found: " + cards.size()
-        );
+        throw new RuntimeException("❌ Store not found: " + addressText);
     }
 
     public boolean isStoreConfirmationDisplayed() {
         try {
             wait.until(ExpectedConditions.visibilityOfElementLocated(storeConfirmationBanner));
-            System.out.println("[INFO] Store confirmation banner is visible.");
             return true;
         } catch (Exception e) {
-            System.out.println("[WARN] Store confirmation banner not found: " + e.getMessage());
             return false;
         }
     }
 
-    // ====== UTIL METHODS ======
+    // ====== UTIL ======
     private WebElement findAddressInCard(WebElement card) {
         try {
             return card.findElement(storeAddress);
@@ -245,19 +219,8 @@ public class StoreLocatorHelper {
     private void safeClick(WebElement element) {
         try {
             element.click();
-        } catch (ElementClickInterceptedException e) {
-            System.out.println("[INFO] Click intercepted, using JS click.");
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
-        }
-    }
-
-    private boolean isElementPresent(By locator, int seconds) {
-        try {
-            WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(seconds));
-            shortWait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-            return true;
         } catch (Exception e) {
-            return false;
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
         }
     }
 }
