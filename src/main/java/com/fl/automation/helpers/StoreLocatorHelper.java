@@ -25,9 +25,16 @@ public class StoreLocatorHelper {
         "//*[contains(text(),'Select my store') or contains(text(),'Find a Store') or contains(text(),'Store Locator')]"
     );
 
-    // CONFIRMED from screenshot: placeholder="Enter address, city or post code"
+    // Using contains() to handle locale variations:
+    // "Enter address, city or post code" (UK/AU)
+    // "Enter address, city or zip code" (US)
+    // "Enter address, city or postal code" (CA)
     private By locationSearchInput = By.xpath(
-        "//input[@placeholder='Enter address, city or post code']"
+        "//input[contains(@placeholder,'address') or " +
+        "contains(@placeholder,'city') or " +
+        "contains(@placeholder,'post code') or " +
+        "contains(@placeholder,'zip') or " +
+        "contains(@placeholder,'postal')]"
     );
 
     // CONFIRMED from screenshot: button text = "Search for Stores"
