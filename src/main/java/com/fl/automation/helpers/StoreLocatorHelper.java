@@ -1,7 +1,6 @@
 package com.fl.automation.helpers;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -23,24 +22,14 @@ public class StoreLocatorHelper {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
 
-    // ✅ Scoped inside StoreLocatorDropdown — confirmed from debug logs
-    private By locationInput = By.xpath(
-        "//*[contains(@class,'StoreLocatorDropdown')]//input | " +
-        "//*[contains(@class,'store-locator')]//input | " +
-        "//input[contains(@placeholder,'address') or " +
-                "contains(@placeholder,'city') or " +
-                "contains(@placeholder,'post code') or " +
-                "contains(@placeholder,'zip') or " +
-                "contains(@placeholder,'store') or " +
-                "contains(@placeholder,'location')]"
-    );
+    // ✅ CONFIRMED from logs: exact id of the store locator input
+    private By locationInput = By.id("StoreLocator_search_query");
 
-    // ✅ Search button scoped inside dropdown
+    // ✅ Search button
     private By searchButton = By.xpath(
-        "//*[contains(@class,'StoreLocatorDropdown')]//button[contains(.,'Search')] | " +
         "//button[contains(.,'Search for Stores')] | " +
         "//button[contains(.,'Search Stores')] | " +
-        "//button[contains(.,'Search')]"
+        "//button[@type='submit' and contains(.,'Search')]"
     );
 
     private By storeResults = By.xpath(
@@ -51,37 +40,20 @@ public class StoreLocatorHelper {
         "//*[contains(text(),'store') and contains(text(),'set')]"
     );
 
-    // ✅ Wait for input inside StoreLocatorDropdown — no iframe, no Shadow DOM
+    // ✅ Wait for store locator input by exact confirmed id
     public void waitForStoreLocatorToLoad() {
-        System.out.println("[INFO] Waiting for store locator input inside StoreLocatorDropdown...");
+        System.out.println("[INFO] Waiting for store locator input (id=StoreLocator_search_query)...");
         try {
-            // Step 1: Wait for dropdown container
-            new WebDriverWait(driver, Duration.ofSeconds(20))
-                .until(ExpectedConditions.presenceOfElementLocated(
-                    By.xpath("//*[contains(@class,'StoreLocatorDropdown')]")));
-            System.out.println("[INFO] StoreLocatorDropdown container found.");
-
-            // Step 2: Wait for input inside dropdown
             WebElement input = new WebDriverWait(driver, Duration.ofSeconds(20))
                 .until(ExpectedConditions.visibilityOfElementLocated(locationInput));
-
-            System.out.println("[INFO] Store locator input is visible. placeholder='"
+            System.out.println("[INFO] Store locator input found and visible. placeholder='"
                 + input.getAttribute("placeholder") + "'");
-
         } catch (Exception e) {
-            // Log all inputs for diagnosis
-            System.out.println("[DEBUG] Dumping all inputs on page:");
-            driver.findElements(By.tagName("input")).forEach(el ->
-                System.out.println("[DEBUG] Input: placeholder='" + el.getAttribute("placeholder")
-                    + "' id='" + el.getAttribute("id")
-                    + "' class='" + el.getAttribute("class")
-                    + "' visible=" + el.isDisplayed())
-            );
             throw new RuntimeException("Store locator input did not appear. " + e.getMessage());
         }
     }
 
-    // ✅ Enter city only — post code ignored, default is "Boston"
+    // ✅ Enter city only — post code ignored
     public void enterLocation(String city) {
         WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locationInput));
         input.clear();
