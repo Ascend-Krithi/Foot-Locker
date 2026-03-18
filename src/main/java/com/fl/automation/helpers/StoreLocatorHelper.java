@@ -64,7 +64,6 @@ public class StoreLocatorHelper {
 
     // ===================== MODAL LOAD =====================
 
-    // Wait for the store locator input to be ready
     public void waitForStoreLocatorToLoad() {
         System.out.println("[INFO] Waiting for store locator input...");
         try {
@@ -79,7 +78,6 @@ public class StoreLocatorHelper {
 
     // ===================== INPUT & SEARCH =====================
 
-    // Type any location — city, address, zip code
     public void enterLocation(String location) {
         WebElement input = wait.until(
             ExpectedConditions.visibilityOfElementLocated(locationInput));
@@ -89,7 +87,6 @@ public class StoreLocatorHelper {
         try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
     }
 
-    // Click Search for Stores button
     public void clickSearchButton() {
         System.out.println("[INFO] Clicking 'Search for Stores'...");
         try {
@@ -97,14 +94,12 @@ public class StoreLocatorHelper {
                 .until(ExpectedConditions.invisibilityOfElementLocated(
                     By.id("StoreLocatorErrors")));
         } catch (Exception ignored) {}
-
         WebElement btn = wait.until(
             ExpectedConditions.presenceOfElementLocated(searchButton));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
         System.out.println("[INFO] Clicked 'Search for Stores'.");
     }
 
-    // Type location and click search in one step
     public void searchForLocation(String location) {
         enterLocation(location);
         clickSearchButton();
@@ -112,7 +107,6 @@ public class StoreLocatorHelper {
 
     // ===================== RESULTS =====================
 
-    // Wait for store results to load after search
     public void waitForStoreResults() {
         System.out.println("[INFO] Waiting for store results...");
         try {
@@ -124,7 +118,6 @@ public class StoreLocatorHelper {
         }
     }
 
-    // Check if store results are displayed
     public boolean areStoreResultsDisplayed() {
         try {
             List<WebElement> results = new WebDriverWait(driver, Duration.ofSeconds(15))
@@ -136,7 +129,6 @@ public class StoreLocatorHelper {
         }
     }
 
-    // Check if a specific store name or text is displayed in results
     public boolean isStoreDisplayed(String storeText) {
         try {
             WebElement el = new WebDriverWait(driver, Duration.ofSeconds(15))
@@ -150,7 +142,6 @@ public class StoreLocatorHelper {
         }
     }
 
-    // Check if a specific address text is displayed
     public boolean isAddressDisplayed(String addressText) {
         try {
             WebElement el = new WebDriverWait(driver, Duration.ofSeconds(15))
@@ -164,7 +155,6 @@ public class StoreLocatorHelper {
         }
     }
 
-    // Get count of store results returned
     public int getStoreResultsCount() {
         try {
             List<WebElement> results = driver.findElements(storeResultsContainer);
@@ -177,12 +167,12 @@ public class StoreLocatorHelper {
 
     // ===================== SET MY STORE =====================
 
-    // Click Set My Store for a specific store by its name/text
     public void clickSetMyStoreForStore(String storeText) {
         try {
             WebElement storeCard = new WebDriverWait(driver, Duration.ofSeconds(15))
                 .until(ExpectedConditions.presenceOfElementLocated(
-                    By.xpath("//*[contains(text(),'" + storeText + "')]/ancestor::div[contains(@class,'store') or contains(@class,'Store')][1]")));
+                    By.xpath("//*[contains(text(),'" + storeText + "')]/ancestor::div" +
+                        "[contains(@class,'store') or contains(@class,'Store')][1]")));
             WebElement btn = storeCard.findElement(By.xpath(
                 ".//button[contains(.,'Set')] | " +
                 ".//a[contains(.,'Update my store')] | " +
@@ -190,12 +180,11 @@ public class StoreLocatorHelper {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
             System.out.println("[INFO] Clicked Set/Update My Store for: " + storeText);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to click Set My Store for: " + storeText
-                + " | " + e.getMessage());
+            throw new RuntimeException("Failed to click Set My Store for: "
+                + storeText + " | " + e.getMessage());
         }
     }
 
-    // Click Set My Store for the first result in the list
     public void clickSetMyStoreForFirstResult() {
         try {
             WebElement btn = new WebDriverWait(driver, Duration.ofSeconds(15))
@@ -209,7 +198,6 @@ public class StoreLocatorHelper {
 
     // ===================== CONFIRMATION =====================
 
-    // Check if store was set/confirmed successfully
     public boolean isStoreConfirmationDisplayed() {
         try {
             WebElement el = new WebDriverWait(driver, Duration.ofSeconds(15))
@@ -222,7 +210,6 @@ public class StoreLocatorHelper {
         }
     }
 
-    // Check if store name persists in the header/nav after setting
     public boolean isStoreNameInHeader(String storeName) {
         try {
             WebElement el = new WebDriverWait(driver, Duration.ofSeconds(15))
@@ -240,7 +227,6 @@ public class StoreLocatorHelper {
 
     // ===================== VALIDATION HELPERS =====================
 
-    // Check if location input is visible
     public boolean isLocationSearchInputDisplayed() {
         try {
             return wait.until(
@@ -250,7 +236,6 @@ public class StoreLocatorHelper {
         }
     }
 
-    // Check if Search for Stores button is visible
     public boolean isSearchButtonDisplayed() {
         try {
             return wait.until(
@@ -260,7 +245,6 @@ public class StoreLocatorHelper {
         }
     }
 
-    // Get current value of the location input field
     public String getLocationInputValue() {
         try {
             WebElement input = wait.until(
@@ -271,7 +255,6 @@ public class StoreLocatorHelper {
         }
     }
 
-    // Clear the location input
     public void clearLocationInput() {
         try {
             WebElement input = wait.until(
@@ -283,7 +266,6 @@ public class StoreLocatorHelper {
         }
     }
 
-    // Check if store locator error message is displayed
     public boolean isErrorMessageDisplayed() {
         try {
             return driver.findElement(By.id("StoreLocatorErrors")).isDisplayed();
@@ -292,12 +274,79 @@ public class StoreLocatorHelper {
         }
     }
 
-    // Get error message text
     public String getErrorMessageText() {
         try {
             return driver.findElement(By.id("StoreLocatorErrors")).getText();
         } catch (Exception e) {
             return "";
         }
+    }
+
+    // ===================== BACKWARD COMPATIBILITY ALIASES =====================
+    // These ensure AI-generated scripts using any method name variation compile successfully
+
+    /** @deprecated Use isStoreDisplayed(String) */
+    public boolean isSpecificStoreDisplayed(String storeText) {
+        return isStoreDisplayed(storeText);
+    }
+
+    /** @deprecated Use clickSetMyStoreForStore(String) */
+    public void clickSetMyStoreForAddress(String storeText) {
+        clickSetMyStoreForStore(storeText);
+    }
+
+    /** @deprecated Use searchForLocation(String) */
+    public void enterAndSearchLocation(String location) {
+        searchForLocation(location);
+    }
+
+    /** @deprecated Use isStoreDisplayed(String) */
+    public boolean isStoreResultDisplayed(String storeText) {
+        return isStoreDisplayed(storeText);
+    }
+
+    /** @deprecated Use areStoreResultsDisplayed() */
+    public boolean isStoreListDisplayed() {
+        return areStoreResultsDisplayed();
+    }
+
+    /** @deprecated Use isStoreConfirmationDisplayed() */
+    public boolean isStoreSetConfirmationDisplayed() {
+        return isStoreConfirmationDisplayed();
+    }
+
+    /** @deprecated Use clickSetMyStoreForStore(String) */
+    public void setStoreAsPreferred(String storeText) {
+        clickSetMyStoreForStore(storeText);
+    }
+
+    /** @deprecated Use clickSetMyStoreForFirstResult() */
+    public void setFirstStoreAsPreferred() {
+        clickSetMyStoreForFirstResult();
+    }
+
+    /** @deprecated Use isStoreNameInHeader(String) */
+    public boolean isPreferredStoreDisplayedInHeader(String storeName) {
+        return isStoreNameInHeader(storeName);
+    }
+
+    /** @deprecated Use isAddressDisplayed(String) */
+    public boolean isStoreAddressDisplayed(String addressText) {
+        return isAddressDisplayed(addressText);
+    }
+
+    /** @deprecated Use waitForStoreResults() */
+    public void waitForSearchResults() {
+        waitForStoreResults();
+    }
+
+    /** @deprecated Use enterLocation(String) */
+    public void typeLocation(String location) {
+        enterLocation(location);
+    }
+
+    /** @deprecated Use clickSearchButton() */
+    public void submitSearch() {
+        clickSearchButton();
     }
 }
