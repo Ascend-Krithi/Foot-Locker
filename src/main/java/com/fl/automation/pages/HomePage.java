@@ -10,6 +10,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.List;
 
 public class HomePage {
 
@@ -24,18 +25,26 @@ public class HomePage {
     );
 
     private By storeDropdown = By.xpath(
-        "//*[contains(text(),'Choose a preferred store') or " +
-        "contains(text(),'Select my store') or " +
-        "contains(text(),'Find a Store')]"
+        "//*[contains(@class,'StoreLocatorDropdown')]"
     );
 
+    // ✅ Precise — targets the link INSIDE the StoreLocatorDropdown only
     private By selectMyStoreLink = By.xpath(
-        "//a[contains(normalize-space(),'Select my store')] | " +
-        "//button[contains(normalize-space(),'Select my store')] | " +
-        "//*[contains(@class,'store') and contains(normalize-space(),'Select my store')]"
+        "//*[contains(@class,'StoreLocatorDropdown')]//*[contains(normalize-space(),'Select my store')] | " +
+        "//*[contains(@class,'StoreLocatorDropdown')]//a | " +
+        "//*[contains(@class,'StoreLocatorDropdown')]//button"
     );
 
     private By cookieAcceptButton = By.id("onetrust-accept-btn-handler");
+
+    // ✅ After clicking Select my store, the c-modals div should become active
+    private By storeLocatorModal = By.xpath(
+        "//*[contains(@class,'c-modals') and .//*[contains(@class,'StoreLocator')]] | " +
+        "//*[contains(@class,'StoreLocatorModal')] | " +
+        "//*[contains(@class,'store-locator-modal')] | " +
+        "//*[@role='dialog'] | " +
+        "//*[@aria-modal='true']"
+    );
 
     public HomePage(WebDriver driver) {
         this.driver = driver;
@@ -94,61 +103,64 @@ public class HomePage {
 
     public void clickSelectMyStore() {
         try {
-            WebElement element = wait.until(
-                ExpectedConditions.elementToBeClickable(selectMyStoreLink)
+            // ✅ Log everything inside the dropdown before clicking
+            System.out.println("[DEBUG] Logging all elements inside StoreLocatorDropdown...");
+            List<WebElement> dropdownChildren = driver.findElements(
+                By.xpath("//*[contains(@class,'StoreLocatorDropdown')]//*")
             );
-            safeClick(element);
+            for (WebElement el : dropdownChildren) {
+                try {
+                    System.out.println("[DEBUG] Dropdown child: tag=" + el.getTagName()
+                        + " text='" + el.getText().trim().replace("\n", " ") + "'"
+                        + " class='" + el.getAttribute("class") + "'"
+                        + " href='" + el.getAttribute("href") + "'"
+                        + " visible=" + el.isDisplayed());
+                } catch (Exception ignored) {}
+            }
+
+            // ✅ Find and click the exact "Select my store" element inside dropdown
+            WebElement selectMyStore = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//*[contains(@class,'StoreLocatorDropdown')]//*[contains(normalize-space(text()),'Select my store') or contains(normalize-space(text()),'select my store')]")
+            ));
+            System.out.println("[INFO] Found 'Select my store' element: tag=" + selectMyStore.getTagName()
+                + " text='" + selectMyStore.getText() + "'"
+                + " href='" + selectMyStore.getAttribute("href") + "'");
+
+            safeClick(selectMyStore);
             System.out.println("[INFO] Clicked 'Select my store' link.");
 
-            // ✅ Wait for page/modal to load after click
-            Thread.sleep(3000);
+            // ✅ Wait 4s for modal/page to load
+            Thread.sleep(4000);
 
-            // ✅ Log current URL to detect navigation
-            System.out.println("[DEBUG] Current URL after click: " + driver.getCurrentUrl());
+            System.out.println("[DEBUG] URL after click: " + driver.getCurrentUrl());
 
-            // ✅ Log all inputs now visible on page
-            driver.findElements(By.tagName("input")).forEach(el ->
-                System.out.println("[DEBUG] Input after click: placeholder='"
-                    + el.getAttribute("placeholder")
-                    + "' id='" + el.getAttribute("id")
-                    + "' class='" + el.getAttribute("class")
-                    + "' type='" + el.getAttribute("type")
-                    + "' visible=" + el.isDisplayed())
-            );
+            // ✅ Log ALL inputs after click
+            driver.findElements(By.tagName("input")).forEach(el -> {
+                try {
+                    System.out.println("[DEBUG] Input after click: placeholder='"
+                        + el.getAttribute("placeholder")
+                        + "' id='" + el.getAttribute("id")
+                        + "' class='" + el.getAttribute("class")
+                        + "' type='" + el.getAttribute("type")
+                        + "' visible=" + el.isDisplayed());
+                } catch (Exception ignored) {}
+            });
 
-            // ✅ Log all modal/drawer/store-related elements
+            // ✅ Log c-modals content
             JavascriptExecutor js = (JavascriptExecutor) driver;
             String script =
-                "var candidates = [];" +
-                "document.querySelectorAll('*').forEach(function(el) {" +
-                "  var cls = el.className;" +
-                "  if (typeof cls === 'string' && (" +
-                "    cls.toLowerCase().includes('modal') || " +
-                "    cls.toLowerCase().includes('dialog') || " +
-                "    cls.toLowerCase().includes('overlay') || " +
-                "    cls.toLowerCase().includes('drawer') || " +
-                "    cls.toLowerCase().includes('flyout') || " +
-                "    cls.toLowerCase().includes('store') || " +
-                "    cls.toLowerCase().includes('locator') || " +
-                "    cls.toLowerCase().includes('panel') || " +
-                "    cls.toLowerCase().includes('sidebar')" +
-                "  )) {" +
-                "    candidates.push(el.tagName + ' | class=' + cls.substring(0,100));" +
-                "  }" +
-                "});" +
-                "return candidates.slice(0,30);";
-            @SuppressWarnings("unchecked")
-            java.util.List<String> results = (java.util.List<String>) js.executeScript(script);
-            System.out.println("[DEBUG] Page elements after click: " + results.size());
-            for (String r : results) {
-                System.out.println("[DEBUG] Element: " + r);
-            }
+                "var modal = document.querySelector('.c-modals');" +
+                "if (!modal) return 'c-modals not found';" +
+                "return modal.innerHTML.substring(0, 500);";
+            Object modalContent = js.executeScript(script);
+            System.out.println("[DEBUG] c-modals innerHTML (first 500 chars): " + modalContent);
 
             System.out.println("[INFO] 'Select my store' click completed.");
 
         } catch (Exception e) {
             throw new RuntimeException(
-                "Failed after clicking 'Select my store'. URL: " + driver.getCurrentUrl(), e
+                "Failed after clicking 'Select my store'. URL: " + driver.getCurrentUrl()
+                + " | Error: " + e.getMessage(), e
             );
         }
     }
