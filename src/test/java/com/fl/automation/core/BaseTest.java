@@ -14,10 +14,6 @@ public class BaseTest {
     public void setup() {
         driver = DriverFactory.createDriver();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-
-        // ✅ Maximize window to full 1920x1080 for full screen recording
-        driver.manage().window().maximize();
-
         driver.get("https://www.footlocker.com/en/category/shoes/sneakers.html");
     }
 
