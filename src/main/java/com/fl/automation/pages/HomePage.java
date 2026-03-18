@@ -35,11 +35,6 @@ public class HomePage {
         "//*[contains(@class,'store') and contains(normalize-space(),'Select my store')]"
     );
 
-    // ✅ StoreLocatorDropdown input — confirmed from debug logs
-    private By storeLocatorDropdownInput = By.xpath(
-        "//*[contains(@class,'StoreLocatorDropdown')]//input"
-    );
-
     private By cookieAcceptButton = By.id("onetrust-accept-btn-handler");
 
     public HomePage(WebDriver driver) {
@@ -48,81 +43,3 @@ public class HomePage {
     }
 
     public void acceptCookiesIfPresent() {
-        try {
-            WebElement cookieBtn = wait.until(
-                ExpectedConditions.elementToBeClickable(cookieAcceptButton)
-            );
-            cookieBtn.click();
-            wait.until(ExpectedConditions.invisibilityOfElementLocated(cookieAcceptButton));
-            System.out.println("[INFO] Cookie popup accepted.");
-        } catch (Exception e) {
-            System.out.println("[INFO] Cookie popup not present or already handled.");
-        }
-    }
-
-    public void clickFindStore() {
-        try {
-            WebElement findStore = wait.until(
-                ExpectedConditions.elementToBeClickable(findStoreButton)
-            );
-            safeClick(findStore);
-            System.out.println("[INFO] Clicked 'Find a Store' button.");
-            wait.until(ExpectedConditions.visibilityOfElementLocated(storeDropdown));
-            System.out.println("[INFO] Store locator dropdown is visible.");
-        } catch (TimeoutException e) {
-            throw new RuntimeException(
-                "'Find a Store' button not clickable or dropdown did not appear. " +
-                "URL: " + driver.getCurrentUrl(), e
-            );
-        }
-    }
-
-    public boolean isFindStoreLinkDisplayed() {
-        try {
-            return wait.until(
-                ExpectedConditions.visibilityOfElementLocated(findStoreButton)
-            ).isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public boolean isSelectMyStoreLinkDisplayed() {
-        try {
-            return wait.until(
-                ExpectedConditions.visibilityOfElementLocated(selectMyStoreLink)
-            ).isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public void clickSelectMyStore() {
-        try {
-            WebElement element = wait.until(
-                ExpectedConditions.elementToBeClickable(selectMyStoreLink)
-            );
-            safeClick(element);
-            System.out.println("[INFO] Clicked 'Select my store' link.");
-
-            // ✅ Wait for StoreLocatorDropdown input to appear (no modal — it's a dropdown)
-            wait.until(ExpectedConditions.presenceOfElementLocated(storeLocatorDropdownInput));
-            System.out.println("[INFO] 'Find a Store' dropdown expanded successfully.");
-
-        } catch (TimeoutException e) {
-            throw new RuntimeException(
-                "StoreLocatorDropdown did not expand after clicking 'Select my store'. " +
-                "URL: " + driver.getCurrentUrl(), e
-            );
-        }
-    }
-
-    private void safeClick(WebElement element) {
-        try {
-            element.click();
-        } catch (ElementClickInterceptedException e) {
-            System.out.println("[INFO] Click intercepted, falling back to JS click.");
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
-        }
-    }
-}
