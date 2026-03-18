@@ -8,7 +8,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
 
     steps:
       - name: Checkout
@@ -155,7 +155,8 @@ jobs:
             recordings/test-run.mp4 >/dev/null 2>&1 &
           echo $! > ffmpeg.pid
 
-      - name: Run TS001 tests (headed on Xvfb :99)
+      # ✅ FIXED: Removed -Dtest filter so ALL 7 tests in testng.xml run
+      - name: Run All TS001 tests (headed on Xvfb :99)
         env:
           DISPLAY: ":99"
           HEADLESS: "false"
@@ -166,7 +167,6 @@ jobs:
             -Dheadless=false \
             -Dwebdriver.http.factory=jdk-http-client \
             -DchromeBinary="${{ steps.chrome.outputs.chrome-path }}" \
-            -Dtest=TS001_TC001*,TS001_TC002* \
             test
 
       - name: Stop screen recording
