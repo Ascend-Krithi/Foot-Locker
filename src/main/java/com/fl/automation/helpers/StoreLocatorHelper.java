@@ -16,14 +16,13 @@ public class StoreLocatorHelper {
     private WebDriver driver;
     private WebDriverWait wait;
 
-    private static final String DEFAULT_CITY = "Boston";
-
     public StoreLocatorHelper(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
 
-    // ✅ Confirmed exact id from logs
+    // ===================== LOCATORS =====================
+
     private By locationInput = By.id("StoreLocator_search_query");
 
     private By searchButton = By.xpath(
@@ -32,143 +31,216 @@ public class StoreLocatorHelper {
         "//button[@type='submit' and contains(.,'Search')]"
     );
 
-    private By storeResults = By.xpath(
-        "//div[contains(@class,'store') or contains(@class,'result')]"
+    private By storeResultsContainer = By.xpath(
+        "//*[contains(@class,'store-card') or " +
+        "contains(@class,'StoreCard') or " +
+        "contains(@class,'store-details') or " +
+        "contains(@class,'StoreDetails') or " +
+        "contains(@class,'store-result') or " +
+        "contains(@class,'StoreResult')]"
     );
 
-    private By confirmationMessage = By.xpath(
-        "//*[contains(text(),'store') and contains(text(),'set')]"
+    private By setMyStoreButton = By.xpath(
+        "//button[contains(.,'Set my store')] | " +
+        "//button[contains(.,'Set My Store')] | " +
+        "//a[contains(.,'Update my store')] | " +
+        "//button[contains(.,'Update my store')]"
     );
 
-    // ✅ Wait for store locator input
+    private By storeConfirmation = By.xpath(
+        "//*[contains(@class,'preferred-store') or " +
+        "contains(@class,'PreferredStore') or " +
+        "contains(@class,'store-confirmation') or " +
+        "contains(text(),'preferred') or " +
+        "contains(text(),'My Store')]"
+    );
+
+    private By storeNameHeader = By.xpath(
+        "//*[contains(@class,'StoreLocator')]//h1 | " +
+        "//*[contains(@class,'StoreLocator')]//h2 | " +
+        "//*[contains(@class,'store-name')] | " +
+        "//*[contains(@class,'StoreName')]"
+    );
+
+    // ===================== MODAL LOAD =====================
+
+    // Wait for the store locator input to be ready
     public void waitForStoreLocatorToLoad() {
-        System.out.println("[INFO] Waiting for store locator input (id=StoreLocator_search_query)...");
+        System.out.println("[INFO] Waiting for store locator input...");
         try {
             WebElement input = new WebDriverWait(driver, Duration.ofSeconds(20))
                 .until(ExpectedConditions.visibilityOfElementLocated(locationInput));
-            System.out.println("[INFO] Store locator input found. placeholder='"
+            System.out.println("[INFO] Store locator input ready. placeholder='"
                 + input.getAttribute("placeholder") + "'");
         } catch (Exception e) {
             throw new RuntimeException("Store locator input did not appear. " + e.getMessage());
         }
     }
 
-    // ✅ Enter city — wait for autocomplete suggestion and click first result
-    public void enterLocation(String city) {
-        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(locationInput));
+    // ===================== INPUT & SEARCH =====================
+
+    // Type any location — city, address, zip code
+    public void enterLocation(String location) {
+        WebElement input = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(locationInput));
         input.clear();
-        input.sendKeys(city);
-        System.out.println("[INFO] Typed city: " + city);
-
-        // Wait for autocomplete suggestions to load
-        try { Thread.sleep(3000); } catch (InterruptedException ignored) {}
-
-        // Try clicking first autocomplete suggestion
-        List<WebElement> suggestions = driver.findElements(By.xpath(
-            "//*[contains(@class,'pac-item')] | " +
-            "//*[contains(@class,'suggestion')] | " +
-            "//*[contains(@class,'Suggestion')] | " +
-            "//*[contains(@class,'autocomplete')] | " +
-            "//*[@role='option'] | " +
-            "//*[@role='listbox']//*[@role='option'] | " +
-            "//*[contains(@class,'StoreLocator')]//li[contains(@class,'item')]"
-        ));
-
-        System.out.println("[DEBUG] Suggestions found: " + suggestions.size());
-
-        boolean clicked = false;
-        for (WebElement s : suggestions) {
-            try {
-                if (s.isDisplayed() && !s.getText().trim().isEmpty()) {
-                    System.out.println("[INFO] Selecting suggestion: '" + s.getText().trim() + "'");
-                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", s);
-                    clicked = true;
-                    try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
-                    break;
-                }
-            } catch (Exception ignored) {}
-        }
-
-        if (!clicked) {
-            System.out.println("[WARN] No suggestion clicked, pressing ENTER.");
-            input.sendKeys(Keys.ENTER);
-            try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
-        }
-
-        // Wait for error to clear if any
-        try {
-            new WebDriverWait(driver, Duration.ofSeconds(5))
-                .until(ExpectedConditions.invisibilityOfElementLocated(
-                    By.id("StoreLocatorErrors")));
-            System.out.println("[INFO] No error alert present.");
-        } catch (Exception ignored) {
-            System.out.println("[WARN] Error alert may still be present.");
-        }
+        input.sendKeys(location);
+        System.out.println("[INFO] Entered location: " + location);
+        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
     }
 
-    // ✅ Enter default city "Boston"
-    public void enterDefaultCity() {
-        enterLocation(DEFAULT_CITY);
-    }
-
-    // ✅ Click Search — JS click to bypass any overlay
+    // Click Search for Stores button
     public void clickSearchButton() {
+        System.out.println("[INFO] Clicking 'Search for Stores'...");
         try {
             new WebDriverWait(driver, Duration.ofSeconds(5))
                 .until(ExpectedConditions.invisibilityOfElementLocated(
                     By.id("StoreLocatorErrors")));
         } catch (Exception ignored) {}
 
-        WebElement btn = wait.until(ExpectedConditions.presenceOfElementLocated(searchButton));
+        WebElement btn = wait.until(
+            ExpectedConditions.presenceOfElementLocated(searchButton));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
-        System.out.println("[INFO] Clicked Search for Stores button via JS");
+        System.out.println("[INFO] Clicked 'Search for Stores'.");
     }
 
-    // ✅ Validate results
+    // Type location and click search in one step
+    public void searchForLocation(String location) {
+        enterLocation(location);
+        clickSearchButton();
+    }
+
+    // ===================== RESULTS =====================
+
+    // Wait for store results to load after search
+    public void waitForStoreResults() {
+        System.out.println("[INFO] Waiting for store results...");
+        try {
+            new WebDriverWait(driver, Duration.ofSeconds(20))
+                .until(ExpectedConditions.presenceOfElementLocated(storeResultsContainer));
+            System.out.println("[INFO] Store results loaded.");
+        } catch (Exception e) {
+            System.out.println("[WARN] Store results container not found: " + e.getMessage());
+        }
+    }
+
+    // Check if store results are displayed
     public boolean areStoreResultsDisplayed() {
         try {
-            List<WebElement> results = wait.until(
-                ExpectedConditions.presenceOfAllElementsLocatedBy(storeResults));
+            List<WebElement> results = new WebDriverWait(driver, Duration.ofSeconds(15))
+                .until(ExpectedConditions.presenceOfAllElementsLocatedBy(storeResultsContainer));
+            System.out.println("[INFO] Store results count: " + results.size());
             return results.size() > 0;
         } catch (Exception e) {
             return false;
         }
     }
 
-    // ✅ Validate specific store
-    public boolean isSpecificStoreDisplayed(String storeText) {
+    // Check if a specific store name or text is displayed in results
+    public boolean isStoreDisplayed(String storeText) {
         try {
-            return driver.findElement(
-                By.xpath("//*[contains(text(),'" + storeText + "')]")).isDisplayed();
+            WebElement el = new WebDriverWait(driver, Duration.ofSeconds(15))
+                .until(ExpectedConditions.visibilityOfElementLocated(
+                    By.xpath("//*[contains(text(),'" + storeText + "')]")));
+            System.out.println("[INFO] Store found: " + storeText);
+            return el.isDisplayed();
         } catch (Exception e) {
+            System.out.println("[WARN] Store not found: " + storeText);
             return false;
         }
     }
 
-    // ✅ Click Set My Store
-    public void clickSetMyStoreForAddress(String storeText) {
+    // Check if a specific address text is displayed
+    public boolean isAddressDisplayed(String addressText) {
         try {
-            WebElement store = driver.findElement(
-                By.xpath("//*[contains(text(),'" + storeText + "')]/ancestor::div"));
-            WebElement btn = store.findElement(By.xpath(".//button[contains(.,'Set')]"));
-            btn.click();
-            System.out.println("[INFO] Clicked Set My Store for: " + storeText);
+            WebElement el = new WebDriverWait(driver, Duration.ofSeconds(15))
+                .until(ExpectedConditions.visibilityOfElementLocated(
+                    By.xpath("//*[contains(text(),'" + addressText + "')]")));
+            System.out.println("[INFO] Address found: " + addressText);
+            return el.isDisplayed();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to click Set My Store for: " + storeText);
+            System.out.println("[WARN] Address not found: " + addressText);
+            return false;
         }
     }
 
-    // ✅ Confirmation
+    // Get count of store results returned
+    public int getStoreResultsCount() {
+        try {
+            List<WebElement> results = driver.findElements(storeResultsContainer);
+            System.out.println("[INFO] Store results count: " + results.size());
+            return results.size();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    // ===================== SET MY STORE =====================
+
+    // Click Set My Store for a specific store by its name/text
+    public void clickSetMyStoreForStore(String storeText) {
+        try {
+            WebElement storeCard = new WebDriverWait(driver, Duration.ofSeconds(15))
+                .until(ExpectedConditions.presenceOfElementLocated(
+                    By.xpath("//*[contains(text(),'" + storeText + "')]/ancestor::div[contains(@class,'store') or contains(@class,'Store')][1]")));
+            WebElement btn = storeCard.findElement(By.xpath(
+                ".//button[contains(.,'Set')] | " +
+                ".//a[contains(.,'Update my store')] | " +
+                ".//button[contains(.,'Update')]"));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
+            System.out.println("[INFO] Clicked Set/Update My Store for: " + storeText);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to click Set My Store for: " + storeText
+                + " | " + e.getMessage());
+        }
+    }
+
+    // Click Set My Store for the first result in the list
+    public void clickSetMyStoreForFirstResult() {
+        try {
+            WebElement btn = new WebDriverWait(driver, Duration.ofSeconds(15))
+                .until(ExpectedConditions.elementToBeClickable(setMyStoreButton));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
+            System.out.println("[INFO] Clicked Set My Store for first result.");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to click Set My Store: " + e.getMessage());
+        }
+    }
+
+    // ===================== CONFIRMATION =====================
+
+    // Check if store was set/confirmed successfully
     public boolean isStoreConfirmationDisplayed() {
         try {
-            return wait.until(
-                ExpectedConditions.visibilityOfElementLocated(confirmationMessage)).isDisplayed();
+            WebElement el = new WebDriverWait(driver, Duration.ofSeconds(15))
+                .until(ExpectedConditions.visibilityOfElementLocated(storeConfirmation));
+            System.out.println("[INFO] Store confirmation displayed: " + el.getText());
+            return el.isDisplayed();
         } catch (Exception e) {
+            System.out.println("[WARN] Store confirmation not found.");
             return false;
         }
     }
 
-    // ✅ TC002 — checks location input is visible
+    // Check if store name persists in the header/nav after setting
+    public boolean isStoreNameInHeader(String storeName) {
+        try {
+            WebElement el = new WebDriverWait(driver, Duration.ofSeconds(15))
+                .until(ExpectedConditions.visibilityOfElementLocated(
+                    By.xpath("//*[contains(@class,'header') or contains(@class,'Header') or " +
+                             "contains(@class,'nav') or contains(@class,'ribbon')]" +
+                             "//*[contains(text(),'" + storeName + "')]")));
+            System.out.println("[INFO] Store name found in header: " + storeName);
+            return el.isDisplayed();
+        } catch (Exception e) {
+            System.out.println("[WARN] Store name not found in header: " + storeName);
+            return false;
+        }
+    }
+
+    // ===================== VALIDATION HELPERS =====================
+
+    // Check if location input is visible
     public boolean isLocationSearchInputDisplayed() {
         try {
             return wait.until(
@@ -178,13 +250,54 @@ public class StoreLocatorHelper {
         }
     }
 
-    // ✅ TC002 — checks Search for Stores button is visible
+    // Check if Search for Stores button is visible
     public boolean isSearchButtonDisplayed() {
         try {
             return wait.until(
                 ExpectedConditions.visibilityOfElementLocated(searchButton)).isDisplayed();
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    // Get current value of the location input field
+    public String getLocationInputValue() {
+        try {
+            WebElement input = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(locationInput));
+            return input.getAttribute("value");
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    // Clear the location input
+    public void clearLocationInput() {
+        try {
+            WebElement input = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(locationInput));
+            input.clear();
+            System.out.println("[INFO] Location input cleared.");
+        } catch (Exception e) {
+            System.out.println("[WARN] Could not clear location input.");
+        }
+    }
+
+    // Check if store locator error message is displayed
+    public boolean isErrorMessageDisplayed() {
+        try {
+            return driver.findElement(By.id("StoreLocatorErrors")).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // Get error message text
+    public String getErrorMessageText() {
+        try {
+            return driver.findElement(By.id("StoreLocatorErrors")).getText();
+        } catch (Exception e) {
+            return "";
         }
     }
 }
