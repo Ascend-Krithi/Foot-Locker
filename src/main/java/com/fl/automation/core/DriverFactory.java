@@ -8,6 +8,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 
 import java.util.Arrays;
+import java.util.Map;
 
 public class DriverFactory {
 
@@ -64,21 +65,18 @@ public class DriverFactory {
                 );
                 chromeOptions.setExperimentalOption("useAutomationExtension", false);
 
-                // ── 5. Let WebDriverManager match chromedriver to the binary ──
-                if (chromeBinary != null && !chromeBinary.isEmpty()) {
-                    WebDriverManager.chromedriver()
-                        .browserPath(chromeBinary)
-                        .setup();
-                } else {
-                    WebDriverManager.chromedriver().setup();
-                }
+                // ── 5. Setup chromedriver matching Chrome 124 ──
+                // browserVersion() is the correct WDM 5.x API (not browserPath())
+                WebDriverManager.chromedriver()
+                    .browserVersion("124")
+                    .setup();
 
                 driver = new ChromeDriver(chromeOptions);
 
                 // ── 6. Remove webdriver flag via JS (extra stealth) ──
                 ((ChromeDriver) driver).executeCdpCommand(
                     "Page.addScriptToEvaluateOnNewDocument",
-                    java.util.Map.of(
+                    Map.of(
                         "source",
                         "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
                     )
