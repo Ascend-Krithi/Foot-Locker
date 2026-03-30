@@ -1,8 +1,16 @@
 on:
   push:
     branches: [ "main", "feature/**", "Feature-*" ]
+    paths:
+      - 'src/test/java/**'
+      - 'src/test/resources/**'
+      - '.github/workflows/**'
+      - 'pom.xml'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'src/test/java/**'
+      - 'src/test/resources/**'
   workflow_dispatch:
 
 jobs:
@@ -155,18 +163,17 @@ jobs:
             recordings/test-run.mp4 >/dev/null 2>&1 &
           echo $! > ffmpeg.pid
 
-      - name: Run TS001 tests (headed on Xvfb :99)
+      - name: Run all TS001 tests (headed on Xvfb :99)
         env:
           DISPLAY: ":99"
           HEADLESS: "false"
           CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
         run: |
           unset CHROMEWEBDRIVER || true
-          mvn -X -B -fae \
+          mvn -B -fae \
             -Dheadless=false \
             -Dwebdriver.http.factory=jdk-http-client \
             -DchromeBinary="${{ steps.chrome.outputs.chrome-path }}" \
-            -Dtest=TS001_TC001*,TS001_TC002* \
             test
 
       - name: Stop screen recording
