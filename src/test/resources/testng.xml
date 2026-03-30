@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Suite" parallel="false">
+    <test name="Store Locator Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_LaunchHomepageVerifyFindStore"/>
+            <class name="com.fl.automation.tests.TS001_TC002_VerifyStoreLocatorPopup"/>
+            <class name="com.fl.automation.tests.TS001_TC003_SearchForStores"/>
+            <class name="com.fl.automation.tests.TS001_TC004_VerifySpecificStore"/>
+            <class name="com.fl.automation.tests.TS001_TC005_SetPreferredStore"/>
+            <class name="com.fl.automation.tests.TS001_TC006_VerifyStoreConfirmation"/>
+            <class name="com.fl.automation.tests.TS001_TC007_VerifyStorePersistence"/>
+        </classes>
+    </test>
+</suite>
