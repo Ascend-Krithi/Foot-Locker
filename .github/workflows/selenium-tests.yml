@@ -141,10 +141,10 @@ jobs:
             sudo rm -f "$(command -v chromedriver)"
           fi
 
-      - name: Install Xvfb & FFmpeg
+      - name: Install Xvfb & FFmpeg & ImageMagick
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb ffmpeg
+          sudo apt-get install -y xvfb ffmpeg scrot imagemagick
 
       - name: Start Xvfb
         env:
@@ -178,6 +178,15 @@ jobs:
             -DchromeBinary="${{ steps.chrome.outputs.chrome-path }}" \
             test
 
+      - name: Capture debug screenshot of current screen
+        if: always()
+        env:
+          DISPLAY: ":99"
+        run: |
+          mkdir -p debug-screenshots
+          scrot debug-screenshots/final-screen.png -d 1 || true
+          echo "Screenshot captured"
+
       - name: Stop screen recording
         if: always()
         run: |
@@ -194,13 +203,14 @@ jobs:
             fi
           fi
 
-      - name: Upload Artifacts (Video + Reports)
+      - name: Upload Artifacts (Video + Reports + Debug Screenshots)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: run-artifacts
           path: |
             recordings/test-run.mp4
+            debug-screenshots/**
             **/target/surefire-reports/**
             **/test-output/**
             **/ExtentReport.html
