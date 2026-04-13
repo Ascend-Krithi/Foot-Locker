@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Foot Locker Automation Suite">
+    <listeners>
+        <listener class-name="com.fl.automation.utils.TestListener"/>
+    </listeners>
+    <test name="All Tests">
+        <classes>
+            <class name="com.fl.automation.tests.TS001_TC001_LaunchAndNavigateToAllPhones"/>
+            <class name="com.fl.automation.tests.TS001_TC002_VerifyAtLeastOneDeviceListed"/>
+            <class name="com.fl.automation.tests.TS001_TC003_VerifyUserNotLoggedIn"/>
+            <class name="com.fl.automation.tests.TS002_TC001_SelectSamsungGalaxyA57"/>
+            <class name="com.fl.automation.tests.TS002_TC002_AttemptSelectNonexistentDevice"/>
+            <class name="com.fl.automation.tests.TS003_TC001_VerifyDefaultSelections"/>
+            <class name="com.fl.automation.tests.TS003_TC002_VerifySelectorsVisibleAndEnabled"/>
+            <class name="com.fl.automation.tests.TS003_TC003_ChangeConfigurationOptions"/>
+            <class name="com.fl.automation.tests.TS004_TC001_ClickNextButtonAfterConfiguration"/>
+            <class name="com.fl.automation.tests.TS004_TC002_VerifyNextButtonState"/>
+            <class name="com.fl.automation.tests.TS005_TC001_VerifyLoginPopupForNonLoggedInUser"/>
+            <class name="com.fl.automation.tests.TS005_TC002_ClickLoginWithHubId"/>
+            <class name="com.fl.automation.tests.TS005_TC003_ClickSignUpLink"/>
+            <class name="com.fl.automation.tests.TS005_TC004_VerifyNoPopupForLoggedInUser"/>
+            <class name="com.fl.automation.tests.TS006_TC001_AttemptNextWithoutStorageSelection"/>
+            <class name="com.fl.automation.tests.TS006_TC002_VerifyErrorMessageForIncompleteConfiguration"/>
+        </classes>
+    </test>
+</suite>
