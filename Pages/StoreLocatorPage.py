@@ -77,3 +77,40 @@ class StoreLocatorPage:
             return True
         except Exception:
             return False
+
+    # --- Appended for SCRUM-15408 TS-SL-012 TC-001 ---
+    def simulate_api_failure(self):
+        """
+        Simulates store locator API being unavailable.
+        This can be done by intercepting network calls or by mocking API failure.
+        Implementation depends on test environment; placeholder for actual simulation.
+        """
+        pass
+
+    def search_store(self, location):
+        """
+        Attempts to perform a store search with the given location.
+        """
+        location_textbox = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.ID, "store-search-location"))
+        )
+        location_textbox.clear()
+        location_textbox.send_keys(location)
+
+        search_button = self.driver.find_element(By.XPATH, "//button[contains(text(), 'Search for Stores')]")
+        search_button.click()
+
+    def verify_error_message_displayed(self):
+        """
+        Verifies that a user-friendly error message is displayed and no results are shown.
+        """
+        try:
+            error_message = WebDriverWait(self.driver, 10).until(
+                EC.visibility_of_element_located((By.XPATH, "//div[contains(@class, 'store-locator-error')]")
+            )
+            assert error_message.is_displayed(), "Error message is not displayed"
+        except Exception as e:
+            raise AssertionError("User-friendly error message was not displayed: {}".format(e))
+
+        results = self.driver.find_elements(By.XPATH, "//div[contains(@class, 'store-result')]")
+        assert len(results) == 0, "Store results are displayed when API is unavailable"
